@@ -112,7 +112,7 @@
 
       <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
         <span>Horizon Universal Sync</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v13.0</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v14.0</span>
       </div>
     </aside>
 
@@ -200,9 +200,9 @@
 
           <div class="flex items-center space-x-3">
             <div id="adminTeamFilterContainer" class="hidden flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700">
-              <span class="text-xs text-orange-400 font-semibold uppercase">Team Filter:</span>
+              <span class="text-xs text-orange-400 font-semibold uppercase">Calendar View Filter:</span>
               <select id="adminTeamFilter" onchange="renderCalendar()" class="bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none">
-                <option value="ALL">All Teams (Color Coded)</option>
+                <option value="ALL">All Teams (Combined View)</option>
                 <option value="sup_1">Zuhair Alsaffar's Team</option>
                 <option value="sup_2">Jaafar Kadhem's Team</option>
                 <option value="sup_3">Husain Yusuf's Team</option>
@@ -359,6 +359,7 @@
                 <tr>
                   <th class="p-3">Tech ID</th>
                   <th class="p-3">Name</th>
+                  <th class="p-3">Supervisor</th>
                   <th class="p-3">Jan</th><th class="p-3">Feb</th><th class="p-3">Mar</th><th class="p-3">Apr</th>
                   <th class="p-3">May</th><th class="p-3">Jun</th><th class="p-3">Jul</th><th class="p-3">Aug</th>
                   <th class="p-3">Sep</th><th class="p-3">Oct</th><th class="p-3">Nov</th><th class="p-3">Dec</th>
@@ -637,7 +638,7 @@
     };
 
     let TECHNICIANS_MASTER = [
-      // ZUHAIR ALSAFFAR'S TEAM (sup_1)
+      // ZUHAIR ALSAFFAR'S TEAM (sup_1) - 16 TECHNICIANS
       { id: '30908', name: 'ABDULLAH SHAMSUL HOQUE', cpr: '940512345', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '30964', name: 'ALAMIN MD SOLEMAN DALI', cpr: '910898765', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '27127', name: 'ANTONIO A CAMACLANG JR', cpr: '881122334', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
@@ -655,7 +656,7 @@
       { id: '30871', name: 'UMAR RIZWAN', cpr: '950889900', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '30952', name: 'RAYHANUL HOQUE', cpr: '960990011', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
 
-      // HUSAIN YUSUF'S TEAM (sup_3)
+      // HUSAIN YUSUF'S TEAM (sup_3) - 16 TECHNICIANS
       { id: '31123', name: 'ABID GUL', cpr: '930112233', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '30966', name: 'AHMED GAMAL ABDELAZIZ GHAZY', cpr: '940223344', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '31042', name: 'ALI JAAFAR SALEH', cpr: '950334455', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
@@ -673,7 +674,7 @@
       { id: '29875', name: 'SHAMSUL ALAM JOYNAL ABEDIN', cpr: '971667788', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '31021', name: 'MOHAMMED HASAN SALEH AHMED', cpr: '981778899', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
 
-      // JAAFAR KADHEM'S TEAM (sup_2)
+      // JAAFAR KADHEM'S TEAM (sup_2) - 12 TECHNICIANS
       { id: '27021', name: 'ALI SAEED MAHDI HABIB ALI ALAKER', cpr: '910334455', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '31098', name: 'EDWARD EDINGTON DAVID', cpr: '920445566', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '31023', name: 'HUSAIN HAMEED YUSUF MOHAMED ALMUGHANI', cpr: '930556677', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
@@ -687,7 +688,7 @@
       { id: '30926', name: 'SHAMROZ ZAHID', cpr: '911445566', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '30819', name: 'WAJAHAT MALIK MAHMOUD', cpr: '921556677', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
 
-      // SAYED MOHAMMED SAEED'S TEAM (sup_4)
+      // SAYED MOHAMMED SAEED'S TEAM (sup_4) - 14 TECHNICIANS
       { id: '31130', name: 'ABDUL BASIT', cpr: '920445566', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '30915', name: 'KABEER VARAMANGALATH', cpr: '930556677', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '31128', name: 'MAHMOUD GAMAL AHMED', cpr: '940667788', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
@@ -738,13 +739,11 @@
       }
     })();
 
-    // SCOPE CONTROL: Admin sees ALL technicians, Supervisor sees ONLY HIS TEAM
+    // SCOPE CONTROL FOR MODULES: Admin sees ALL technicians unconditionally across views
     function getScopedTechnicians() {
       if (!currentUser) return [];
       if (currentUser.role === 'admin') {
-        const filterVal = document.getElementById('adminTeamFilter')?.value || 'ALL';
-        if (filterVal === 'ALL') return TECHNICIANS_MASTER;
-        return TECHNICIANS_MASTER.filter(t => t.supId === filterVal);
+        return TECHNICIANS_MASTER;
       }
       return TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
     }
@@ -978,13 +977,20 @@
       const grid = document.getElementById('calendarGrid');
       grid.innerHTML = '';
 
-      const techList = getScopedTechnicians();
+      // CALENDAR SPECIFIC FILTER (DOES NOT TOUCH OTHER MODULES)
+      let calendarTechs = getScopedTechnicians();
+      if (currentUser.role === 'admin') {
+        const calFilterVal = document.getElementById('adminTeamFilter')?.value || 'ALL';
+        if (calFilterVal !== 'ALL') {
+          calendarTechs = calendarTechs.filter(t => t.supId === calFilterVal);
+        }
+      }
 
       for (let day = 1; day <= 31; day++) {
         const dateStr = `${targetYear}-${String(targetMonthIdx+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         
         let dayLeaves = LEAVE_APPLICATIONS.filter(l => {
-          return dateStr >= l.from && dateStr <= l.to && techList.some(t => t.id === l.techId);
+          return dateStr >= l.from && dateStr <= l.to && calendarTechs.some(t => t.id === l.techId);
         });
 
         const cell = document.createElement('div');
@@ -1053,7 +1059,6 @@
 
     // ==================== CREATE LEAVE APPLICATION LOGIC ====================
     function openLeaveRequestModal() {
-      // ADMIN ACCESSES ALL TECHNICIANS FOR LEAVE CREATION, SUPERVISOR ACCESSES HIS TEAM
       const techList = currentUser.role === 'admin' ? TECHNICIANS_MASTER : TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
       const select = document.getElementById('leaveFormTechSelect');
       select.innerHTML = '';
@@ -1206,28 +1211,24 @@
 
     // ==================== AVAILABILITY MODULE ENGINE ====================
     function renderAvailability() {
-      const techList = getScopedTechnicians();
       const container = document.getElementById('availabilityTeamsContainer');
       container.innerHTML = '';
 
       let countDuty = 0, countPaid = 0, countUnpaid = 0;
 
-      // Segregate Technicians by Supervisor
+      // Segregate Technicians by Supervisor Team unconditionally for Admin
       const grouped = {};
 
       if (currentUser.role === 'admin') {
-        const filterVal = document.getElementById('adminTeamFilter')?.value || 'ALL';
         Object.keys(SUPERVISOR_THEMES).forEach(supKey => {
-          if (filterVal === 'ALL' || filterVal === supKey) {
-            grouped[supKey] = TECHNICIANS_MASTER.filter(t => t.supId === supKey);
-          }
+          grouped[supKey] = TECHNICIANS_MASTER.filter(t => t.supId === supKey);
         });
       } else {
         grouped[currentUser.id] = TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
       }
 
-      // Calculate Total Counts across viewed scope
-      techList.forEach(t => {
+      const activeList = getScopedTechnicians();
+      activeList.forEach(t => {
         if (t.status === 'On Duty') countDuty++;
         if (t.status === 'On Paid Leave') countPaid++;
         if (t.status === 'On Unpaid Leave') countUnpaid++;
@@ -1300,7 +1301,7 @@
           <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
           <td class="p-3 font-semibold text-white">${t.name}</td>
           <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
-          <td class="p-3 text-slate-400">${supName}</td>
+          <td class="p-3 text-slate-400 font-semibold">${supName}</td>
           <td class="p-3 text-center space-x-1">
             <button onclick='openTechModal(${JSON.stringify(t)})' class="bg-blue-600/80 hover:bg-blue-500 text-white p-1.5 rounded transition" title="Edit Roster Profile"><i class="fa-solid fa-pen-to-square"></i></button>
             <button onclick="deleteTech('${t.id}')" class="bg-rose-600/80 hover:bg-rose-500 text-white p-1.5 rounded transition" title="Delete Profile"><i class="fa-solid fa-trash-can"></i></button>
@@ -1442,7 +1443,7 @@
           <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
           <td class="p-3 font-semibold text-white">${t.name}</td>
           <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
-          <td class="p-3 text-slate-400">${supName}</td>
+          <td class="p-3 text-slate-400 font-semibold">${supName}</td>
           <td class="p-3 font-mono text-slate-300">${t.balance2027} Days</td>
           <td class="p-3 font-mono text-rose-400">${totalPaidTaken} Days</td>
           <td class="p-3 font-mono font-bold text-emerald-400">${remaining} Days</td>
@@ -1461,11 +1462,12 @@
       tbody.innerHTML = '';
 
       if (techList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="17" class="p-4 text-center text-slate-500">No technician records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="18" class="p-4 text-center text-slate-500">No technician records found.</td></tr>`;
         return;
       }
 
       techList.forEach(t => {
+        const supName = SYSTEM_USERS[t.supId]?.name || '--';
         const totalPaid = t.monthlyPaid.reduce((a, b) => a + b, 0);
         const totalUnpaid = t.monthlyUnpaid.reduce((a, b) => a + b, 0);
         const combinedTotal = totalPaid + totalUnpaid;
@@ -1481,6 +1483,7 @@
         tr.innerHTML = `
           <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
           <td class="p-3 font-semibold text-white">${t.name}</td>
+          <td class="p-3 text-slate-400 text-[11px] font-semibold">${supName}</td>
           ${mCells}
           <td class="p-3 font-mono font-bold text-blue-400">${totalPaid} d</td>
           <td class="p-3 font-mono font-bold text-rose-400">${totalUnpaid} d</td>
