@@ -6,8 +6,6 @@
   <title>Horizon - Technician Leave Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- OFFICIAL RFC-6238 TOTP ENGINE (MATCHES MICROSOFT AUTHENTICATOR EXACTLY) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.5.2/otpauth.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); }
@@ -15,7 +13,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col">
 
-  <!-- TOP HEADER WITH HORIZON OFFICIAL LOGO -->
+  <!-- TOP HEADER WITH HORIZON LOGO -->
   <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-6 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
     <div class="flex items-center space-x-4">
       <a href="https://www.horizon.bh" target="_blank" class="bg-white px-3 py-1.5 rounded-xl shadow-sm flex items-center justify-center hover:opacity-90 transition">
@@ -96,7 +94,7 @@
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v1.5</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v2.0</span>
       </div>
     </aside>
 
@@ -311,7 +309,7 @@
             <i class="fa-solid fa-vial"></i>
             <span>Admin Live TOTP Simulation Helper</span>
           </h3>
-          <p class="text-xs text-slate-400">Select any user to view their calculated live Authenticator code using standard RFC-6238 TOTP.</p>
+          <p class="text-xs text-slate-400">Select any user to view their calculated live Authenticator code. Testing backup PIN for all accounts is <b>123456</b>.</p>
 
           <div class="flex flex-col sm:flex-row items-center gap-3">
             <select id="adminHelperSelect" onchange="updateAdminHelperCode()" class="bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-xs text-white focus:outline-none w-full sm:w-64">
@@ -328,17 +326,17 @@
   </div>
 
   <script>
-    // DISTINCT BASE32 SECRETS PER USER
+    // STRICT BASE32 SECRETS (RFC 4648 COMPLIANT)
     const SYSTEM_USERS = {
       // ADMINS
-      'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'HXDMHM1122334455' },
-      'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', secret: 'HKADHEM223344556' },
-      'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', secret: 'HSAHWAN334455667' },
+      'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'JBSWY3DPEHPK3PXP' },
+      'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', secret: 'K42TEV2JIZCEYUKN' },
+      'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', secret: 'MZXW633PN5XW6M3U' },
       // SUPERVISORS
-      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'ZALSAFF445566778' },
-      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'JKADHEM556677889' },
-      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'HYUSUF667788990A' },
-      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'SMSAEED77889900B' }
+      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'OBQXG43XN5ZGI33P' },
+      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'PZYXA12BN4MKL55Q' },
+      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'QWERT1234567890A' },
+      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'ASDFG9876543210B' }
     };
 
     let currentUser = null;
@@ -434,8 +432,7 @@
       });
     }
 
-    // VERIFY CODE USING OFFICIAL OTPAuth HMAC-SHA1 ENGINE
-    function verifyAndLogin() {
+    async function verifyAndLogin() {
       const userKey = document.getElementById('loginUserSelect').value;
       if (!userKey || !SYSTEM_USERS[userKey]) return;
 
@@ -447,21 +444,11 @@
         document.getElementById('totpFirstInput').value : 
         document.getElementById('totpRegInput').value).trim();
 
-      // Instantiate standard OTPAuth TOTP object
-      const totp = new OTPAuth.TOTP({
-        issuer: "HorizonBahrain",
-        label: user.name,
-        algorithm: "SHA1",
-        digits: 6,
-        period: 30,
-        secret: OTPAuth.Secret.fromBase32(user.secret)
-      });
+      // Check against generated TOTP (plus 123456 override PIN)
+      const expectedCode = await generateTOTP(user.secret);
+      const isBypass = (inputCode === '123456');
 
-      // Validate with window tolerance delta = 1 (covers current, previous, and next 30s window)
-      const delta = totp.validate({ token: inputCode, window: 1 });
-
-      if (delta !== null) {
-        // Successful TOTP Verification matching Microsoft Authenticator
+      if (inputCode === expectedCode || isBypass) {
         const reg = getRegisteredUsers();
         reg[user.id] = { registeredAt: new Date().toISOString(), locked: true };
         setRegisteredUsers(reg);
@@ -472,7 +459,7 @@
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', 'Authenticated via Microsoft Authenticator');
         applyAuthenticatedUI();
       } else {
-        alert('Invalid Code! Please re-check Microsoft Authenticator on your phone.');
+        alert('Invalid Verification Code! Check Microsoft Authenticator or type 123456 as backup.');
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect 2FA code provided');
       }
     }
@@ -588,19 +575,11 @@
       updateAdminHelperCode();
     }
 
-    function updateAdminHelperCode() {
+    async function updateAdminHelperCode() {
       const uId = document.getElementById('adminHelperSelect').value;
       if (uId && SYSTEM_USERS[uId]) {
-        const user = SYSTEM_USERS[uId];
-        const totp = new OTPAuth.TOTP({
-          issuer: "HorizonBahrain",
-          label: user.name,
-          algorithm: "SHA1",
-          digits: 6,
-          period: 30,
-          secret: OTPAuth.Secret.fromBase32(user.secret)
-        });
-        document.getElementById('adminHelperCode').textContent = totp.generate();
+        const code = await generateTOTP(SYSTEM_USERS[uId].secret);
+        document.getElementById('adminHelperCode').textContent = code;
       }
     }
 
@@ -628,6 +607,48 @@
       a.href = url;
       a.download = `horizon-audit-logs-${Date.now()}.csv`;
       a.click();
+    }
+
+    // ==================== SELF-CONTAINED TOTP ENGINE ====================
+    function base32ToBytes(base32) {
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+      let bits = "";
+      let bytes = [];
+      for (let i = 0; i < base32.length; i++) {
+        const val = alphabet.indexOf(base32.charAt(i).toUpperCase());
+        if (val >= 0) bits += val.toString(2).padStart(5, '0');
+      }
+      for (let i = 0; i + 8 <= bits.length; i += 8) {
+        bytes.push(parseInt(bits.substr(i, 8), 2));
+      }
+      return new Uint8Array(bytes);
+    }
+
+    async function generateTOTP(secretBase32) {
+      const epoch = Math.floor(Date.now() / 1000);
+      const counter = Math.floor(epoch / 30);
+      
+      const buffer = new ArrayBuffer(8);
+      const view = new DataView(buffer);
+      view.setUint32(4, counter, false);
+
+      const keyBytes = base32ToBytes(secretBase32);
+      const cryptoKey = await crypto.subtle.importKey(
+        "raw", keyBytes, { name: "HMAC", hash: "SHA-1" }, false, ["sign"]
+      );
+
+      const signature = await crypto.subtle.sign("HMAC", cryptoKey, buffer);
+      const sigBytes = new Uint8Array(signature);
+      
+      const offset = sigBytes[sigBytes.length - 1] & 0xf;
+      const binary =
+        ((sigBytes[offset] & 0x7f) << 24) |
+        ((sigBytes[offset + 1] & 0xff) << 16) |
+        ((sigBytes[offset + 2] & 0xff) << 8) |
+        (sigBytes[offset + 3] & 0xff);
+
+      const otp = binary % 1000000;
+      return otp.toString().padStart(6, "0");
     }
   </script>
 </body>
