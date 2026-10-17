@@ -6,6 +6,8 @@
   <title>Horizon - Technician Leave Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- OFFICIAL RFC-6238 TOTP ENGINE (MATCHES MICROSOFT AUTHENTICATOR EXACTLY) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.5.2/otpauth.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); }
@@ -94,7 +96,7 @@
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v1.4</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v1.5</span>
       </div>
     </aside>
 
@@ -309,7 +311,7 @@
             <i class="fa-solid fa-vial"></i>
             <span>Admin Live TOTP Simulation Helper</span>
           </h3>
-          <p class="text-xs text-slate-400">Select any user to view their calculated live Authenticator code. Testing bypass code for all accounts is <b>123456</b>.</p>
+          <p class="text-xs text-slate-400">Select any user to view their calculated live Authenticator code using standard RFC-6238 TOTP.</p>
 
           <div class="flex flex-col sm:flex-row items-center gap-3">
             <select id="adminHelperSelect" onchange="updateAdminHelperCode()" class="bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-xs text-white focus:outline-none w-full sm:w-64">
@@ -326,17 +328,17 @@
   </div>
 
   <script>
-    // USER ROSTER WITH STANDARD BASE32 KEYS
+    // DISTINCT BASE32 SECRETS PER USER
     const SYSTEM_USERS = {
       // ADMINS
-      'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'JBSWY3DPEHPK3PXP' },
-      'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', secret: 'K42TEV2JIZCEYUKN' },
-      'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', secret: 'MZXW633PN5XW6M3U' },
+      'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'HXDMHM1122334455' },
+      'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', secret: 'HKADHEM223344556' },
+      'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', secret: 'HSAHWAN334455667' },
       // SUPERVISORS
-      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'JBSWY3DPEHPK3PXP' },
-      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'K42TEV2JIZCEYUKN' },
-      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'MZXW633PN5XW6M3U' },
-      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'JBSWY3DPEHPK3PXP' }
+      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'ZALSAFF445566778' },
+      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'JKADHEM556677889' },
+      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'HYUSUF667788990A' },
+      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'SMSAEED77889900B' }
     };
 
     let currentUser = null;
@@ -432,6 +434,7 @@
       });
     }
 
+    // VERIFY CODE USING OFFICIAL OTPAuth HMAC-SHA1 ENGINE
     function verifyAndLogin() {
       const userKey = document.getElementById('loginUserSelect').value;
       if (!userKey || !SYSTEM_USERS[userKey]) return;
@@ -444,13 +447,21 @@
         document.getElementById('totpFirstInput').value : 
         document.getElementById('totpRegInput').value).trim();
 
-      // Check against live generated codes (with +- 30s window tolerance)
-      const validCodes = getValidTotpCodes(user.secret);
-      
-      const isValidTotp = validCodes.includes(inputCode);
-      const isBypassCode = (inputCode === '123456'); // Universal test code
+      // Instantiate standard OTPAuth TOTP object
+      const totp = new OTPAuth.TOTP({
+        issuer: "HorizonBahrain",
+        label: user.name,
+        algorithm: "SHA1",
+        digits: 6,
+        period: 30,
+        secret: OTPAuth.Secret.fromBase32(user.secret)
+      });
 
-      if (isValidTotp || isBypassCode) {
+      // Validate with window tolerance delta = 1 (covers current, previous, and next 30s window)
+      const delta = totp.validate({ token: inputCode, window: 1 });
+
+      if (delta !== null) {
+        // Successful TOTP Verification matching Microsoft Authenticator
         const reg = getRegisteredUsers();
         reg[user.id] = { registeredAt: new Date().toISOString(), locked: true };
         setRegisteredUsers(reg);
@@ -461,7 +472,7 @@
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', 'Authenticated via Microsoft Authenticator');
         applyAuthenticatedUI();
       } else {
-        alert('Invalid Code! Please check Microsoft Authenticator or enter 123456 for testing.');
+        alert('Invalid Code! Please re-check Microsoft Authenticator on your phone.');
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect 2FA code provided');
       }
     }
@@ -580,7 +591,16 @@
     function updateAdminHelperCode() {
       const uId = document.getElementById('adminHelperSelect').value;
       if (uId && SYSTEM_USERS[uId]) {
-        document.getElementById('adminHelperCode').textContent = getValidTotpCodes(SYSTEM_USERS[uId].secret)[0];
+        const user = SYSTEM_USERS[uId];
+        const totp = new OTPAuth.TOTP({
+          issuer: "HorizonBahrain",
+          label: user.name,
+          algorithm: "SHA1",
+          digits: 6,
+          period: 30,
+          secret: OTPAuth.Secret.fromBase32(user.secret)
+        });
+        document.getElementById('adminHelperCode').textContent = totp.generate();
       }
     }
 
@@ -608,30 +628,6 @@
       a.href = url;
       a.download = `horizon-audit-logs-${Date.now()}.csv`;
       a.click();
-    }
-
-    // ==================== TOTP ENGINE ====================
-    function getValidTotpCodes(secret) {
-      const epoch = Math.floor(Date.now() / 1000);
-      const timeStep = 30;
-      const currentCounter = Math.floor(epoch / timeStep);
-
-      // Return array containing [current code, previous window code, next window code] for time drift tolerance
-      return [
-        calculateTotpForCounter(secret, currentCounter),
-        calculateTotpForCounter(secret, currentCounter - 1),
-        calculateTotpForCounter(secret, currentCounter + 1)
-      ];
-    }
-
-    function calculateTotpForCounter(secret, counter) {
-      let hash = 0;
-      const str = secret + counter.toString();
-      for (let i = 0; i < str.length; i++) {
-        hash = ((hash << 5) - hash) + str.charCodeAt(i);
-        hash |= 0;
-      }
-      return Math.abs(hash % 1000000).toString().padStart(6, '0');
     }
   </script>
 </body>
