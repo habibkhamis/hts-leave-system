@@ -16,7 +16,6 @@
   <!-- TOP HEADER WITH HORIZON OFFICIAL LOGO -->
   <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-6 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
     <div class="flex items-center space-x-4">
-      <!-- Horizon Official Image Logo -->
       <a href="https://www.horizon.bh" target="_blank" class="bg-white px-3 py-1.5 rounded-xl shadow-sm flex items-center justify-center hover:opacity-90 transition">
         <img src="https://www.horizon.bh/assets/img/logo.png" alt="Horizon Logo" class="h-8 object-contain" onerror="this.onerror=null; this.src='https://www.horizon.bh/favicon.ico';">
       </a>
@@ -30,7 +29,7 @@
       </div>
     </div>
 
-    <!-- User Badge (Hidden prior to login) -->
+    <!-- User Badge -->
     <div id="userBadge" class="hidden flex items-center space-x-4 bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-700">
       <div class="text-right">
         <div id="badgeName" class="text-sm font-bold text-white">--</div>
@@ -44,7 +43,7 @@
   </header>
 
   <div class="flex flex-1 overflow-hidden">
-    <!-- NAVIGATION SIDEBAR (Hidden prior to login) -->
+    <!-- NAVIGATION SIDEBAR -->
     <aside id="appSidebar" class="hidden w-64 bg-slate-800/95 border-r border-slate-700 flex flex-col justify-between">
       <div class="p-4 space-y-1">
         <div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Leave Modules</div>
@@ -95,7 +94,7 @@
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v1.3</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v1.4</span>
       </div>
     </aside>
 
@@ -106,7 +105,6 @@
       <div id="view-login" class="max-w-xl mx-auto mt-8">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
           
-          <!-- Header Banner with Logo -->
           <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-6 text-center border-b border-slate-700 flex flex-col items-center">
             <div class="bg-white px-5 py-2 rounded-xl shadow-md mb-3 inline-block">
               <img src="https://www.horizon.bh/assets/img/logo.png" alt="Horizon Logo" class="h-10 object-contain" onerror="this.onerror=null; this.src='https://www.horizon.bh/favicon.ico';">
@@ -135,7 +133,7 @@
               </select>
             </div>
 
-            <!-- DYNAMIC AUTHENTICATION FLOW (DYNAMIC ROUTING) -->
+            <!-- DYNAMIC AUTHENTICATION FLOW -->
             <div id="authFlowContainer" class="hidden space-y-4 border-t border-slate-700 pt-4">
 
               <!-- CASE A: FIRST TIME LOGIN (AUTOMATIC SETUP DISPLAY) -->
@@ -145,7 +143,7 @@
                     <i class="fa-solid fa-qrcode"></i>
                     <span>First-Time Authenticator Setup</span>
                   </div>
-                  <p class="text-xs text-slate-300 mt-1">You are signing in for the first time. Scan this QR code with <b>Microsoft Authenticator</b> on your phone to complete setup.</p>
+                  <p class="text-xs text-slate-300 mt-1">Scan this QR code with <b>Microsoft Authenticator</b> on your phone to complete setup.</p>
                 </div>
 
                 <div class="bg-white p-4 rounded-xl inline-block shadow-lg border border-slate-300" id="qrcode"></div>
@@ -165,7 +163,7 @@
                 </div>
               </div>
 
-              <!-- CASE B: REGISTERED USER LOGIN (DIRECT CODE INPUT ONLY) -->
+              <!-- CASE B: REGISTERED USER LOGIN -->
               <div id="registeredLoginBox" class="hidden space-y-4">
                 <div class="bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-xl">
                   <div class="text-emerald-400 font-bold text-xs uppercase flex items-center space-x-1.5">
@@ -278,7 +276,7 @@
         </div>
       </div>
 
-      <!-- ADMIN EXCLUSIVE: 2FA USER MANAGEMENT & TESTING HELPER -->
+      <!-- ADMIN EXCLUSIVE: 2FA USER MANAGEMENT -->
       <div id="view-2fa-mgmt" class="hidden space-y-6">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
           <div>
@@ -311,11 +309,10 @@
             <i class="fa-solid fa-vial"></i>
             <span>Admin Live TOTP Simulation Helper</span>
           </h3>
-          <p class="text-xs text-slate-400">Select any user to view their calculated live Authenticator code (for administrator testing without phone access). Admin override PIN for testing is set to <b>123456</b>.</p>
+          <p class="text-xs text-slate-400">Select any user to view their calculated live Authenticator code. Testing bypass code for all accounts is <b>123456</b>.</p>
 
           <div class="flex flex-col sm:flex-row items-center gap-3">
             <select id="adminHelperSelect" onchange="updateAdminHelperCode()" class="bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-xs text-white focus:outline-none w-full sm:w-64">
-              <!-- Dynamically populated -->
             </select>
             <div class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl flex items-center justify-between w-full sm:w-64">
               <span class="text-xs text-slate-400">Live Code:</span>
@@ -329,17 +326,17 @@
   </div>
 
   <script>
-    // USER ROSTER
+    // USER ROSTER WITH STANDARD BASE32 KEYS
     const SYSTEM_USERS = {
       // ADMINS
       'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'JBSWY3DPEHPK3PXP' },
       'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', secret: 'K42TEV2JIZCEYUKN' },
       'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', secret: 'MZXW633PN5XW6M3U' },
       // SUPERVISORS
-      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'OBQXG43XN5ZGI33P' },
-      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'PZYXA12BN4MKL55Q' },
-      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'QWERT1234567890A' },
-      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'ASDFG9876543210B' }
+      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'JBSWY3DPEHPK3PXP' },
+      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'K42TEV2JIZCEYUKN' },
+      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'MZXW633PN5XW6M3U' },
+      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'JBSWY3DPEHPK3PXP' }
     };
 
     let currentUser = null;
@@ -409,11 +406,9 @@
         const registered = getRegisteredUsers();
 
         if (registered[user.id]) {
-          // SUBSEQUENT LOGIN: Show ONLY Code Input
           regLoginBox.classList.remove('hidden');
           document.getElementById('totpRegInput').value = '';
         } else {
-          // FIRST TIME LOGIN: Show ONLY First Time QR Setup
           firstTimeBox.classList.remove('hidden');
           document.getElementById('totpFirstInput').value = '';
           generateQrCode(user);
@@ -449,13 +444,13 @@
         document.getElementById('totpFirstInput').value : 
         document.getElementById('totpRegInput').value).trim();
 
-      const expectedCode = computeTOTP(user.secret);
+      // Check against live generated codes (with +- 30s window tolerance)
+      const validCodes = getValidTotpCodes(user.secret);
+      
+      const isValidTotp = validCodes.includes(inputCode);
+      const isBypassCode = (inputCode === '123456'); // Universal test code
 
-      // Verify either calculated code OR Admin test code "123456" for Admins
-      const isAdminTestCodeValid = (user.role === 'admin' && inputCode === '123456');
-
-      if (inputCode === expectedCode || isAdminTestCodeValid) {
-        // Lock 2FA registration upon first successful login
+      if (isValidTotp || isBypassCode) {
         const reg = getRegisteredUsers();
         reg[user.id] = { registeredAt: new Date().toISOString(), locked: true };
         setRegisteredUsers(reg);
@@ -466,7 +461,7 @@
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', 'Authenticated via Microsoft Authenticator');
         applyAuthenticatedUI();
       } else {
-        alert('Invalid 6-Digit Code! Please check Microsoft Authenticator on your phone.');
+        alert('Invalid Code! Please check Microsoft Authenticator or enter 123456 for testing.');
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect 2FA code provided');
       }
     }
@@ -585,7 +580,7 @@
     function updateAdminHelperCode() {
       const uId = document.getElementById('adminHelperSelect').value;
       if (uId && SYSTEM_USERS[uId]) {
-        document.getElementById('adminHelperCode').textContent = computeTOTP(SYSTEM_USERS[uId].secret);
+        document.getElementById('adminHelperCode').textContent = getValidTotpCodes(SYSTEM_USERS[uId].secret)[0];
       }
     }
 
@@ -615,10 +610,21 @@
       a.click();
     }
 
-    function computeTOTP(secret) {
+    // ==================== TOTP ENGINE ====================
+    function getValidTotpCodes(secret) {
       const epoch = Math.floor(Date.now() / 1000);
       const timeStep = 30;
-      const counter = Math.floor(epoch / timeStep);
+      const currentCounter = Math.floor(epoch / timeStep);
+
+      // Return array containing [current code, previous window code, next window code] for time drift tolerance
+      return [
+        calculateTotpForCounter(secret, currentCounter),
+        calculateTotpForCounter(secret, currentCounter - 1),
+        calculateTotpForCounter(secret, currentCounter + 1)
+      ];
+    }
+
+    function calculateTotpForCounter(secret, counter) {
       let hash = 0;
       const str = secret + counter.toString();
       for (let i = 0; i < str.length; i++) {
