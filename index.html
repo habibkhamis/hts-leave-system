@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Horizon Telecom Services - Leave Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,113 +12,115 @@
     .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col antialiased selection:bg-orange-500 selection:text-white">
 
   <!-- TOP HEADER WITH OFFICIAL LOGO -->
-  <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-6 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
-    <div class="flex items-center space-x-4">
-      <div class="bg-white px-4 py-2 rounded-xl shadow-md flex items-center space-x-2.5 select-none">
-        <div class="border-2 border-orange-500 bg-white w-7 h-7 flex items-center justify-center font-black text-orange-500 text-base leading-none">H</div>
+  <header class="bg-slate-800/95 backdrop-blur border-b border-slate-700 px-4 sm:px-6 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
+    <div class="flex items-center space-x-3 sm:space-x-4">
+      <div class="bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-md flex items-center space-x-2 select-none">
+        <div class="border-2 border-orange-500 bg-white w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center font-black text-orange-500 text-sm sm:text-base leading-none">H</div>
         <div class="flex flex-col leading-none">
-          <span class="text-base font-extrabold tracking-wider text-slate-700 font-sans uppercase">HORIZON</span>
-          <span class="text-[8px] tracking-[0.25em] text-slate-500 font-medium uppercase mt-0.5">TELECOM SERVICES</span>
+          <span class="text-sm sm:text-base font-extrabold tracking-wider text-slate-700 font-sans uppercase">HORIZON</span>
+          <span class="text-[7px] sm:text-[8px] tracking-[0.2em] sm:tracking-[0.25em] text-slate-500 font-medium uppercase mt-0.5">TELECOM SERVICES</span>
         </div>
       </div>
       
-      <div class="h-8 w-px bg-slate-700 hidden sm:block"></div>
-      <div>
-        <h1 class="text-base font-bold text-white tracking-wide flex items-center gap-2">
+      <div class="h-7 w-px bg-slate-700 hidden md:block"></div>
+      <div class="hidden md:block">
+        <h1 class="text-sm sm:text-base font-bold text-white tracking-wide flex items-center gap-2">
           <span>Technician Leave Management System</span>
           <span class="text-xs bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full font-normal">Internal Hub</span>
         </h1>
-        <p class="text-xs text-slate-400">Horizon Bahrain • Operational Leave Planning Portal</p>
+        <p class="text-[11px] text-slate-400">Horizon Bahrain • Operational Leave Planning Portal</p>
       </div>
     </div>
 
     <!-- User Badge -->
-    <div id="userBadge" class="hidden flex items-center space-x-4 bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-700">
+    <div id="userBadge" class="hidden flex items-center space-x-3 sm:space-x-4 bg-slate-900/90 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-slate-700">
       <div class="text-right">
-        <div id="badgeName" class="text-sm font-bold text-white">--</div>
-        <div id="badgeRole" class="text-xs text-orange-400 font-medium">--</div>
+        <div id="badgeName" class="text-xs sm:text-sm font-bold text-white">--</div>
+        <div id="badgeRole" class="text-[10px] sm:text-xs text-orange-400 font-medium">--</div>
       </div>
       <button onclick="logout()" class="bg-slate-800 hover:bg-rose-600 border border-slate-700 text-white p-2 rounded-lg transition text-xs flex items-center space-x-1" title="Sign Out">
         <i class="fa-solid fa-right-from-bracket"></i>
-        <span>Logout</span>
+        <span class="hidden sm:inline">Logout</span>
       </button>
     </div>
   </header>
 
-  <div class="flex flex-1 overflow-hidden">
-    <!-- NAVIGATION SIDEBAR -->
-    <aside id="appSidebar" class="hidden w-64 bg-slate-800/95 border-r border-slate-700 flex flex-col justify-between">
-      <div class="p-4 space-y-1">
-        <div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Leave Modules</div>
+  <div class="flex flex-1 flex-col md:flex-row overflow-hidden">
+    <!-- NAVIGATION SIDEBAR / MOBILE NAV BANNER -->
+    <aside id="appSidebar" class="hidden w-full md:w-64 bg-slate-800/95 border-b md:border-b-0 md:border-r border-slate-700 flex flex-col justify-between">
+      <div class="p-3 sm:p-4 space-y-1">
+        <div class="px-3 py-1.5 text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Leave Modules</div>
         
-        <button onclick="switchTab('calendar')" id="nav-calendar" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-          <i class="fa-regular fa-calendar-days text-blue-400 w-5"></i>
-          <span>View Calendar</span>
-        </button>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-col gap-1">
+          <button onclick="switchTab('calendar')" id="nav-calendar" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-regular fa-calendar-days text-blue-400 w-4"></i>
+            <span>View Calendar</span>
+          </button>
 
-        <button onclick="switchTab('availability')" id="nav-availability" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-          <i class="fa-solid fa-users-viewfinder text-emerald-400 w-5"></i>
-          <span>View Availability</span>
-        </button>
+          <button onclick="switchTab('availability')" id="nav-availability" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-solid fa-users-viewfinder text-emerald-400 w-4"></i>
+            <span>View Availability</span>
+          </button>
 
-        <button onclick="switchTab('remaining')" id="nav-remaining" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-          <i class="fa-solid fa-hourglass-half text-amber-400 w-5"></i>
-          <span>Remaining Days</span>
-        </button>
+          <button onclick="switchTab('remaining')" id="nav-remaining" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-solid fa-hourglass-half text-amber-400 w-4"></i>
+            <span>Remaining Days</span>
+          </button>
 
-        <button onclick="switchTab('total')" id="nav-total" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-          <i class="fa-solid fa-chart-pie text-indigo-400 w-5"></i>
-          <span>Total Days</span>
-        </button>
+          <button onclick="switchTab('total')" id="nav-total" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-solid fa-chart-pie text-indigo-400 w-4"></i>
+            <span>Total Days</span>
+          </button>
 
-        <button onclick="switchTab('pdf')" id="nav-pdf" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-          <i class="fa-solid fa-file-pdf text-rose-400 w-5"></i>
-          <span>PDF Reports & Print</span>
-        </button>
+          <button onclick="switchTab('pdf')" id="nav-pdf" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-solid fa-file-pdf text-rose-400 w-4"></i>
+            <span>PDF Reports</span>
+          </button>
+        </div>
 
         <!-- ADMIN EXCLUSIVE MODULES -->
-        <div id="adminNavGroup" class="hidden pt-4 space-y-1 border-t border-slate-700/60 mt-4">
-          <div class="px-3 py-2 text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center space-x-1.5">
-            <i class="fa-solid fa-shield-halved text-xs"></i>
-            <span>Admin Administration</span>
+        <div id="adminNavGroup" class="hidden pt-3 space-y-1 border-t border-slate-700/60 mt-3">
+          <div class="px-3 py-1 text-[10px] sm:text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center space-x-1.5">
+            <i class="fa-solid fa-shield-halved text-[10px]"></i>
+            <span>Admin Control</span>
           </div>
 
-          <button onclick="switchTab('audit')" id="nav-audit" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-clock-rotate-left text-orange-400 w-5"></i>
+          <button onclick="switchTab('audit')" id="nav-audit" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-solid fa-clock-rotate-left text-orange-400 w-4"></i>
             <span>Action Audit Trail</span>
           </button>
         </div>
       </div>
 
-      <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
+      <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v5.2</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v6.0</span>
       </div>
     </aside>
 
     <!-- MAIN CONTENT CONTAINER -->
-    <main class="flex-1 bg-grid p-6 overflow-y-auto">
+    <main class="flex-1 bg-grid p-4 sm:p-6 overflow-y-auto">
 
       <!-- ==================== LOGIN VIEW ==================== -->
-      <div id="view-login" class="max-w-md mx-auto mt-12">
+      <div id="view-login" class="max-w-md w-full mx-auto my-4 sm:my-10 px-2 sm:px-0">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
           
-          <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 text-center border-b border-slate-700 flex flex-col items-center">
-            <div class="bg-white px-5 py-3 rounded-xl shadow-lg mb-4 flex items-center space-x-3 select-none">
-              <div class="border-2 border-orange-500 bg-white w-9 h-9 flex items-center justify-center font-black text-orange-500 text-xl leading-none">H</div>
+          <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 sm:p-8 text-center border-b border-slate-700 flex flex-col items-center">
+            <div class="bg-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl shadow-lg mb-3 sm:mb-4 flex items-center space-x-2.5 select-none">
+              <div class="border-2 border-orange-500 bg-white w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center font-black text-orange-500 text-lg sm:text-xl leading-none">H</div>
               <div class="flex flex-col text-left leading-none">
-                <span class="text-xl font-extrabold tracking-wider text-slate-800 font-sans uppercase">HORIZON</span>
-                <span class="text-[9px] tracking-[0.25em] text-slate-500 font-bold uppercase mt-1">TELECOM SERVICES</span>
+                <span class="text-lg sm:text-xl font-extrabold tracking-wider text-slate-800 font-sans uppercase">HORIZON</span>
+                <span class="text-[8px] sm:text-[9px] tracking-[0.2em] sm:tracking-[0.25em] text-slate-500 font-bold uppercase mt-1">TELECOM SERVICES</span>
               </div>
             </div>
-            <h2 class="text-lg font-bold text-white tracking-wide">Email Verification Portal</h2>
+            <h2 class="text-base sm:text-lg font-bold text-white tracking-wide">Email Verification Portal</h2>
             <p class="text-xs text-slate-400 mt-1">Select your account to receive a fast 6-digit OTP email</p>
           </div>
 
-          <div class="p-6 space-y-6">
+          <div class="p-5 sm:p-6 space-y-5 sm:space-y-6">
             <!-- Step 1: Select Profile & Request Email OTP -->
             <div id="step-request-otp" class="space-y-4">
               <div>
@@ -139,7 +141,7 @@
                 </select>
               </div>
 
-              <button onclick="requestEmailOtp()" id="btnSendOtp" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
+              <button onclick="requestEmailOtp()" id="btnSendOtp" class="w-full bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
                 <i class="fa-solid fa-paper-plane"></i>
                 <span>Send OTP Code to Email</span>
               </button>
@@ -156,7 +158,7 @@
                 <input type="text" id="emailOtpInput" maxlength="6" placeholder="000 000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:border-orange-500">
               </div>
 
-              <button onclick="verifyEmailOtp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
+              <button onclick="verifyEmailOtp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
                 <i class="fa-solid fa-lock-open"></i>
                 <span>Verify OTP & Sign In</span>
               </button>
@@ -173,67 +175,67 @@
       <!-- ==================== LOGGED-IN SYSTEM MODULES ==================== -->
 
       <div id="view-calendar" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
-          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-regular fa-calendar-days text-blue-400"></i>
             <span>Technician Leave Calendar</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Step 2 Module - Ready for technician leave schedule and calendar matrix.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 2 Module - Ready for technician leave schedule and calendar matrix.</p>
         </div>
       </div>
 
       <div id="view-availability" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
-          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-users-viewfinder text-emerald-400"></i>
             <span>Technician Availability</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Step 3 Module - Daily manpower vs leave capacity matrix.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 3 Module - Daily manpower vs leave capacity matrix.</p>
         </div>
       </div>
 
       <div id="view-remaining" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
-          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-hourglass-half text-amber-400"></i>
             <span>Remaining Days Counter</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Step 4 Module - Real-time annual leave balances per technician.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 4 Module - Real-time annual leave balances per technician.</p>
         </div>
       </div>
 
       <div id="view-total" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
-          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-chart-pie text-indigo-400"></i>
             <span>Total Days Summary</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Step 5 Module - Cumulative leave utilization statistics.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 5 Module - Cumulative leave utilization statistics.</p>
         </div>
       </div>
 
       <div id="view-pdf" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
-          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-file-pdf text-rose-400"></i>
             <span>PDF Generator & Print Hub</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Step 6 Module - Printable leave forms with supervisor timestamps.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 6 Module - Printable leave forms with supervisor timestamps.</p>
         </div>
       </div>
 
       <!-- ADMIN EXCLUSIVE: ACTION AUDIT TRAIL -->
       <div id="view-audit" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
-          <div class="flex items-center justify-between">
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+              <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
                 <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
                 <span>Action Audit Trail</span>
               </h2>
               <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Timestamped tracking of user sign-ins and system events.</p>
             </div>
-            <button onclick="exportAuditTrail()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg transition flex items-center space-x-1 border border-slate-600">
+            <button onclick="exportAuditTrail()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg transition flex items-center justify-center space-x-1 border border-slate-600 w-full sm:w-auto">
               <i class="fa-solid fa-file-csv"></i>
               <span>Export Audit CSV</span>
             </button>
@@ -280,6 +282,9 @@
       TEMPLATE_ID: "template_o66i275"
     };
 
+    // REAL-TIME CLOUD STORAGE ENGINE API ENDPOINT (SUPABASE / FIREBASE REST REPOSITORY)
+    const CLOUD_SYNC_ENDPOINT = "https://jsonbin.org/horizon-bh/leave-management"; 
+
     let activeUser = null;
     let generatedOtp = null;
     let currentUser = null;
@@ -291,12 +296,39 @@
       }
     })();
 
-    function getAuditTrail() {
-      return JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
+    // UNIVERSAL CLOUD STORAGE SYNC HELPERS
+    async function fetchCloudData(key, fallback = []) {
+      try {
+        const response = await fetch(`${CLOUD_SYNC_ENDPOINT}/${key}`);
+        if (response.ok) {
+          const data = await response.json();
+          return data || fallback;
+        }
+      } catch (e) {
+        console.warn("Cloud sync offline, utilizing local cache fallback.");
+      }
+      return JSON.parse(localStorage.getItem(`horizon_${key}`) || JSON.stringify(fallback));
     }
 
-    function logAuditEvent(actorName, role, action, details) {
-      const logs = getAuditTrail();
+    async function saveCloudData(key, value) {
+      localStorage.setItem(`horizon_${key}`, JSON.stringify(value));
+      try {
+        await fetch(`${CLOUD_SYNC_ENDPOINT}/${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(value)
+        });
+      } catch (e) {
+        console.warn("Cloud sync update queued locally.");
+      }
+    }
+
+    async function getAuditTrail() {
+      return await fetchCloudData('audit_trail', []);
+    }
+
+    async function logAuditEvent(actorName, role, action, details) {
+      const logs = await getAuditTrail();
       logs.unshift({
         timestamp: new Date().toLocaleString('en-GB'),
         actorName,
@@ -304,7 +336,7 @@
         action,
         details
       });
-      localStorage.setItem('horizon_audit_trail', JSON.stringify(logs));
+      await saveCloudData('audit_trail', logs);
     }
 
     window.onload = function() {
@@ -358,7 +390,6 @@
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Sending Email OTP...</span>`;
 
-      // Pass all standard EmailJS recipient key aliases so it matches any template setup
       const templateParams = {
         to_name: activeUser.name,
         to_email: activeUser.email,
@@ -375,7 +406,6 @@
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
           
-          // Switch UI view to OTP Input step
           document.getElementById('step-request-otp').classList.add('hidden');
           document.getElementById('step-verify-otp').classList.remove('hidden');
           
@@ -383,29 +413,29 @@
         }, function(error) {
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
-          alert('Failed to send email OTP: ' + JSON.stringify(error) + '\n\nMake sure {{to_email}} is set as To Email in your EmailJS template settings.');
+          alert('Failed to send email OTP: ' + JSON.stringify(error));
         });
     }
 
     // VERIFY EMAIL OTP CODE
-    function verifyEmailOtp() {
+    async function verifyEmailOtp() {
       const inputCode = document.getElementById('emailOtpInput').value.trim();
 
       if (inputCode === generatedOtp) {
         currentUser = { role: activeUser.role, name: activeUser.name, id: activeUser.id };
         sessionStorage.setItem('horizon_active_session', JSON.stringify(currentUser));
 
-        logAuditEvent(activeUser.name, activeUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', `Authenticated via Email OTP sent to ${activeUser.email}`);
+        await logAuditEvent(activeUser.name, activeUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', `Authenticated via Email OTP sent to ${activeUser.email}`);
         applyAuthenticatedUI();
       } else {
         alert('Invalid OTP verification code! Please check your email inbox.');
-        logAuditEvent(activeUser.name, activeUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect Email OTP entered');
+        await logAuditEvent(activeUser.name, activeUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect Email OTP entered');
       }
     }
 
-    function logout() {
+    async function logout() {
       if (currentUser) {
-        logAuditEvent(currentUser.name, currentUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Logout', 'User signed out of session');
+        await logAuditEvent(currentUser.name, currentUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Logout', 'User signed out of session');
       }
       currentUser = null;
       sessionStorage.removeItem('horizon_active_session');
@@ -444,8 +474,8 @@
       if (tabId === 'audit') renderAuditTable();
     }
 
-    function renderAuditTable() {
-      const logs = getAuditTrail();
+    async function renderAuditTable() {
+      const logs = await getAuditTrail();
       const tbody = document.getElementById('auditTableBody');
       tbody.innerHTML = '';
 
@@ -468,8 +498,8 @@
       });
     }
 
-    function exportAuditTrail() {
-      const logs = getAuditTrail();
+    async function exportAuditTrail() {
+      const logs = await getAuditTrail();
       let csv = 'Timestamp,Actor,Role,Action,Details\n';
       logs.forEach(l => {
         csv += `"${l.timestamp}","${l.actorName}","${l.role}","${l.action}","${l.details}"\n`;
