@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technician Leave Planning System - GitHub Pages Edition</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for modern feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-50">
+
+    <!-- TOP HEADER BAR -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- App Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-600 p-2 rounded-lg text-white shadow-sm">
+                    <i class="fa-solid font-bold fa-calendar-check text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white leading-none">TechLeave Hub</h1>
+                    <p class="text-xs text-slate-400 mt-0.5">Technician Leave Planning & Tracking System</p>
+                </div>
+            </div>
+
+            <!-- Active User Indicator / Logout Button -->
+            <div id="userHeaderSection" class="hidden items-center space-x-4">
+                <div class="hidden sm:flex flex-col text-right">
+                    <span id="headerUserName" class="text-sm font-semibold text-slate-100">---</span>
+                    <span id="headerUserCPR" class="text-xs text-brand-400 font-mono">CPR: ---</span>
+                </div>
+                <div class="h-8 w-px bg-slate-700 hidden sm:block"></div>
+                <button onclick="handleLogout()" class="inline-flex items-center space-x-2 bg-slate-800 hover:bg-rose-900/50 hover:text-rose-200 text-slate-300 text-xs font-medium py-2 px-3 rounded-lg transition-colors border border-slate-700 hover:border-rose-700/50">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Log Out</span>
+                </button>
+            </div>
+            
+            <!-- Logged out badge indicator -->
+            <div id="guestHeaderBadge" class="flex items-center text-xs text-slate-400 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+                <span class="w-2 h-2 rounded-full bg-amber-400 mr-2 animate-pulse"></span>
+                <span>Authentication Required</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN WRAPPER WITH NAVIGATION & CONTENT -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
+
+        <!-- SIDEBAR NAVIGATION (Visible when logged in, or restricted preview) -->
+        <aside class="w-full md:w-64 flex-shrink-0">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 sticky top-22">
+                <p class="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">System Modules</p>
+                <nav class="space-y-1" id="mainNavigation">
+                    <!-- Step 1 Navigation -->
+                    <button id="nav-login" onclick="switchTab('login')" class="nav-item w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-brand-700 bg-brand-50 border border-brand-200">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-key w-5 text-center text-brand-600"></i>
+                            <span>1. Supervisor Login</span>
+                        </div>
+                        <span id="loginStatusBadge" class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Required</span>
+                    </button>
+
+                    <!-- Step 2 Navigation (Placeholder for Step 2) -->
+                    <button id="nav-calendar" onclick="switchTab('calendar')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-calendar-days w-5 text-center text-slate-400"></i>
+                            <span>2. View Calendar</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 2</span>
+                    </button>
+
+                    <!-- Step 3 Navigation -->
+                    <button id="nav-availability" onclick="switchTab('availability')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-users-viewfinder w-5 text-center text-slate-400"></i>
+                            <span>3. Availability Matrix</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 3</span>
+                    </button>
+
+                    <!-- Step 4 Navigation -->
+                    <button id="nav-remaining" onclick="switchTab('remaining')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-hourglass-half w-5 text-center text-slate-400"></i>
+                            <span>4. Remaining Days</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 4</span>
+                    </button>
+
+                    <!-- Step 5 Navigation -->
+                    <button id="nav-total" onclick="switchTab('total')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
+                            <span>5. Total Days & Stats</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 5</span>
+                    </button>
+
+                    <hr class="my-2 border-slate-200">
+
+                    <!-- Live Audit Trail Page -->
+                    <button id="nav-audit" onclick="switchTab('audit')" class="nav-item w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-clipboard-list w-5 text-center text-indigo-500"></i>
+                            <span>Action Audit Logs</span>
+                        </div>
+                        <span id="auditCountBadge" class="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                    </button>
+
+                    <!-- Step 6 Navigation -->
+                    <button id="nav-print" onclick="switchTab('print')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-file-pdf w-5 text-center text-slate-400"></i>
+                            <span>6. Print PDF Summary</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 6</span>
+                    </button>
+                </nav>
+
+                <!-- Storage Info Box -->
+                <div class="mt-6 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-500">
+                    <div class="flex items-center justify-between font-semibold text-slate-700 mb-1">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-brand-600"></i> Local Storage Engine</span>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">GitHub Ready</span>
+                    </div>
+                    <p class="text-[11px] leading-tight text-slate-500">All audit trail logs and supervisor actions persist locally in your browser session.</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEW AREA -->
+        <main class="flex-1">
+
+            <!-- TAB 1: LOGIN PAGE (STEP 1 FOCUS) -->
+            <div id="tab-login" class="tab-content">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-2xl mx-auto">
+                    <!-- Login Header Banner -->
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-brand-900 px-6 py-8 text-white relative overflow-hidden">
+                        <div class="relative z-10">
+                            <span class="bg-brand-500/20 text-brand-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-brand-400/30">
+                                Step 1 Focus
+                            </span>
+                            <h2 class="text-2xl font-bold mt-3">Supervisor Authentication</h2>
+                            <p class="text-slate-300 text-sm mt-1">Select your supervisor account and input your CPR number to access the technician leave planning system.</p>
+                        </div>
+                        <i class="fa-solid fa-user-shield text-8xl text-white/5 absolute -right-2 -bottom-4 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Login Form Form Container -->
+                    <div class="p-6 sm:p-8">
+                        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
+                            
+                            <!-- Supervisor Name Dropdown -->
+                            <div>
+                                <label for="supervisorSelect" class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Supervisor Name <span class="text-rose-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-user-tie"></i>
+                                    </div>
+                                    <select id="supervisorSelect" required onchange="autoFillCPRHint()" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                                        <option value="" disabled selected>-- Select Supervisor --</option>
+                                        <!-- Dynamically Populated via JS -->
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CPR Input Field -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label for="cprInput" class="block text-sm font-semibold text-slate-700">
+                                        CPR Number <span class="text-rose-500">*</span>
+                                    </label>
+                                    <span id="cprHintBadge" class="text-xs font-mono text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100 hidden">
+                                        Demo CPR: <strong id="hintCprVal">---</strong>
+                                    </span>
+                                </div>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-id-card"></i>
+                                    </div>
+                                    <input type="password" id="cprInput" required maxlength="9" pattern="\d{9}" placeholder="e.g. 880123456 (9 Digits)" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                                    <button type="button" onclick="toggleCPRVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
+                                        <i id="cprToggleIcon" class="fa-solid fa-eye text-sm"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Must enter 9-digit CPR corresponding to the selected supervisor.</p>
+                            </div>
+
+                            <!-- Error Message Box -->
+                            <div id="loginErrorMsg" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-lg flex items-center space-x-3 text-rose-700 text-sm">
+                                <i class="fa-solid fa-circle-exclamation text-rose-500 text-lg flex-shrink-0"></i>
+                                <span id="loginErrorText">Invalid CPR number provided.</span>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 group">
+                                <span>Sign In & Authorize Access</span>
+                                <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        </form>
+
+                        <!-- Pre-configured Credentials Quick Selector Table -->
+                        <div class="mt-8 pt-6 border-t border-slate-200">
+                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center justify-between">
+                                <span>Demo Preset Credentials</span>
+                                <span class="text-[10px] text-brand-600 font-normal">Click any row to test</span>
+                            </h3>
+                            <div class="overflow-x-auto rounded-lg border border-slate-200">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                                        <tr>
+                                            <th class="p-2.5">Supervisor Name</th>
+                                            <th class="p-2.5">Role</th>
+                                            <th class="p-2.5">CPR Number</th>
+                                            <th class="p-2.5 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="demoCredentialsTable" class="divide-y divide-slate-200 bg-white">
+                                        <!-- Populated dynamically via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: ACTION AUDIT LOGS (ACTIVE & LIVE) -->
+            <div id="tab-audit" class="tab-content hidden space-y-4">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h2 class="text-xl font-bold text-slate-800">Action Audit Trail</h2>
+                                <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">Live Recording</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Every supervisor action (login, logout, leave approval, modifications) is logged here with exact timestamp and CPR verification.</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="exportAuditLogs()" class="px-3 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Export JSON</span>
+                            </button>
+                            <button onclick="clearAuditLogs()" class="px-3 py-2 text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg border border-rose-200 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-trash-can"></i>
+                                <span>Clear Logs</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Audit Log Table -->
+                    <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold uppercase tracking-wider border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">Timestamp</th>
+                                    <th class="p-3">Action Type</th>
+                                    <th class="p-3">Performed By</th>
+                                    <th class="p-3">CPR No.</th>
+                                    <th class="p-3">Action Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditLogsTableBody" class="divide-y divide-slate-200 bg-white font-mono text-slate-600">
+                                <!-- Dynamic content populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PLACEHOLDER TABS FOR STEPS 2 - 6 -->
+            <div id="tab-calendar" class="tab-content hidden">
+                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
+                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Step 2: Leave Calendar Module</h3>
+                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">This page will feature an interactive month/year calendar view displaying technician leaves, color-coded by department or status.</p>
+                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
+                </div>
+            </div>
+
+            <div id="tab-availability" class="tab-content hidden">
+                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
+                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                        <i class="fa-solid fa-users-viewfinder"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Step 3: Availability Matrix</h3>
+                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Grid matrix showing shift coverage, daily technician staffing counts, and shortage alerts.</p>
+                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
+                </div>
+            </div>
+
+            <div id="tab-remaining" class="tab-content hidden">
+                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
+                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Step 4: Remaining Days Tracker</h3>
+                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Individual breakdown per technician showing allocated vs taken annual leave, sick leave, and emergency leave.</p>
+                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
+                </div>
+            </div>
+
+            <div id="tab-total" class="tab-content hidden">
+                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
+                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Step 5: Total Days & Analytics</h3>
+                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Departmental metrics, leave utilization rate, and annual forecasting reports.</p>
+                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
+                </div>
+            </div>
+
+            <div id="tab-print" class="tab-content hidden">
+                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
+                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Step 6: Printable PDF Generator</h3>
+                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Formated, print-ready document template for technician leave requests with supervisor signatures.</p>
+                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- SYSTEM JAVASCRIPT LOGIC -->
+    <script>
+        /**
+         * PRESET SUPERVISOR DEMO ACCOUNTS
+         * In a real GitHub static deployment, these act as the authorized supervisor registry.
+         */
+        const SUPERVISORS = [
+            { id: 1, name: 'Ali Al-Mansoori', role: 'Senior Supervisor', cpr: '880123456' },
+            { id: 2, name: 'Sarah Ahmed', role: 'Operations Manager', cpr: '910987654' },
+            { id: 3, name: 'Hassan Abdulla', role: 'Technical Team Lead', cpr: '850555123' },
+            { id: 4, name: 'Fatima Al-Sayed', role: 'Maintenance Supervisor', cpr: '930444888' }
+        ];
+
+        // GLOBAL APPLICATION STATE
+        let currentUser = null;
+        let auditLogs = [];
+
+        // INITIALIZATION ON PAGE LOAD
+        window.addEventListener('DOMContentLoaded', () => {
+            initSupervisorDropdown();
+            renderDemoCredentialsTable();
+            loadAuditLogs();
+            checkExistingSession();
+            renderAuditLogsTable();
+        });
+
+        // 1. POPULATE SUPERVISOR DROPDOWN
+        function initSupervisorDropdown() {
+            const select = document.getElementById('supervisorSelect');
+            select.innerHTML = '<option value="" disabled selected>-- Select Supervisor --</option>';
+            
+            SUPERVISORS.forEach(sup => {
+                const opt = document.createElement('option');
+                opt.value = sup.id;
+                opt.textContent = `${sup.name} (${sup.role})`;
+                select.appendChild(opt);
+            });
+        }
+
+        // 2. RENDER PRESET CREDENTIALS TABLE FOR FAST DEMO TESTING
+        function renderDemoCredentialsTable() {
+            const tbody = document.getElementById('demoCredentialsTable');
+            tbody.innerHTML = '';
+
+            SUPERVISORS.forEach(sup => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors cursor-pointer';
+                tr.onclick = () => selectPresetUser(sup.id);
+                tr.innerHTML = `
+                    <td class="p-2.5 font-semibold text-slate-800">${sup.name}</td>
+                    <td class="p-2.5 text-slate-500">${sup.role}</td>
+                    <td class="p-2.5 font-mono text-brand-600">${sup.cpr}</td>
+                    <td class="p-2.5 text-right">
+                        <button type="button" class="px-2 py-1 text-[11px] bg-brand-50 text-brand-600 hover:bg-brand-100 rounded border border-brand-200">
+                            Auto-Fill
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // AUTO FILL ON CLICKING PRESET
+        function selectPresetUser(supId) {
+            const sup = SUPERVISORS.find(s => s.id === supId);
+            if (!sup) return;
+
+            document.getElementById('supervisorSelect').value = sup.id;
+            document.getElementById('cprInput').value = sup.cpr;
+            autoFillCPRHint();
+            showToast(`Preset loaded for ${sup.name}`, 'info');
+        }
+
+        // AUTO FILL HINT BADGE
+        function autoFillCPRHint() {
+            const selectedId = parseInt(document.getElementById('supervisorSelect').value);
+            const sup = SUPERVISORS.find(s => s.id === selectedId);
+            const hintBadge = document.getElementById('cprHintBadge');
+            const hintVal = document.getElementById('hintCprVal');
+
+            if (sup) {
+                hintVal.textContent = sup.cpr;
+                hintBadge.classList.remove('hidden');
+            } else {
+                hintBadge.classList.add('hidden');
+            }
+        }
+
+        // TOGGLE CPR MASKING
+        function toggleCPRVisibility() {
+            const input = document.getElementById('cprInput');
+            const icon = document.getElementById('cprToggleIcon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // 3. HANDLE LOGIN ACTION
+        function handleLogin(event) {
+            event.preventDefault();
+            const supId = parseInt(document.getElementById('supervisorSelect').value);
+            const inputCPR = document.getElementById('cprInput').value.trim();
+            const errorMsg = document.getElementById('loginErrorMsg');
+
+            errorMsg.classList.add('hidden');
+
+            const sup = SUPERVISORS.find(s => s.id === supId);
+
+            if (!sup) {
+                showError('Please select a valid supervisor account.');
+                return;
+            }
+
+            if (sup.cpr !== inputCPR) {
+                showError('Invalid CPR number provided for selected supervisor.');
+                logAuditEvent('FAILED_LOGIN_ATTEMPT', `${sup.name}`, inputCPR, 'Failed authentication attempt: CPR mismatch');
+                return;
+            }
+
+            // SUCCESSFUL LOGIN
+            currentUser = {
+                id: sup.id,
+                name: sup.name,
+                role: sup.role,
+                cpr: sup.cpr,
+                loginTime: new Date().toISOString()
+            };
+
+            // Save to sessionStorage
+            sessionStorage.setItem('techleave_current_user', JSON.stringify(currentUser));
+
+            // Log Audit Event
+            logAuditEvent('SUPERVISOR_LOGIN', currentUser.name, currentUser.cpr, 'Supervisor authenticated successfully into the system.');
+
+            // Update Header & UI UI
+            updateUIForLoggedInUser();
+            showToast(`Welcome back, ${currentUser.name}!`, 'success');
+
+            // Reset form
+            document.getElementById('loginForm').reset();
+            document.getElementById('cprHintBadge').classList.add('hidden');
+        }
+
+        function showError(msg) {
+            const errorMsg = document.getElementById('loginErrorMsg');
+            const errorText = document.getElementById('loginErrorText');
+            errorText.textContent = msg;
+            errorMsg.classList.remove('hidden');
+        }
+
+        // CHECK EXISTING SESSION
+        function checkExistingSession() {
+            const stored = sessionStorage.getItem('techleave_current_user');
+            if (stored) {
+                try {
+                    currentUser = JSON.parse(stored);
+                    updateUIForLoggedInUser();
+                } catch(e) {
+                    sessionStorage.removeItem('techleave_current_user');
+                }
+            }
+        }
+
+        // UPDATE UI ON LOGIN
+        function updateUIForLoggedInUser() {
+            if (!currentUser) return;
+
+            // Update Header
+            document.getElementById('headerUserName').textContent = `${currentUser.name} (${currentUser.role})`;
+            document.getElementById('headerUserCPR').textContent = `CPR: ${currentUser.cpr}`;
+            document.getElementById('userHeaderSection').classList.remove('hidden');
+            document.getElementById('userHeaderSection').classList.add('flex');
+            document.getElementById('guestHeaderBadge').classList.add('hidden');
+
+            // Update Login Nav Badge
+            const statusBadge = document.getElementById('loginStatusBadge');
+            statusBadge.textContent = 'Authenticated';
+            statusBadge.className = 'bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold';
+
+            // Unlock other tabs visually (Step preparation)
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('opacity-60');
+            });
+        }
+
+        // LOGOUT HANDLER
+        function handleLogout() {
+            if (!currentUser) return;
+
+            logAuditEvent('SUPERVISOR_LOGOUT', currentUser.name, currentUser.cpr, 'Supervisor logged out of session.');
+            showToast(`Logged out supervisor ${currentUser.name}`, 'info');
+
+            currentUser = null;
+            sessionStorage.removeItem('techleave_current_user');
+
+            // Reset Header UI
+            document.getElementById('userHeaderSection').classList.add('hidden');
+            document.getElementById('userHeaderSection').classList.remove('flex');
+            document.getElementById('guestHeaderBadge').classList.remove('hidden');
+
+            // Reset Login Nav Badge
+            const statusBadge = document.getElementById('loginStatusBadge');
+            statusBadge.textContent = 'Required';
+            statusBadge.className = 'bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold';
+
+            // Switch back to Login Tab
+            switchTab('login');
+        }
+
+        // TAB SWITCHING LOGIC
+        function switchTab(tabId) {
+            // Hide all contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.classList.add('hidden'));
+
+            // Show target
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.remove('hidden');
+
+            // Style nav buttons
+            const navBtns = document.querySelectorAll('.nav-item');
+            navBtns.forEach(btn => {
+                btn.classList.remove('bg-brand-50', 'text-brand-700', 'border', 'border-brand-200');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-brand-50', 'text-brand-700', 'border', 'border-brand-200');
+                activeBtn.classList.remove('text-slate-600');
+            }
+        }
+
+        // 4. AUDIT LOG ENGINE
+        function logAuditEvent(actionType, userName, cpr, details) {
+            const newLog = {
+                id: 'LOG-' + Date.now(),
+                timestamp: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'medium' }),
+                actionType: actionType,
+                userName: userName || 'System Guest',
+                cpr: cpr || 'N/A',
+                details: details
+            };
+
+            auditLogs.unshift(newLog); // Push to beginning
+            saveAuditLogs();
+            renderAuditLogsTable();
+        }
+
+        function loadAuditLogs() {
+            const stored = localStorage.getItem('techleave_audit_logs');
+            if (stored) {
+                try {
+                    auditLogs = JSON.parse(stored);
+                } catch(e) {
+                    auditLogs = [];
+                }
+            } else {
+                // Initialize with system creation log
+                auditLogs = [
+                    {
+                        id: 'LOG-INIT',
+                        timestamp: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'medium' }),
+                        actionType: 'SYSTEM_INIT',
+                        userName: 'System Core',
+                        cpr: '000000000',
+                        details: 'Technician Leave Planning System Audit Trail Initialized.'
+                    }
+                ];
+                saveAuditLogs();
+            }
+        }
+
+        function saveAuditLogs() {
+            localStorage.setItem('techleave_audit_logs', JSON.stringify(auditLogs));
+            document.getElementById('auditCountBadge').textContent = auditLogs.length;
+        }
+
+        function renderAuditLogsTable() {
+            const tbody = document.getElementById('auditLogsTableBody');
+            tbody.innerHTML = '';
+
+            if (auditLogs.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="p-6 text-center text-slate-400 font-sans">
+                            No audit logs recorded yet.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            auditLogs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors';
+
+                let actionBadgeColor = 'bg-slate-100 text-slate-700';
+                if (log.actionType.includes('LOGIN')) actionBadgeColor = 'bg-emerald-100 text-emerald-800';
+                if (log.actionType.includes('LOGOUT')) actionBadgeColor = 'bg-amber-100 text-amber-800';
+                if (log.actionType.includes('FAILED')) actionBadgeColor = 'bg-rose-100 text-rose-800';
+
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-500 whitespace-nowrap">${log.timestamp}</td>
+                    <td class="p-3 whitespace-nowrap">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${actionBadgeColor}">
+                            ${log.actionType}
+                        </span>
+                    </td>
+                    <td class="p-3 font-semibold text-slate-800 whitespace-nowrap font-sans">${log.userName}</td>
+                    <td class="p-3 text-brand-600">${log.cpr}</td>
+                    <td class="p-3 font-sans text-slate-600 max-w-xs truncate">${log.details}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('auditCountBadge').textContent = auditLogs.length;
+        }
+
+        function clearAuditLogs() {
+            if (confirm('Are you sure you want to clear all historical audit logs?')) {
+                auditLogs = [];
+                saveAuditLogs();
+                renderAuditLogsTable();
+                showToast('Audit logs cleared', 'info');
+            }
+        }
+
+        function exportAuditLogs() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `techleave_audit_logs_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('Audit log exported as JSON', 'success');
+        }
+
+        // TOAST NOTIFICATIONS
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            let bg = 'bg-slate-900 text-white';
+            let icon = 'fa-circle-info';
+
+            if (type === 'success') {
+                bg = 'bg-emerald-700 text-white';
+                icon = 'fa-circle-check';
+            } else if (type === 'error') {
+                bg = 'bg-rose-700 text-white';
+                icon = 'fa-triangle-exclamation';
+            }
+
+            toast.className = `pointer-events-auto flex items-center space-x-3 ${bg} px-4 py-3 rounded-lg shadow-lg border border-white/10 text-xs font-medium transition-all transform translate-y-2 opacity-0`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon}"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Remove after 3s
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
