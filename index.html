@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Horizon - Technician Leave Management System</title>
+  <title>Horizon Telecom Services - Leave Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); }
@@ -13,17 +12,23 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col">
 
-  <!-- HEADER -->
+  <!-- TOP HEADER WITH OFFICIAL HORIZON TELECOM SERVICES LOGO -->
   <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-6 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
     <div class="flex items-center space-x-4">
-      <a href="https://www.horizon.bh" target="_blank" class="bg-white px-3 py-1.5 rounded-xl shadow-sm flex items-center justify-center hover:opacity-90 transition">
-        <img src="https://www.horizon.bh/assets/img/logo.png" alt="Horizon Logo" class="h-8 object-contain" onerror="this.onerror=null; this.src='https://www.horizon.bh/favicon.ico';">
-      </a>
+      <!-- Horizon Telecom Services Styled Brand Logo -->
+      <div class="bg-white px-4 py-2 rounded-xl shadow-md flex items-center space-x-2.5 select-none">
+        <div class="border-2 border-orange-500 bg-white w-7 h-7 flex items-center justify-center font-black text-orange-500 text-base leading-none">H</div>
+        <div class="flex flex-col leading-none">
+          <span class="text-base font-extrabold tracking-wider text-slate-700 font-sans uppercase">HORIZON</span>
+          <span class="text-[8px] tracking-[0.25em] text-slate-500 font-medium uppercase mt-0.5">TELECOM SERVICES</span>
+        </div>
+      </div>
+      
       <div class="h-8 w-px bg-slate-700 hidden sm:block"></div>
       <div>
         <h1 class="text-base font-bold text-white tracking-wide flex items-center gap-2">
           <span>Technician Leave Management System</span>
-          <span class="text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full font-normal">Horizon Hub</span>
+          <span class="text-xs bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full font-normal">Internal Hub</span>
         </h1>
         <p class="text-xs text-slate-400">Horizon Bahrain • Operational Leave Planning Portal</p>
       </div>
@@ -33,7 +38,7 @@
     <div id="userBadge" class="hidden flex items-center space-x-4 bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-700">
       <div class="text-right">
         <div id="badgeName" class="text-sm font-bold text-white">--</div>
-        <div id="badgeRole" class="text-xs text-amber-400 font-medium">--</div>
+        <div id="badgeRole" class="text-xs text-orange-400 font-medium">--</div>
       </div>
       <button onclick="logout()" class="bg-slate-800 hover:bg-rose-600 border border-slate-700 text-white p-2 rounded-lg transition text-xs flex items-center space-x-1" title="Sign Out">
         <i class="fa-solid fa-right-from-bracket"></i>
@@ -43,7 +48,7 @@
   </header>
 
   <div class="flex flex-1 overflow-hidden">
-    <!-- SIDEBAR -->
+    <!-- NAVIGATION SIDEBAR -->
     <aside id="appSidebar" class="hidden w-64 bg-slate-800/95 border-r border-slate-700 flex flex-col justify-between">
       <div class="p-4 space-y-1">
         <div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Leave Modules</div>
@@ -73,50 +78,52 @@
           <span>PDF Reports & Print</span>
         </button>
 
-        <!-- ADMIN MODULES -->
+        <!-- ADMIN EXCLUSIVE MODULES -->
         <div id="adminNavGroup" class="hidden pt-4 space-y-1 border-t border-slate-700/60 mt-4">
-          <div class="px-3 py-2 text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-1.5">
+          <div class="px-3 py-2 text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center space-x-1.5">
             <i class="fa-solid fa-shield-halved text-xs"></i>
             <span>Admin Administration</span>
           </div>
 
           <button onclick="switchTab('audit')" id="nav-audit" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-clock-rotate-left text-amber-400 w-5"></i>
+            <i class="fa-solid fa-clock-rotate-left text-orange-400 w-5"></i>
             <span>Action Audit Trail</span>
-          </button>
-
-          <button onclick="switchTab('2fa-mgmt')" id="nav-2fa-mgmt" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-key text-amber-400 w-5"></i>
-            <span>2FA User Controls</span>
           </button>
         </div>
       </div>
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v3.0</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v4.0</span>
       </div>
     </aside>
 
-    <!-- MAIN VIEW -->
+    <!-- MAIN CONTENT CONTAINER -->
     <main class="flex-1 bg-grid p-6 overflow-y-auto">
 
-      <div id="view-login" class="max-w-xl mx-auto mt-8">
+      <!-- ==================== LOGIN VIEW ==================== -->
+      <div id="view-login" class="max-w-md mx-auto mt-12">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
           
-          <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-6 text-center border-b border-slate-700 flex flex-col items-center">
-            <div class="bg-white px-5 py-2 rounded-xl shadow-md mb-3 inline-block">
-              <img src="https://www.horizon.bh/assets/img/logo.png" alt="Horizon Logo" class="h-10 object-contain" onerror="this.onerror=null; this.src='https://www.horizon.bh/favicon.ico';">
+          <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 text-center border-b border-slate-700 flex flex-col items-center">
+            <!-- Brand Logo in Banner -->
+            <div class="bg-white px-5 py-3 rounded-xl shadow-lg mb-4 flex items-center space-x-3 select-none">
+              <div class="border-2 border-orange-500 bg-white w-9 h-9 flex items-center justify-center font-black text-orange-500 text-xl leading-none">H</div>
+              <div class="flex flex-col text-left leading-none">
+                <span class="text-xl font-extrabold tracking-wider text-slate-800 font-sans uppercase">HORIZON</span>
+                <span class="text-[9px] tracking-[0.25em] text-slate-500 font-bold uppercase mt-1">TELECOM SERVICES</span>
+              </div>
             </div>
-            <h2 class="text-xl font-bold text-white tracking-wide">Leave Management System</h2>
-            <p class="text-xs text-slate-300 mt-1">Select your profile and authenticate using Microsoft Authenticator</p>
+            <h2 class="text-lg font-bold text-white tracking-wide">Leave Management System</h2>
+            <p class="text-xs text-slate-400 mt-1">Select your account profile to access system modules</p>
           </div>
 
           <div class="p-6 space-y-6">
+            <!-- User Selection Dropdown -->
             <div>
               <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Select User Account</label>
-              <select id="loginUserSelect" onchange="onUserSelectionChange()" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 shadow-inner">
-                <option value="">-- Choose Name --</option>
+              <select id="loginUserSelect" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 shadow-inner">
+                <option value="">-- Choose User Profile --</option>
                 <optgroup label="Administrators (Full System Access)">
                   <option value="admin_1">Habib Khamis (Admin)</option>
                   <option value="admin_2">Husain Kadhem (Admin)</option>
@@ -131,70 +138,24 @@
               </select>
             </div>
 
-            <div id="authFlowContainer" class="hidden space-y-4 border-t border-slate-700 pt-4">
-
-              <!-- CASE A: FIRST TIME LOGIN -->
-              <div id="firstTimeSetupBox" class="hidden space-y-4 text-center">
-                <div class="bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl text-left">
-                  <div class="text-blue-400 font-bold text-xs uppercase flex items-center space-x-1.5">
-                    <i class="fa-solid fa-qrcode"></i>
-                    <span>First-Time Authenticator Setup</span>
-                  </div>
-                  <p class="text-xs text-slate-300 mt-1">Scan this QR code with <b>Microsoft Authenticator</b> on your phone to complete setup.</p>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl inline-block shadow-lg border border-slate-300" id="qrcode"></div>
-                
-                <div class="text-xs font-mono text-slate-400 bg-slate-900 p-2.5 rounded-lg border border-slate-700">
-                  Secret Key: <span id="secretKeyDisplay" class="text-amber-400 font-bold">--</span>
-                </div>
-
-                <div class="pt-2 text-left space-y-2">
-                  <label class="block text-xs font-semibold text-slate-300 uppercase">Enter 6-Digit Verification Code</label>
-                  <input type="text" id="totpFirstInput" maxlength="6" placeholder="000 000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:border-blue-500">
-                  
-                  <button onclick="verifyAndLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg mt-2">
-                    <i class="fa-solid fa-shield-check"></i>
-                    <span>Verify Code & Complete Registration</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- CASE B: REGISTERED USER LOGIN -->
-              <div id="registeredLoginBox" class="hidden space-y-4">
-                <div class="bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-xl">
-                  <div class="text-emerald-400 font-bold text-xs uppercase flex items-center space-x-1.5">
-                    <i class="fa-solid fa-user-check"></i>
-                    <span>Authenticator Active</span>
-                  </div>
-                  <p class="text-xs text-slate-300 mt-0.5">Account verified. Open <b>Microsoft Authenticator</b> on your phone and type the 6-digit code.</p>
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Authenticator Code</label>
-                  <input type="text" id="totpRegInput" maxlength="6" placeholder="000 000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:border-blue-500">
-                </div>
-
-                <button onclick="verifyAndLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
-                  <i class="fa-solid fa-lock-open"></i>
-                  <span>Verify & Sign In</span>
-                </button>
-              </div>
-
-            </div>
-
+            <button onclick="loginUser()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
+              <i class="fa-solid fa-right-to-bracket"></i>
+              <span>Sign In to System</span>
+            </button>
           </div>
+
         </div>
       </div>
 
-      <!-- MODULE PLACEHOLDERS -->
+      <!-- ==================== LOGGED-IN SYSTEM MODULES ==================== -->
+
       <div id="view-calendar" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
           <h2 class="text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-regular fa-calendar-days text-blue-400"></i>
             <span>Technician Leave Calendar</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Ready for Step 2 - Technician schedule and leave calendar matrix.</p>
+          <p class="text-sm text-slate-400 mt-1">Step 2 Module - Ready for technician leave schedule and calendar matrix.</p>
         </div>
       </div>
 
@@ -204,7 +165,7 @@
             <i class="fa-solid fa-users-viewfinder text-emerald-400"></i>
             <span>Technician Availability</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Ready for Step 3 - Daily manpower vs leave capacity matrix.</p>
+          <p class="text-sm text-slate-400 mt-1">Step 3 Module - Daily manpower vs leave capacity matrix.</p>
         </div>
       </div>
 
@@ -214,7 +175,7 @@
             <i class="fa-solid fa-hourglass-half text-amber-400"></i>
             <span>Remaining Days Counter</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Ready for Step 4 - Real-time annual leave balances per technician.</p>
+          <p class="text-sm text-slate-400 mt-1">Step 4 Module - Real-time annual leave balances per technician.</p>
         </div>
       </div>
 
@@ -224,7 +185,7 @@
             <i class="fa-solid fa-chart-pie text-indigo-400"></i>
             <span>Total Days Summary</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Ready for Step 5 - Cumulative leave utilization statistics.</p>
+          <p class="text-sm text-slate-400 mt-1">Step 5 Module - Cumulative leave utilization statistics.</p>
         </div>
       </div>
 
@@ -234,20 +195,20 @@
             <i class="fa-solid fa-file-pdf text-rose-400"></i>
             <span>PDF Generator & Print Hub</span>
           </h2>
-          <p class="text-sm text-slate-400 mt-1">Ready for Step 6 - Printable leave forms with supervisor timestamps.</p>
+          <p class="text-sm text-slate-400 mt-1">Step 6 Module - Printable leave forms with supervisor timestamps.</p>
         </div>
       </div>
 
-      <!-- ADMIN EXCLUSIVE: AUDIT TRAIL -->
+      <!-- ADMIN EXCLUSIVE: ACTION AUDIT TRAIL -->
       <div id="view-audit" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-xl font-bold text-white flex items-center space-x-2">
-                <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
+                <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
                 <span>Action Audit Trail</span>
               </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Timestamped tracking of logins, 2FA events, and supervisor actions.</p>
+              <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Timestamped tracking of user sign-ins and system events.</p>
             </div>
             <button onclick="exportAuditTrail()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg transition flex items-center space-x-1 border border-slate-600">
               <i class="fa-solid fa-file-csv"></i>
@@ -272,59 +233,24 @@
         </div>
       </div>
 
-      <!-- ADMIN EXCLUSIVE: 2FA MANAGEMENT -->
-      <div id="view-2fa-mgmt" class="hidden space-y-6">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
-          <div>
-            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
-              <i class="fa-solid fa-key text-amber-400"></i>
-              <span>2FA User Registration Management</span>
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Issue 2FA resets if a user loses or deletes Microsoft Authenticator.</p>
-          </div>
-
-          <div class="overflow-x-auto border border-slate-700 rounded-xl">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
-                <tr>
-                  <th class="p-3">User Name</th>
-                  <th class="p-3">System Role</th>
-                  <th class="p-3">2FA Status</th>
-                  <th class="p-3">Registration Date</th>
-                  <th class="p-3">Administrative Control</th>
-                </tr>
-              </thead>
-              <tbody id="mgmtTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
     </main>
   </div>
 
   <script>
-    // USER ROSTER WITH UNIQUE BASE32 KEYS
+    // SYSTEM ROSTER
     const SYSTEM_USERS = {
-      'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'JBSWY3DPEHPK3PXP' },
-      'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', secret: 'K42TEV2JIZCEYUKN' },
-      'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', secret: 'MZXW633PN5XW6M3U' },
-      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'NBSWY3DPEHPK3PXP' },
-      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'OBSWY3DPEHPK3PXP' },
-      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'PBSWY3DPEHPK3PXP' },
-      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'QBSWY3DPEHPK3PXP' }
+      // ADMINS
+      'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin' },
+      'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin' },
+      'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin' },
+      // SUPERVISORS
+      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor' },
+      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor' },
+      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor' },
+      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor' }
     };
 
     let currentUser = null;
-    let qrcodeObj = null;
-
-    function getRegisteredUsers() {
-      return JSON.parse(localStorage.getItem('horizon_registered_2fa') || '{}');
-    }
-
-    function setRegisteredUsers(data) {
-      localStorage.setItem('horizon_registered_2fa', JSON.stringify(data));
-    }
 
     function getAuditTrail() {
       return JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
@@ -361,86 +287,28 @@
     }
 
     function hideAllViews() {
-      const views = ['view-login', 'view-calendar', 'view-availability', 'view-remaining', 'view-total', 'view-pdf', 'view-audit', 'view-2fa-mgmt'];
+      const views = ['view-login', 'view-calendar', 'view-availability', 'view-remaining', 'view-total', 'view-pdf', 'view-audit'];
       views.forEach(v => document.getElementById(v).classList.add('hidden'));
     }
 
-    function onUserSelectionChange() {
+    function loginUser() {
       const val = document.getElementById('loginUserSelect').value;
-      const flowContainer = document.getElementById('authFlowContainer');
-      const firstTimeBox = document.getElementById('firstTimeSetupBox');
-      const regLoginBox = document.getElementById('registeredLoginBox');
-
-      flowContainer.classList.add('hidden');
-      firstTimeBox.classList.add('hidden');
-      regLoginBox.classList.add('hidden');
-
-      if (val && SYSTEM_USERS[val]) {
-        flowContainer.classList.remove('hidden');
-
-        const user = SYSTEM_USERS[val];
-        const registered = getRegisteredUsers();
-
-        if (registered[user.id]) {
-          regLoginBox.classList.remove('hidden');
-          document.getElementById('totpRegInput').value = '';
-        } else {
-          firstTimeBox.classList.remove('hidden');
-          document.getElementById('totpFirstInput').value = '';
-          generateQrCode(user);
-        }
+      if (!val || !SYSTEM_USERS[val]) {
+        alert('Please select a user profile to sign in.');
+        return;
       }
-    }
 
-    function generateQrCode(user) {
-      document.getElementById('secretKeyDisplay').textContent = user.secret;
-      const otpauth = `otpauth://totp/Horizon:${encodeURIComponent(user.name)}?secret=${user.secret}&issuer=HorizonBahrain`;
+      const user = SYSTEM_USERS[val];
+      currentUser = { role: user.role, name: user.name, id: user.id };
+      sessionStorage.setItem('horizon_active_session', JSON.stringify(currentUser));
 
-      const qrDiv = document.getElementById('qrcode');
-      qrDiv.innerHTML = "";
-      qrcodeObj = new QRCode(qrDiv, {
-        text: otpauth,
-        width: 160,
-        height: 160,
-        colorDark: "#0f172a",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
-      });
-    }
-
-    function verifyAndLogin() {
-      const userKey = document.getElementById('loginUserSelect').value;
-      if (!userKey || !SYSTEM_USERS[userKey]) return;
-
-      const user = SYSTEM_USERS[userKey];
-      const registered = getRegisteredUsers();
-      const isFirstTime = !registered[user.id];
-
-      const inputCode = (isFirstTime ? 
-        document.getElementById('totpFirstInput').value : 
-        document.getElementById('totpRegInput').value).trim();
-
-      const validCodes = getValidTotpCodes(user.secret);
-
-      if (validCodes.includes(inputCode)) {
-        const reg = getRegisteredUsers();
-        reg[user.id] = { registeredAt: new Date().toISOString(), locked: true };
-        setRegisteredUsers(reg);
-
-        currentUser = { role: user.role, name: user.name, id: user.id };
-        sessionStorage.setItem('horizon_active_session', JSON.stringify(currentUser));
-
-        logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', 'Authenticated via Microsoft Authenticator');
-        applyAuthenticatedUI();
-      } else {
-        alert('Invalid Code! Please re-verify in Microsoft Authenticator.');
-        logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect 2FA code provided');
-      }
+      logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', 'User signed in to system portal');
+      applyAuthenticatedUI();
     }
 
     function logout() {
       if (currentUser) {
-        logAuditEvent(currentUser.name, currentUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Logout', 'User signed out of portal session');
+        logAuditEvent(currentUser.name, currentUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Logout', 'User signed out of session');
       }
       currentUser = null;
       sessionStorage.removeItem('horizon_active_session');
@@ -467,8 +335,8 @@
     function switchTab(tabId) {
       hideAllViews();
 
-      if ((tabId === 'audit' || tabId === '2fa-mgmt') && currentUser.role !== 'admin') {
-        alert('Access Restricted: Only Administrators can view Audit Logs and 2FA User Controls.');
+      if (tabId === 'audit' && currentUser.role !== 'admin') {
+        alert('Access Restricted: Only Administrators can view Audit Logs.');
         switchTab('calendar');
         return;
       }
@@ -477,7 +345,6 @@
       if (viewEl) viewEl.classList.remove('hidden');
 
       if (tabId === 'audit') renderAuditTable();
-      if (tabId === '2fa-mgmt') render2faMgmtTable();
     }
 
     function renderAuditTable() {
@@ -496,54 +363,12 @@
         tr.innerHTML = `
           <td class="p-3 font-mono text-slate-400">${log.timestamp}</td>
           <td class="p-3 font-semibold text-white">${log.actorName}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${log.role === 'Admin' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'}">${log.role}</span></td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${log.role === 'Admin' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'}">${log.role}</span></td>
           <td class="p-3 text-emerald-400 font-medium">${log.action}</td>
           <td class="p-3 text-slate-400">${log.details}</td>
         `;
         tbody.appendChild(tr);
       });
-    }
-
-    function render2faMgmtTable() {
-      const reg = getRegisteredUsers();
-      const tbody = document.getElementById('mgmtTableBody');
-      tbody.innerHTML = '';
-
-      Object.values(SYSTEM_USERS).forEach(user => {
-        const isReg = reg[user.id] && reg[user.id].locked;
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
-        tr.innerHTML = `
-          <td class="p-3 font-semibold text-white">${user.name}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${user.role === 'admin' ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'}">${user.role.toUpperCase()}</span></td>
-          <td class="p-3">
-            <span class="px-2 py-1 rounded text-xs font-bold ${isReg ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
-              ${isReg ? 'REGISTERED & LOCKED' : 'PENDING SETUP'}
-            </span>
-          </td>
-          <td class="p-3 text-slate-400">${isReg ? new Date(reg[user.id].registeredAt).toLocaleDateString('en-GB') : 'Never'}</td>
-          <td class="p-3">
-            ${isReg ? `
-              <button onclick="resetUser2fa('${user.id}')" class="bg-rose-900/60 hover:bg-rose-800 border border-rose-700 text-rose-200 px-2.5 py-1 rounded text-xs transition">
-                Reset 2FA Lock
-              </button>
-            ` : '<span class="text-slate-500 italic">No Lock Active</span>'}
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function resetUser2fa(userId) {
-      if (!confirm(`Are you sure you want to reset 2FA registration for ${SYSTEM_USERS[userId].name}?`)) return;
-
-      const reg = getRegisteredUsers();
-      delete reg[userId];
-      setRegisteredUsers(reg);
-
-      logAuditEvent(currentUser.name, 'Admin', 'Admin 2FA Reset', `Issued new 2FA setup lock reset for ${SYSTEM_USERS[userId].name}`);
-      render2faMgmtTable();
-      alert(`2FA reset complete for ${SYSTEM_USERS[userId].name}. They can now scan a new QR code on next login.`);
     }
 
     function exportAuditTrail() {
@@ -558,38 +383,6 @@
       a.href = url;
       a.download = `horizon-audit-logs-${Date.now()}.csv`;
       a.click();
-    }
-
-    // STANDALONE RFC 6238 TOTP ENGINE
-    function getValidTotpCodes(secret) {
-      const epoch = Math.floor(Date.now() / 1000);
-      const counter = Math.floor(epoch / 30);
-      return [
-        calcTotp(secret, counter),
-        calcTotp(secret, counter - 1),
-        calcTotp(secret, counter + 1)
-      ];
-    }
-
-    function calcTotp(secret, counter) {
-      const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-      let bits = "";
-      for (let i = 0; i < secret.length; i++) {
-        const val = base32chars.indexOf(secret.charAt(i).toUpperCase());
-        bits += val.toString(2).padStart(5, '0');
-      }
-      let keyBytes = [];
-      for (let i = 0; i + 8 <= bits.length; i += 8) {
-        keyBytes.push(parseInt(bits.substr(i, 8), 2));
-      }
-
-      // SHA1 HMAC calculation over 8-byte counter buffer
-      let hash = counter;
-      for (let i = 0; i < keyBytes.length; i++) {
-        hash = ((hash << 5) - hash) + keyBytes[i];
-        hash |= 0;
-      }
-      return Math.abs(hash % 1000000).toString().padStart(6, '0');
     }
   </script>
 </body>
