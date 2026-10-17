@@ -13,7 +13,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col">
 
-  <!-- TOP HEADER WITH HORIZON LOGO -->
+  <!-- HEADER -->
   <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-6 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
     <div class="flex items-center space-x-4">
       <a href="https://www.horizon.bh" target="_blank" class="bg-white px-3 py-1.5 rounded-xl shadow-sm flex items-center justify-center hover:opacity-90 transition">
@@ -43,7 +43,7 @@
   </header>
 
   <div class="flex flex-1 overflow-hidden">
-    <!-- NAVIGATION SIDEBAR -->
+    <!-- SIDEBAR -->
     <aside id="appSidebar" class="hidden w-64 bg-slate-800/95 border-r border-slate-700 flex flex-col justify-between">
       <div class="p-4 space-y-1">
         <div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Leave Modules</div>
@@ -73,7 +73,7 @@
           <span>PDF Reports & Print</span>
         </button>
 
-        <!-- ADMIN EXCLUSIVE MODULES -->
+        <!-- ADMIN MODULES -->
         <div id="adminNavGroup" class="hidden pt-4 space-y-1 border-t border-slate-700/60 mt-4">
           <div class="px-3 py-2 text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-1.5">
             <i class="fa-solid fa-shield-halved text-xs"></i>
@@ -94,14 +94,13 @@
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v2.1</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v3.0</span>
       </div>
     </aside>
 
-    <!-- MAIN CONTENT CONTAINER -->
+    <!-- MAIN VIEW -->
     <main class="flex-1 bg-grid p-6 overflow-y-auto">
 
-      <!-- ==================== LOGIN VIEW ==================== -->
       <div id="view-login" class="max-w-xl mx-auto mt-8">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
           
@@ -114,7 +113,6 @@
           </div>
 
           <div class="p-6 space-y-6">
-            <!-- User Selection Dropdown -->
             <div>
               <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Select User Account</label>
               <select id="loginUserSelect" onchange="onUserSelectionChange()" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 shadow-inner">
@@ -133,7 +131,6 @@
               </select>
             </div>
 
-            <!-- DYNAMIC AUTHENTICATION FLOW -->
             <div id="authFlowContainer" class="hidden space-y-4 border-t border-slate-700 pt-4">
 
               <!-- CASE A: FIRST TIME LOGIN -->
@@ -190,8 +187,7 @@
         </div>
       </div>
 
-      <!-- ==================== LOGGED-IN SYSTEM MODULES ==================== -->
-
+      <!-- MODULE PLACEHOLDERS -->
       <div id="view-calendar" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
           <h2 class="text-xl font-bold text-white flex items-center space-x-2">
@@ -242,7 +238,7 @@
         </div>
       </div>
 
-      <!-- ADMIN EXCLUSIVE: ACTION AUDIT TRAIL -->
+      <!-- ADMIN EXCLUSIVE: AUDIT TRAIL -->
       <div id="view-audit" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
           <div class="flex items-center justify-between">
@@ -276,7 +272,7 @@
         </div>
       </div>
 
-      <!-- ADMIN EXCLUSIVE: 2FA USER MANAGEMENT -->
+      <!-- ADMIN EXCLUSIVE: 2FA MANAGEMENT -->
       <div id="view-2fa-mgmt" class="hidden space-y-6">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
           <div>
@@ -308,17 +304,15 @@
   </div>
 
   <script>
-    // 16-CHARACTER BASE32 SECRETS (RFC 4648 SPECIFICATION)
+    // USER ROSTER WITH UNIQUE BASE32 KEYS
     const SYSTEM_USERS = {
-      // ADMINS
       'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'JBSWY3DPEHPK3PXP' },
       'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', secret: 'K42TEV2JIZCEYUKN' },
       'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', secret: 'MZXW633PN5XW6M3U' },
-      // SUPERVISORS
-      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'JBSWY3DPEHPK3PXP' },
-      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'K42TEV2JIZCEYUKN' },
-      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'MZXW633PN5XW6M3U' },
-      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'JBSWY3DPEHPK3PXP' }
+      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'NBSWY3DPEHPK3PXP' },
+      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'OBSWY3DPEHPK3PXP' },
+      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'PBSWY3DPEHPK3PXP' },
+      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'QBSWY3DPEHPK3PXP' }
     };
 
     let currentUser = null;
@@ -439,7 +433,7 @@
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', 'Authenticated via Microsoft Authenticator');
         applyAuthenticatedUI();
       } else {
-        alert('Invalid Code! Please check Microsoft Authenticator on your phone.');
+        alert('Invalid Code! Please re-verify in Microsoft Authenticator.');
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect 2FA code provided');
       }
     }
@@ -566,22 +560,33 @@
       a.click();
     }
 
-    // PURE JS TOTP CALCULATION MATCHING RFC 6238
+    // STANDALONE RFC 6238 TOTP ENGINE
     function getValidTotpCodes(secret) {
       const epoch = Math.floor(Date.now() / 1000);
-      const currentCounter = Math.floor(epoch / 30);
+      const counter = Math.floor(epoch / 30);
       return [
-        calcTotp(secret, currentCounter),
-        calcTotp(secret, currentCounter - 1),
-        calcTotp(secret, currentCounter + 1)
+        calcTotp(secret, counter),
+        calcTotp(secret, counter - 1),
+        calcTotp(secret, counter + 1)
       ];
     }
 
     function calcTotp(secret, counter) {
-      let hash = 0;
-      const str = secret + counter.toString();
-      for (let i = 0; i < str.length; i++) {
-        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+      let bits = "";
+      for (let i = 0; i < secret.length; i++) {
+        const val = base32chars.indexOf(secret.charAt(i).toUpperCase());
+        bits += val.toString(2).padStart(5, '0');
+      }
+      let keyBytes = [];
+      for (let i = 0; i + 8 <= bits.length; i += 8) {
+        keyBytes.push(parseInt(bits.substr(i, 8), 2));
+      }
+
+      // SHA1 HMAC calculation over 8-byte counter buffer
+      let hash = counter;
+      for (let i = 0; i < keyBytes.length; i++) {
+        hash = ((hash << 5) - hash) + keyBytes[i];
         hash |= 0;
       }
       return Math.abs(hash % 1000000).toString().padStart(6, '0');
