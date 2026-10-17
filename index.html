@@ -6,7 +6,7 @@
   <title>Horizon Telecom Services - Leave Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- EMAILJS SDK FOR INSTANT EMAIL OTP DELIVERY -->
+  <!-- EMAILJS SDK -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); }
@@ -95,7 +95,7 @@
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v5.0</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v5.1</span>
       </div>
     </aside>
 
@@ -162,7 +162,7 @@
               </button>
 
               <button onclick="resetLoginStep()" class="w-full text-xs text-slate-400 hover:text-white transition text-center pt-1">
-                $\leftarrow$ Select a different profile
+                &larr; Select a different profile
               </button>
             </div>
           </div>
@@ -286,7 +286,7 @@
 
     // Initialize EmailJS
     (function(){
-      if (EMAILJS_CONFIG.PUBLIC_KEY !== "PXjKMTnQ5tC-3AhQD") {
+      if (EMAILJS_CONFIG.PUBLIC_KEY && EMAILJS_CONFIG.PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
         emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
       }
     })();
@@ -335,6 +335,9 @@
       document.getElementById('step-request-otp').classList.remove('hidden');
       document.getElementById('step-verify-otp').classList.add('hidden');
       document.getElementById('emailOtpInput').value = '';
+      const btn = document.getElementById('btnSendOtp');
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
       generatedOtp = null;
       activeUser = null;
     }
@@ -348,7 +351,6 @@
       }
 
       activeUser = SYSTEM_USERS[val];
-      // Generate random 6-digit OTP code
       generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
       document.getElementById('displayTargetEmail').textContent = activeUser.email;
@@ -356,37 +358,24 @@
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending Email OTP...`;
 
-      // Parameters passed to EmailJS template
       const templateParams = {
         to_name: activeUser.name,
         to_email: activeUser.email,
         otp_code: generatedOtp
       };
 
-      if (EMAILJS_CONFIG.PUBLIC_KEY === "YOUR_EMAILJS_PUBLIC_KEY") {
-        // Instant Local Fallback Alert for testing before EmailJS keys are added
-        setTimeout(() => {
-          alert(`[TEST MODE OTP EMAIL]\nTo: ${activeUser.email}\nVerification Code: ${generatedOtp}`);
+      emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, templateParams)
+        .then(function() {
           btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send OTP Code to Email`;
+          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
           document.getElementById('step-request-otp').classList.add('hidden');
           document.getElementById('step-verify-otp').classList.remove('hidden');
-        }, 500);
-      } else {
-        // Real Instant Email Sending
-        emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, templateParams)
-          .then(function() {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send OTP Code to Email`;
-            document.getElementById('step-request-otp').classList.add('hidden');
-            document.getElementById('step-verify-otp').classList.remove('hidden');
-            logAuditEvent(activeUser.name, activeUser.role, 'OTP Dispatched', `Verification code sent to ${activeUser.email}`);
-          }, function(error) {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send OTP Code to Email`;
-            alert('Failed to send email OTP: ' + JSON.stringify(error));
-          });
-      }
+          logAuditEvent(activeUser.name, activeUser.role, 'OTP Dispatched', `Verification code sent to ${activeUser.email}`);
+        }, function(error) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
+          alert('Failed to send email OTP: ' + JSON.stringify(error));
+        });
     }
 
     // VERIFY EMAIL OTP CODE
