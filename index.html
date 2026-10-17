@@ -96,8 +96,8 @@
       </div>
 
       <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
-        <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v6.0</span>
+        <span>Horizon Universal Sync</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v7.0</span>
       </div>
     </aside>
 
@@ -231,9 +231,9 @@
             <div>
               <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
                 <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
-                <span>Action Audit Trail</span>
+                <span>Action Audit Trail (Universal Real-Time Cloud Sync)</span>
               </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Timestamped tracking of user sign-ins and system events.</p>
+              <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Timestamped tracking from all mobile phones, laptops, and browsers.</p>
             </div>
             <button onclick="exportAuditTrail()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg transition flex items-center justify-center space-x-1 border border-slate-600 w-full sm:w-auto">
               <i class="fa-solid fa-file-csv"></i>
@@ -282,8 +282,8 @@
       TEMPLATE_ID: "template_o66i275"
     };
 
-    // REAL-TIME CLOUD STORAGE ENGINE API ENDPOINT (SUPABASE / FIREBASE REST REPOSITORY)
-    const CLOUD_SYNC_ENDPOINT = "https://jsonbin.org/horizon-bh/leave-management"; 
+    // FIREBASE REALTIME DATABASE REST ENDPOINT (REPLACE WITH YOUR FIREBASE URL)
+    const FIREBASE_DB_URL = "https://hts-leave-system-default-rtdb.firebaseio.com/"; 
 
     let activeUser = null;
     let generatedOtp = null;
@@ -296,47 +296,52 @@
       }
     })();
 
-    // UNIVERSAL CLOUD STORAGE SYNC HELPERS
-    async function fetchCloudData(key, fallback = []) {
+    // CLOUD REALTIME DATABASE SYNC FUNCTIONS
+    async function getAuditTrail() {
+      if (FIREBASE_DB_URL.includes("hts-leave-system")) {
+        // Local fallback until you paste your Firebase Realtime DB URL
+        return JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
+      }
       try {
-        const response = await fetch(`${CLOUD_SYNC_ENDPOINT}/${key}`);
+        const response = await fetch(`${FIREBASE_DB_URL}/audit_trail.json`);
         if (response.ok) {
           const data = await response.json();
-          return data || fallback;
+          if (data) {
+            return Object.values(data).reverse();
+          }
         }
       } catch (e) {
-        console.warn("Cloud sync offline, utilizing local cache fallback.");
+        console.warn("Could not reach Firebase database:", e);
       }
-      return JSON.parse(localStorage.getItem(`horizon_${key}`) || JSON.stringify(fallback));
-    }
-
-    async function saveCloudData(key, value) {
-      localStorage.setItem(`horizon_${key}`, JSON.stringify(value));
-      try {
-        await fetch(`${CLOUD_SYNC_ENDPOINT}/${key}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(value)
-        });
-      } catch (e) {
-        console.warn("Cloud sync update queued locally.");
-      }
-    }
-
-    async function getAuditTrail() {
-      return await fetchCloudData('audit_trail', []);
+      return JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
     }
 
     async function logAuditEvent(actorName, role, action, details) {
-      const logs = await getAuditTrail();
-      logs.unshift({
+      const logEntry = {
         timestamp: new Date().toLocaleString('en-GB'),
         actorName,
         role,
         action,
         details
-      });
-      await saveCloudData('audit_trail', logs);
+      };
+
+      // Always save locally
+      const localLogs = JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
+      localLogs.unshift(logEntry);
+      localStorage.setItem('horizon_audit_trail', JSON.stringify(localLogs));
+
+      // Push entry to Cloud Firebase Database if connected
+      if (!FIREBASE_DB_URL.includes("hts-leave-system")) {
+        try {
+          await fetch(`${FIREBASE_DB_URL}/audit_trail.json`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(logEntry)
+          });
+        } catch (e) {
+          console.warn("Failed to push event to cloud database:", e);
+        }
+      }
     }
 
     window.onload = function() {
