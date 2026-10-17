@@ -13,18 +13,18 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col">
 
-  <!-- TOP HEADER WITH HORIZON BRANDING -->
+  <!-- TOP HEADER WITH HORIZON OFFICIAL LOGO -->
   <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-6 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
     <div class="flex items-center space-x-4">
-      <!-- Horizon Branding Container -->
-      <div class="bg-white px-3 py-1.5 rounded-lg shadow-sm flex items-center justify-center">
-        <span class="text-xl font-extrabold tracking-wider text-blue-900 font-serif">HORIZON</span>
-      </div>
+      <!-- Horizon Official Image Logo -->
+      <a href="https://www.horizon.bh" target="_blank" class="bg-white px-3 py-1.5 rounded-xl shadow-sm flex items-center justify-center hover:opacity-90 transition">
+        <img src="https://www.horizon.bh/assets/img/logo.png" alt="Horizon Logo" class="h-8 object-contain" onerror="this.onerror=null; this.src='https://www.horizon.bh/favicon.ico';">
+      </a>
       <div class="h-8 w-px bg-slate-700 hidden sm:block"></div>
       <div>
         <h1 class="text-base font-bold text-white tracking-wide flex items-center gap-2">
           <span>Technician Leave Management System</span>
-          <span class="text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full font-normal">Internal Hub</span>
+          <span class="text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full font-normal">Horizon Hub</span>
         </h1>
         <p class="text-xs text-slate-400">Horizon Bahrain • Operational Leave Planning Portal</p>
       </div>
@@ -95,7 +95,7 @@
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v1.2</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v1.3</span>
       </div>
     </aside>
 
@@ -106,10 +106,10 @@
       <div id="view-login" class="max-w-xl mx-auto mt-8">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
           
-          <!-- Header Banner -->
-          <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-6 text-center border-b border-slate-700">
-            <div class="inline-block bg-white px-4 py-2 rounded-xl shadow-md mb-3">
-              <span class="text-2xl font-extrabold tracking-widest text-blue-950 font-serif">HORIZON</span>
+          <!-- Header Banner with Logo -->
+          <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-6 text-center border-b border-slate-700 flex flex-col items-center">
+            <div class="bg-white px-5 py-2 rounded-xl shadow-md mb-3 inline-block">
+              <img src="https://www.horizon.bh/assets/img/logo.png" alt="Horizon Logo" class="h-10 object-contain" onerror="this.onerror=null; this.src='https://www.horizon.bh/favicon.ico';">
             </div>
             <h2 class="text-xl font-bold text-white tracking-wide">Leave Management System</h2>
             <p class="text-xs text-slate-300 mt-1">Select your profile and authenticate using Microsoft Authenticator</p>
@@ -135,26 +135,49 @@
               </select>
             </div>
 
-            <!-- 2FA CONTAINER (DYNAMIC BASED ON REGISTRATION STATUS) -->
-            <div id="authContainer" class="hidden space-y-4">
-              
-              <!-- SUBTAB HEADER -->
-              <div class="flex border-b border-slate-700">
-                <button id="tabBtn-code" onclick="toggle2faTab('code')" class="flex-1 py-2.5 text-sm font-semibold text-blue-400 border-b-2 border-blue-500">
-                  Enter 6-Digit Code
-                </button>
-                <button id="tabBtn-qr" onclick="toggle2faTab('qr')" class="flex-1 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200">
-                  First-Time Setup / QR Code
-                </button>
+            <!-- DYNAMIC AUTHENTICATION FLOW (DYNAMIC ROUTING) -->
+            <div id="authFlowContainer" class="hidden space-y-4 border-t border-slate-700 pt-4">
+
+              <!-- CASE A: FIRST TIME LOGIN (AUTOMATIC SETUP DISPLAY) -->
+              <div id="firstTimeSetupBox" class="hidden space-y-4 text-center">
+                <div class="bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl text-left">
+                  <div class="text-blue-400 font-bold text-xs uppercase flex items-center space-x-1.5">
+                    <i class="fa-solid fa-qrcode"></i>
+                    <span>First-Time Authenticator Setup</span>
+                  </div>
+                  <p class="text-xs text-slate-300 mt-1">You are signing in for the first time. Scan this QR code with <b>Microsoft Authenticator</b> on your phone to complete setup.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl inline-block shadow-lg border border-slate-300" id="qrcode"></div>
+                
+                <div class="text-xs font-mono text-slate-400 bg-slate-900 p-2.5 rounded-lg border border-slate-700">
+                  Secret Key: <span id="secretKeyDisplay" class="text-amber-400 font-bold">--</span>
+                </div>
+
+                <div class="pt-2 text-left space-y-2">
+                  <label class="block text-xs font-semibold text-slate-300 uppercase">Enter 6-Digit Verification Code</label>
+                  <input type="text" id="totpFirstInput" maxlength="6" placeholder="000 000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:border-blue-500">
+                  
+                  <button onclick="verifyAndLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg mt-2">
+                    <i class="fa-solid fa-shield-check"></i>
+                    <span>Verify Code & Complete Registration</span>
+                  </button>
+                </div>
               </div>
 
-              <!-- CODE INPUT SUB-TAB -->
-              <div id="subtab-code" class="space-y-4 pt-2">
-                <p class="text-xs text-slate-400">Open <b>Microsoft Authenticator</b> on your mobile device and type the current 6-digit verification code.</p>
-                
+              <!-- CASE B: REGISTERED USER LOGIN (DIRECT CODE INPUT ONLY) -->
+              <div id="registeredLoginBox" class="hidden space-y-4">
+                <div class="bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-xl">
+                  <div class="text-emerald-400 font-bold text-xs uppercase flex items-center space-x-1.5">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span>Authenticator Active</span>
+                  </div>
+                  <p class="text-xs text-slate-300 mt-0.5">Account verified. Open <b>Microsoft Authenticator</b> on your phone and type the 6-digit code.</p>
+                </div>
+
                 <div>
                   <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Authenticator Code</label>
-                  <input type="text" id="totpInput" maxlength="6" placeholder="000 000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:border-blue-500">
+                  <input type="text" id="totpRegInput" maxlength="6" placeholder="000 000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:border-blue-500">
                 </div>
 
                 <button onclick="verifyAndLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
@@ -163,46 +186,6 @@
                 </button>
               </div>
 
-              <!-- QR CODE SETUP SUB-TAB -->
-              <div id="subtab-qr" class="hidden space-y-4 pt-2 text-center">
-                <!-- Locked Notice if already setup -->
-                <div id="qrLockedWarning" class="hidden bg-rose-500/10 border border-rose-500/30 p-4 rounded-xl text-left space-y-2">
-                  <div class="text-rose-400 font-bold text-xs uppercase flex items-center space-x-1.5">
-                    <i class="fa-solid fa-lock"></i>
-                    <span>Registration Locked & Completed</span>
-                  </div>
-                  <p class="text-xs text-slate-300">This account has already completed setup and is locked. If you lost or deleted Microsoft Authenticator, ask an Administrator (Habib, Husain, or Hasan) to reset your account key from the 2FA Management Panel.</p>
-                </div>
-
-                <!-- First Time QR Box -->
-                <div id="qrBox" class="space-y-3">
-                  <p class="text-xs text-slate-300">Scan this QR code with <b>Microsoft Authenticator</b> on your phone:</p>
-                  
-                  <div class="bg-white p-4 rounded-xl inline-block shadow-lg border border-slate-300" id="qrcode"></div>
-                  
-                  <div class="text-xs font-mono text-slate-400 bg-slate-900 p-2.5 rounded-lg border border-slate-700">
-                    Secret Key: <span id="secretKeyDisplay" class="text-amber-400 font-bold">--</span>
-                  </div>
-
-                  <p class="text-xs text-slate-400">Once scanned, switch to the <b>"Enter 6-Digit Code"</b> tab above to sign in and lock your registration.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Testing Helper -->
-            <div id="desktopTestHelper" class="hidden border-t border-slate-700/80 pt-4">
-              <button onclick="toggleTestPanel()" class="text-xs text-blue-400 hover:underline flex items-center space-x-1">
-                <i class="fa-solid fa-vial"></i>
-                <span>Testing Helper (Simulate Authenticator Code)</span>
-              </button>
-
-              <div id="testPanel" class="hidden mt-3 bg-slate-900/90 border border-slate-700 p-3 rounded-xl space-y-2">
-                <p class="text-xs text-slate-400">Current code calculated for selected profile (for test without phone):</p>
-                <div class="flex items-center justify-between bg-slate-800 px-3 py-2 rounded-lg border border-slate-700">
-                  <span id="computedTotpVal" class="font-mono text-lg text-emerald-400 font-bold">------</span>
-                  <button onclick="fillComputedTotp()" class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-white font-medium">Auto-Fill Code</button>
-                </div>
-              </div>
             </div>
 
           </div>
@@ -295,8 +278,8 @@
         </div>
       </div>
 
-      <!-- ADMIN EXCLUSIVE: 2FA USER MANAGEMENT -->
-      <div id="view-2fa-mgmt" class="hidden space-y-4">
+      <!-- ADMIN EXCLUSIVE: 2FA USER MANAGEMENT & TESTING HELPER -->
+      <div id="view-2fa-mgmt" class="hidden space-y-6">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
           <div>
             <h2 class="text-xl font-bold text-white flex items-center space-x-2">
@@ -321,13 +304,32 @@
             </table>
           </div>
         </div>
+
+        <!-- RESTRICTED ADMIN TESTING HELPER -->
+        <div class="bg-slate-800/90 border border-slate-700 p-6 rounded-2xl space-y-4">
+          <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-2">
+            <i class="fa-solid fa-vial"></i>
+            <span>Admin Live TOTP Simulation Helper</span>
+          </h3>
+          <p class="text-xs text-slate-400">Select any user to view their calculated live Authenticator code (for administrator testing without phone access). Admin override PIN for testing is set to <b>123456</b>.</p>
+
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <select id="adminHelperSelect" onchange="updateAdminHelperCode()" class="bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-xs text-white focus:outline-none w-full sm:w-64">
+              <!-- Dynamically populated -->
+            </select>
+            <div class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl flex items-center justify-between w-full sm:w-64">
+              <span class="text-xs text-slate-400">Live Code:</span>
+              <span id="adminHelperCode" class="font-mono text-base font-bold text-emerald-400">------</span>
+            </div>
+          </div>
+        </div>
       </div>
 
     </main>
   </div>
 
   <script>
-    // USER ROSTER (ADMINS & SUPERVISORS)
+    // USER ROSTER
     const SYSTEM_USERS = {
       // ADMINS
       'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'JBSWY3DPEHPK3PXP' },
@@ -392,52 +394,30 @@
 
     function onUserSelectionChange() {
       const val = document.getElementById('loginUserSelect').value;
-      const authContainer = document.getElementById('authContainer');
-      const testHelper = document.getElementById('desktopTestHelper');
+      const flowContainer = document.getElementById('authFlowContainer');
+      const firstTimeBox = document.getElementById('firstTimeSetupBox');
+      const regLoginBox = document.getElementById('registeredLoginBox');
 
-      authContainer.classList.add('hidden');
-      testHelper.classList.add('hidden');
+      flowContainer.classList.add('hidden');
+      firstTimeBox.classList.add('hidden');
+      regLoginBox.classList.add('hidden');
 
       if (val && SYSTEM_USERS[val]) {
-        authContainer.classList.remove('hidden');
-        testHelper.classList.remove('hidden');
+        flowContainer.classList.remove('hidden');
 
         const user = SYSTEM_USERS[val];
         const registered = getRegisteredUsers();
 
         if (registered[user.id]) {
-          // ALREADY REGISTERED -> Go directly to Code Tab, Lock QR Setup
-          toggle2faTab('code');
-          document.getElementById('qrLockedWarning').classList.remove('hidden');
-          document.getElementById('qrBox').classList.add('hidden');
+          // SUBSEQUENT LOGIN: Show ONLY Code Input
+          regLoginBox.classList.remove('hidden');
+          document.getElementById('totpRegInput').value = '';
         } else {
-          // FIRST TIME LOGIN -> Go directly to First-Time Setup / QR Code
-          toggle2faTab('qr');
-          document.getElementById('qrLockedWarning').classList.add('hidden');
-          document.getElementById('qrBox').classList.remove('hidden');
+          // FIRST TIME LOGIN: Show ONLY First Time QR Setup
+          firstTimeBox.classList.remove('hidden');
+          document.getElementById('totpFirstInput').value = '';
           generateQrCode(user);
         }
-
-        updateTestHelperCode(user.secret);
-      }
-    }
-
-    function toggle2faTab(tab) {
-      const codeBtn = document.getElementById('tabBtn-code');
-      const qrBtn = document.getElementById('tabBtn-qr');
-      const codeSub = document.getElementById('subtab-code');
-      const qrSub = document.getElementById('subtab-qr');
-
-      if (tab === 'code') {
-        codeBtn.className = "flex-1 py-2.5 text-sm font-semibold text-blue-400 border-b-2 border-blue-500";
-        qrBtn.className = "flex-1 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-0";
-        codeSub.classList.remove('hidden');
-        qrSub.classList.add('hidden');
-      } else {
-        qrBtn.className = "flex-1 py-2.5 text-sm font-semibold text-blue-400 border-b-2 border-blue-500";
-        codeBtn.className = "flex-1 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-0";
-        qrSub.classList.remove('hidden');
-        codeSub.classList.add('hidden');
       }
     }
 
@@ -459,15 +439,23 @@
 
     function verifyAndLogin() {
       const userKey = document.getElementById('loginUserSelect').value;
-      const inputCode = document.getElementById('totpInput').value.trim();
-
       if (!userKey || !SYSTEM_USERS[userKey]) return;
+
       const user = SYSTEM_USERS[userKey];
+      const registered = getRegisteredUsers();
+      const isFirstTime = !registered[user.id];
+
+      const inputCode = (isFirstTime ? 
+        document.getElementById('totpFirstInput').value : 
+        document.getElementById('totpRegInput').value).trim();
 
       const expectedCode = computeTOTP(user.secret);
 
-      if (inputCode === expectedCode || inputCode === '999999') {
-        // Lock 2FA registration for this user account
+      // Verify either calculated code OR Admin test code "123456" for Admins
+      const isAdminTestCodeValid = (user.role === 'admin' && inputCode === '123456');
+
+      if (inputCode === expectedCode || isAdminTestCodeValid) {
+        // Lock 2FA registration upon first successful login
         const reg = getRegisteredUsers();
         reg[user.id] = { registeredAt: new Date().toISOString(), locked: true };
         setRegisteredUsers(reg);
@@ -475,7 +463,7 @@
         currentUser = { role: user.role, name: user.name, id: user.id };
         sessionStorage.setItem('horizon_active_session', JSON.stringify(currentUser));
 
-        logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', '2FA Authenticated via Microsoft Authenticator');
+        logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', 'Authenticated via Microsoft Authenticator');
         applyAuthenticatedUI();
       } else {
         alert('Invalid 6-Digit Code! Please check Microsoft Authenticator on your phone.');
@@ -489,7 +477,6 @@
       }
       currentUser = null;
       sessionStorage.removeItem('horizon_active_session');
-      document.getElementById('totpInput').value = '';
       showLoginScreen();
     }
 
@@ -523,7 +510,10 @@
       if (viewEl) viewEl.classList.remove('hidden');
 
       if (tabId === 'audit') renderAuditTable();
-      if (tabId === '2fa-mgmt') render2faMgmtTable();
+      if (tabId === '2fa-mgmt') {
+        render2faMgmtTable();
+        populateAdminHelperSelect();
+      }
     }
 
     function renderAuditTable() {
@@ -580,6 +570,25 @@
       });
     }
 
+    function populateAdminHelperSelect() {
+      const sel = document.getElementById('adminHelperSelect');
+      sel.innerHTML = '';
+      Object.values(SYSTEM_USERS).forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = `${u.name} (${u.role.toUpperCase()})`;
+        sel.appendChild(opt);
+      });
+      updateAdminHelperCode();
+    }
+
+    function updateAdminHelperCode() {
+      const uId = document.getElementById('adminHelperSelect').value;
+      if (uId && SYSTEM_USERS[uId]) {
+        document.getElementById('adminHelperCode').textContent = computeTOTP(SYSTEM_USERS[uId].secret);
+      }
+    }
+
     function resetUser2fa(userId) {
       if (!confirm(`Are you sure you want to reset 2FA registration for ${SYSTEM_USERS[userId].name}?`)) return;
 
@@ -604,19 +613,6 @@
       a.href = url;
       a.download = `horizon-audit-logs-${Date.now()}.csv`;
       a.click();
-    }
-
-    function updateTestHelperCode(secret) {
-      document.getElementById('computedTotpVal').textContent = computeTOTP(secret);
-    }
-
-    function fillComputedTotp() {
-      const code = document.getElementById('computedTotpVal').textContent;
-      document.getElementById('totpInput').value = code;
-    }
-
-    function toggleTestPanel() {
-      document.getElementById('testPanel').classList.toggle('hidden');
     }
 
     function computeTOTP(secret) {
