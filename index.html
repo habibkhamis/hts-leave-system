@@ -49,7 +49,7 @@
   </header>
 
   <div class="flex flex-1 flex-col md:flex-row overflow-hidden">
-    <!-- NAVIGATION SIDEBAR / MOBILE NAV BANNER -->
+    <!-- NAVIGATION SIDEBAR -->
     <aside id="appSidebar" class="hidden w-full md:w-64 bg-slate-800/95 border-b md:border-b-0 md:border-r border-slate-700 flex flex-col justify-between">
       <div class="p-3 sm:p-4 space-y-1">
         <div class="px-3 py-1.5 text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Leave Modules</div>
@@ -97,7 +97,7 @@
 
       <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
         <span>Horizon Universal Sync</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v7.0</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v8.0</span>
       </div>
     </aside>
 
@@ -172,68 +172,174 @@
         </div>
       </div>
 
-      <!-- ==================== LOGGED-IN SYSTEM MODULES ==================== -->
-
+      <!-- ==================== SYSTEM MODULE 1: CALENDAR VIEW ==================== -->
       <div id="view-calendar" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
-          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-            <i class="fa-regular fa-calendar-days text-blue-400"></i>
-            <span>Technician Leave Calendar</span>
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 2 Module - Ready for technician leave schedule and calendar matrix.</p>
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
+              <i class="fa-regular fa-calendar-days text-blue-400"></i>
+              <span>Technician Leave Calendar (2027)</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Annual leave schedules with color-coded daily technician availability.</p>
+          </div>
+          <!-- Admin Filter (Visible only for Admins) -->
+          <div id="adminTeamFilterContainer" class="hidden flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700">
+            <span class="text-xs text-orange-400 font-semibold uppercase">Scope Filter:</span>
+            <select id="adminTeamFilter" onchange="renderCalendar()" class="bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none">
+              <option value="ALL">All Teams (System Admin)</option>
+              <option value="sup_1">Zuhair Alsaffar's Team</option>
+              <option value="sup_2">Jaafar Kadhem's Team</option>
+              <option value="sup_3">Husain Yusuf's Team</option>
+              <option value="sup_4">Sayed Mohammed Saeed's Team</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Month Navigation -->
+        <div class="flex items-center justify-between bg-slate-800 border border-slate-700 p-3 rounded-xl">
+          <button onclick="changeCalendarMonth(-1)" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold transition">&larr; Previous</button>
+          <span id="calendarMonthTitle" class="text-sm font-bold text-white">January 2027</span>
+          <button onclick="changeCalendarMonth(1)" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold transition">Next &rarr;</button>
+        </div>
+
+        <!-- Calendar Matrix -->
+        <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl">
+          <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 uppercase mb-2">
+            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+          </div>
+          <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-xs"></div>
         </div>
       </div>
 
+      <!-- ==================== SYSTEM MODULE 2: AVAILABILITY VIEW ==================== -->
       <div id="view-availability" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
           <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-users-viewfinder text-emerald-400"></i>
-            <span>Technician Availability</span>
+            <span>Daily Technician Availability & Roster Status</span>
           </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 3 Module - Daily manpower vs leave capacity matrix.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time status overview: On Duty vs. Paid / Unpaid Leave.</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-2xl text-center">
+            <span class="text-xs text-emerald-400 font-bold uppercase">On Duty Today</span>
+            <div id="countOnDuty" class="text-3xl font-bold text-white mt-1">0</div>
+          </div>
+          <div class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-2xl text-center">
+            <span class="text-xs text-blue-400 font-bold uppercase">On Paid Leave</span>
+            <div id="countPaidLeave" class="text-3xl font-bold text-white mt-1">0</div>
+          </div>
+          <div class="bg-rose-500/10 border border-rose-500/30 p-4 rounded-2xl text-center">
+            <span class="text-xs text-rose-400 font-bold uppercase">On Unpaid Leave</span>
+            <div id="countUnpaidLeave" class="text-3xl font-bold text-white mt-1">0</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">Tech ID</th>
+                  <th class="p-3">Technician Name</th>
+                  <th class="p-3">CPR</th>
+                  <th class="p-3">Current Status</th>
+                  <th class="p-3">Supervisor</th>
+                </tr>
+              </thead>
+              <tbody id="availabilityTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
+      <!-- ==================== SYSTEM MODULE 3: REMAINING DAYS VIEW ==================== -->
       <div id="view-remaining" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
           <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-hourglass-half text-amber-400"></i>
-            <span>Remaining Days Counter</span>
+            <span>Leave Remaining as of Today</span>
           </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 4 Module - Real-time annual leave balances per technician.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Calculated as: <b>(Leave Balance as of 31-Dec-2027) - (Total Leave Days Taken)</b>.</p>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">Tech ID</th>
+                  <th class="p-3">Name</th>
+                  <th class="p-3">CPR</th>
+                  <th class="p-3">Balance (31-Dec-2027)</th>
+                  <th class="p-3">Total Days Taken</th>
+                  <th class="p-3">Leave Remaining</th>
+                </tr>
+              </thead>
+              <tbody id="remainingTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
+      <!-- ==================== SYSTEM MODULE 4: TOTAL DAYS VIEW ==================== -->
       <div id="view-total" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
           <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-chart-pie text-indigo-400"></i>
-            <span>Total Days Summary</span>
+            <span>Total Leave Days Summary (Jan - Dec)</span>
           </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 5 Module - Cumulative leave utilization statistics.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Monthly breakdowns of paid and unpaid leave days per technician.</p>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">Tech ID</th>
+                  <th class="p-3">Name</th>
+                  <th class="p-3">Jan</th><th class="p-3">Feb</th><th class="p-3">Mar</th><th class="p-3">Apr</th>
+                  <th class="p-3">May</th><th class="p-3">Jun</th><th class="p-3">Jul</th><th class="p-3">Aug</th>
+                  <th class="p-3">Sep</th><th class="p-3">Oct</th><th class="p-3">Nov</th><th class="p-3">Dec</th>
+                  <th class="p-3 font-bold text-orange-400">Total Days</th>
+                </tr>
+              </thead>
+              <tbody id="totalDaysTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
+      <!-- ==================== SYSTEM MODULE 5: PDF REPORTS ==================== -->
       <div id="view-pdf" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
           <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-file-pdf text-rose-400"></i>
-            <span>PDF Generator & Print Hub</span>
+            <span>Printable Leave Request Forms (Ready-Print PDF)</span>
           </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Step 6 Module - Printable leave forms with supervisor timestamps.</p>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Ready for PDF integration. You can upload or link your official leave request PDF template here for automatic fill & print.</p>
+        </div>
+
+        <div class="bg-slate-800/80 border border-dashed border-slate-600 p-8 rounded-2xl text-center space-y-3">
+          <i class="fa-solid fa-file-arrow-up text-4xl text-slate-500"></i>
+          <h3 class="text-base font-bold text-white">PDF Template Configurator</h3>
+          <p class="text-xs text-slate-400 max-w-md mx-auto">Provide your PDF document form layout, and we will activate automatic field mapping and printable PDF downloads for your team.</p>
         </div>
       </div>
 
-      <!-- ADMIN EXCLUSIVE: ACTION AUDIT TRAIL -->
+      <!-- ==================== ADMIN EXCLUSIVE: ACTION AUDIT TRAIL ==================== -->
       <div id="view-audit" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
                 <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
-                <span>Action Audit Trail (Universal Real-Time Cloud Sync)</span>
+                <span>Action Audit Trail (Universal Cloud Sync)</span>
               </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Timestamped tracking from all mobile phones, laptops, and browsers.</p>
+              <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Timestamped tracking across all devices and browsers.</p>
             </div>
             <button onclick="exportAuditTrail()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg transition flex items-center justify-center space-x-1 border border-slate-600 w-full sm:w-auto">
               <i class="fa-solid fa-file-csv"></i>
@@ -262,7 +368,7 @@
   </div>
 
   <script>
-    // System Users and Email Address Mapping
+    // SYSTEM USER ROSTER
     const SYSTEM_USERS = {
       // ADMINS
       'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', email: 'habib.khamis@horizon.bh' },
@@ -275,6 +381,21 @@
       'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', email: 'mohammed.saeed@horizon.bh' }
     };
 
+    // SAMPLE TECHNICIAN ROSTER (PRE-LOADED WITH ZUHAIR'S TEAM)
+    const TECHNICIANS_MASTER = [
+      // ZUHAIR ALSAFFAR'S TEAM (sup_1)
+      { id: 'ZUH-01', name: 'Ali Ahmed Hassan', cpr: '940512345', supId: 'sup_1', balance2027: 30, monthly: [2, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: 'ZUH-02', name: 'Mohammed Redha', cpr: '910898765', supId: 'sup_1', balance2027: 30, monthly: [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Paid Leave' },
+      { id: 'ZUH-03', name: 'Sadiq Abdulhusain', cpr: '881122334', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: 'ZUH-04', name: 'Mahmood Salman', cpr: '950233445', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Unpaid Leave' },
+      // JAAFAR KADHEM'S TEAM (sup_2)
+      { id: 'JAF-01', name: 'Ebrahim Khalil', cpr: '930411223', supId: 'sup_2', balance2027: 30, monthly: [0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      // HUSAIN YUSUF'S TEAM (sup_3)
+      { id: 'YUS-01', name: 'Yousif Majeed', cpr: '960788990', supId: 'sup_3', balance2027: 30, monthly: [0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      // SAYED MOHAMMED'S TEAM (sup_4)
+      { id: 'SAY-01', name: 'Sayed Ali Mustafa', cpr: '920344556', supId: 'sup_4', balance2027: 30, monthly: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' }
+    ];
+
     // EmailJS Credentials
     const EMAILJS_CONFIG = {
       PUBLIC_KEY: "PXjKMTnQ5tC-3AhQD",
@@ -282,12 +403,12 @@
       TEMPLATE_ID: "template_o66i275"
     };
 
-    // FIREBASE REALTIME DATABASE REST ENDPOINT (REPLACE WITH YOUR FIREBASE URL)
-    const FIREBASE_DB_URL = "https://hts-leave-system-default-rtdb.firebaseio.com/"; 
+    const FIREBASE_DB_URL = "https://YOUR-FIREBASE-PROJECT.firebaseio.com"; 
 
     let activeUser = null;
     let generatedOtp = null;
     let currentUser = null;
+    let currentCalendarMonth = 0; // 0 = Jan 2027
 
     // Initialize EmailJS
     (function(){
@@ -296,19 +417,27 @@
       }
     })();
 
-    // CLOUD REALTIME DATABASE SYNC FUNCTIONS
+    // HELPER: FILTER TECHNICIANS BASED ON LOGGED-IN ROLE
+    function getScopedTechnicians() {
+      if (!currentUser) return [];
+      if (currentUser.role === 'admin') {
+        const filterVal = document.getElementById('adminTeamFilter')?.value || 'ALL';
+        if (filterVal === 'ALL') return TECHNICIANS_MASTER;
+        return TECHNICIANS_MASTER.filter(t => t.supId === filterVal);
+      }
+      // Supervisors only see their own assigned team members
+      return TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
+    }
+
     async function getAuditTrail() {
-      if (FIREBASE_DB_URL.includes("hts-leave-system")) {
-        // Local fallback until you paste your Firebase Realtime DB URL
+      if (FIREBASE_DB_URL.includes("YOUR-FIREBASE-PROJECT")) {
         return JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
       }
       try {
         const response = await fetch(`${FIREBASE_DB_URL}/audit_trail.json`);
         if (response.ok) {
           const data = await response.json();
-          if (data) {
-            return Object.values(data).reverse();
-          }
+          if (data) return Object.values(data).reverse();
         }
       } catch (e) {
         console.warn("Could not reach Firebase database:", e);
@@ -325,13 +454,11 @@
         details
       };
 
-      // Always save locally
       const localLogs = JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
       localLogs.unshift(logEntry);
       localStorage.setItem('horizon_audit_trail', JSON.stringify(localLogs));
 
-      // Push entry to Cloud Firebase Database if connected
-      if (!FIREBASE_DB_URL.includes("hts-leave-system")) {
+      if (!FIREBASE_DB_URL.includes("YOUR-FIREBASE-PROJECT")) {
         try {
           await fetch(`${FIREBASE_DB_URL}/audit_trail.json`, {
             method: 'POST',
@@ -379,7 +506,6 @@
       activeUser = null;
     }
 
-    // GENERATE AND SEND EMAIL OTP
     function requestEmailOtp() {
       const val = document.getElementById('loginUserSelect').value;
       if (!val || !SYSTEM_USERS[val]) {
@@ -422,7 +548,6 @@
         });
     }
 
-    // VERIFY EMAIL OTP CODE
     async function verifyEmailOtp() {
       const inputCode = document.getElementById('emailOtpInput').value.trim();
 
@@ -457,9 +582,11 @@
 
       if (currentUser.role === 'admin') {
         document.getElementById('adminNavGroup').classList.remove('hidden');
-        switchTab('audit');
+        document.getElementById('adminTeamFilterContainer').classList.remove('hidden');
+        switchTab('calendar');
       } else {
         document.getElementById('adminNavGroup').classList.add('hidden');
+        document.getElementById('adminTeamFilterContainer').classList.add('hidden');
         switchTab('calendar');
       }
     }
@@ -476,9 +603,126 @@
       const viewEl = document.getElementById(`view-${tabId}`);
       if (viewEl) viewEl.classList.remove('hidden');
 
+      if (tabId === 'calendar') renderCalendar();
+      if (tabId === 'availability') renderAvailability();
+      if (tabId === 'remaining') renderRemainingDays();
+      if (tabId === 'total') renderTotalDays();
       if (tabId === 'audit') renderAuditTable();
     }
 
+    // ==================== RENDER MODULE 1: CALENDAR ====================
+    function renderCalendar() {
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      document.getElementById('calendarMonthTitle').textContent = `${monthNames[currentCalendarMonth]} 2027`;
+
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      const techList = getScopedTechnicians();
+
+      for (let day = 1; day <= 31; day++) {
+        // Find technicians on leave this month
+        let leaveTechs = techList.filter(t => t.monthly[currentCalendarMonth] > 0 && day <= t.monthly[currentCalendarMonth]);
+        let hasLeave = leaveTechs.length > 0;
+
+        const cell = document.createElement('div');
+        cell.className = `p-2 min-h-[60px] border border-slate-700/60 rounded-lg flex flex-col justify-between ${hasLeave ? 'bg-orange-500/10 border-orange-500/40' : 'bg-slate-900/50'}`;
+        cell.innerHTML = `
+          <span class="font-bold text-xs ${hasLeave ? 'text-orange-400' : 'text-slate-400'}">${day}</span>
+          ${hasLeave ? `<span class="text-[9px] bg-orange-500/20 text-orange-300 border border-orange-500/30 px-1 py-0.5 rounded mt-1 font-mono">${leaveTechs.length} Tech Leave</span>` : ''}
+        `;
+        grid.appendChild(cell);
+      }
+    }
+
+    function changeCalendarMonth(delta) {
+      currentCalendarMonth = (currentCalendarMonth + delta + 12) % 12;
+      renderCalendar();
+    }
+
+    // ==================== RENDER MODULE 2: AVAILABILITY ====================
+    function renderAvailability() {
+      const techList = getScopedTechnicians();
+      const tbody = document.getElementById('availabilityTableBody');
+      tbody.innerHTML = '';
+
+      let countDuty = 0, countPaid = 0, countUnpaid = 0;
+
+      techList.forEach(t => {
+        if (t.status === 'On Duty') countDuty++;
+        if (t.status === 'On Paid Leave') countPaid++;
+        if (t.status === 'On Unpaid Leave') countUnpaid++;
+
+        const supName = SYSTEM_USERS[t.supId] ? SYSTEM_USERS[t.supId].name : '--';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
+        tr.innerHTML = `
+          <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
+          <td class="p-3 font-semibold text-white">${t.name}</td>
+          <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-xs font-semibold ${t.status === 'On Duty' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : (t.status === 'On Paid Leave' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30')}">
+              ${t.status}
+            </span>
+          </td>
+          <td class="p-3 text-slate-400">${supName}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('countOnDuty').textContent = countDuty;
+      document.getElementById('countPaidLeave').textContent = countPaid;
+      document.getElementById('countUnpaidLeave').textContent = countUnpaid;
+    }
+
+    // ==================== RENDER MODULE 3: REMAINING DAYS ====================
+    function renderRemainingDays() {
+      const techList = getScopedTechnicians();
+      const tbody = document.getElementById('remainingTableBody');
+      tbody.innerHTML = '';
+
+      techList.forEach(t => {
+        const totalTaken = t.monthly.reduce((a, b) => a + b, 0);
+        const remaining = t.balance2027 - totalTaken;
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
+        tr.innerHTML = `
+          <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
+          <td class="p-3 font-semibold text-white">${t.name}</td>
+          <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
+          <td class="p-3 font-mono text-slate-300">${t.balance2027} Days</td>
+          <td class="p-3 font-mono text-rose-400">${totalTaken} Days</td>
+          <td class="p-3 font-mono font-bold text-emerald-400">${remaining} Days</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ==================== RENDER MODULE 4: TOTAL DAYS ====================
+    function renderTotalDays() {
+      const techList = getScopedTechnicians();
+      const tbody = document.getElementById('totalDaysTableBody');
+      tbody.innerHTML = '';
+
+      techList.forEach(t => {
+        const totalTaken = t.monthly.reduce((a, b) => a + b, 0);
+        let mCells = t.monthly.map(m => `<td class="p-3 font-mono ${m > 0 ? 'text-orange-400 font-bold' : 'text-slate-500'}">${m}</td>`).join('');
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
+        tr.innerHTML = `
+          <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
+          <td class="p-3 font-semibold text-white">${t.name}</td>
+          ${mCells}
+          <td class="p-3 font-mono font-bold text-orange-400">${totalTaken} Days</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ==================== RENDER AUDIT LOGS ====================
     async function renderAuditTable() {
       const logs = await getAuditTrail();
       const tbody = document.getElementById('auditTableBody');
