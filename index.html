@@ -95,7 +95,7 @@
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v5.1</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v5.2</span>
       </div>
     </aside>
 
@@ -273,7 +273,7 @@
       'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', email: 'mohammed.saeed@horizon.bh' }
     };
 
-    // Configuration Keys for EmailJS
+    // EmailJS Credentials
     const EMAILJS_CONFIG = {
       PUBLIC_KEY: "PXjKMTnQ5tC-3AhQD",
       SERVICE_ID: "service_7xbrdob",
@@ -286,7 +286,7 @@
 
     // Initialize EmailJS
     (function(){
-      if (EMAILJS_CONFIG.PUBLIC_KEY && EMAILJS_CONFIG.PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
+      if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.PUBLIC_KEY) {
         emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
       }
     })();
@@ -356,25 +356,34 @@
       document.getElementById('displayTargetEmail').textContent = activeUser.email;
       const btn = document.getElementById('btnSendOtp');
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending Email OTP...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Sending Email OTP...</span>`;
 
+      // Pass all standard EmailJS recipient key aliases so it matches any template setup
       const templateParams = {
         to_name: activeUser.name,
         to_email: activeUser.email,
-        otp_code: generatedOtp
+        email: activeUser.email,
+        user_email: activeUser.email,
+        recipient: activeUser.email,
+        reply_to: activeUser.email,
+        otp_code: generatedOtp,
+        code: generatedOtp
       };
 
       emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, templateParams)
-        .then(function() {
+        .then(function(response) {
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
+          
+          // Switch UI view to OTP Input step
           document.getElementById('step-request-otp').classList.add('hidden');
           document.getElementById('step-verify-otp').classList.remove('hidden');
+          
           logAuditEvent(activeUser.name, activeUser.role, 'OTP Dispatched', `Verification code sent to ${activeUser.email}`);
         }, function(error) {
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
-          alert('Failed to send email OTP: ' + JSON.stringify(error));
+          alert('Failed to send email OTP: ' + JSON.stringify(error) + '\n\nMake sure {{to_email}} is set as To Email in your EmailJS template settings.');
         });
     }
 
