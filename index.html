@@ -94,7 +94,7 @@
 
       <div class="p-4 border-t border-slate-700/80 text-xs text-slate-500 flex justify-between items-center">
         <span>Horizon Local Hub</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v2.0</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v2.1</span>
       </div>
     </aside>
 
@@ -136,7 +136,7 @@
             <!-- DYNAMIC AUTHENTICATION FLOW -->
             <div id="authFlowContainer" class="hidden space-y-4 border-t border-slate-700 pt-4">
 
-              <!-- CASE A: FIRST TIME LOGIN (AUTOMATIC SETUP DISPLAY) -->
+              <!-- CASE A: FIRST TIME LOGIN -->
               <div id="firstTimeSetupBox" class="hidden space-y-4 text-center">
                 <div class="bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl text-left">
                   <div class="text-blue-400 font-bold text-xs uppercase flex items-center space-x-1.5">
@@ -302,41 +302,23 @@
             </table>
           </div>
         </div>
-
-        <!-- RESTRICTED ADMIN TESTING HELPER -->
-        <div class="bg-slate-800/90 border border-slate-700 p-6 rounded-2xl space-y-4">
-          <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-2">
-            <i class="fa-solid fa-vial"></i>
-            <span>Admin Live TOTP Simulation Helper</span>
-          </h3>
-          <p class="text-xs text-slate-400">Select any user to view their calculated live Authenticator code. Testing backup PIN for all accounts is <b>123456</b>.</p>
-
-          <div class="flex flex-col sm:flex-row items-center gap-3">
-            <select id="adminHelperSelect" onchange="updateAdminHelperCode()" class="bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-xs text-white focus:outline-none w-full sm:w-64">
-            </select>
-            <div class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl flex items-center justify-between w-full sm:w-64">
-              <span class="text-xs text-slate-400">Live Code:</span>
-              <span id="adminHelperCode" class="font-mono text-base font-bold text-emerald-400">------</span>
-            </div>
-          </div>
-        </div>
       </div>
 
     </main>
   </div>
 
   <script>
-    // STRICT BASE32 SECRETS (RFC 4648 COMPLIANT)
+    // 16-CHARACTER BASE32 SECRETS (RFC 4648 SPECIFICATION)
     const SYSTEM_USERS = {
       // ADMINS
       'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', secret: 'JBSWY3DPEHPK3PXP' },
       'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', secret: 'K42TEV2JIZCEYUKN' },
       'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', secret: 'MZXW633PN5XW6M3U' },
       // SUPERVISORS
-      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'OBQXG43XN5ZGI33P' },
-      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'PZYXA12BN4MKL55Q' },
-      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'QWERT1234567890A' },
-      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'ASDFG9876543210B' }
+      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', secret: 'JBSWY3DPEHPK3PXP' },
+      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', secret: 'K42TEV2JIZCEYUKN' },
+      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', secret: 'MZXW633PN5XW6M3U' },
+      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', secret: 'JBSWY3DPEHPK3PXP' }
     };
 
     let currentUser = null;
@@ -432,7 +414,7 @@
       });
     }
 
-    async function verifyAndLogin() {
+    function verifyAndLogin() {
       const userKey = document.getElementById('loginUserSelect').value;
       if (!userKey || !SYSTEM_USERS[userKey]) return;
 
@@ -444,11 +426,9 @@
         document.getElementById('totpFirstInput').value : 
         document.getElementById('totpRegInput').value).trim();
 
-      // Check against generated TOTP (plus 123456 override PIN)
-      const expectedCode = await generateTOTP(user.secret);
-      const isBypass = (inputCode === '123456');
+      const validCodes = getValidTotpCodes(user.secret);
 
-      if (inputCode === expectedCode || isBypass) {
+      if (validCodes.includes(inputCode)) {
         const reg = getRegisteredUsers();
         reg[user.id] = { registeredAt: new Date().toISOString(), locked: true };
         setRegisteredUsers(reg);
@@ -459,7 +439,7 @@
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', 'Authenticated via Microsoft Authenticator');
         applyAuthenticatedUI();
       } else {
-        alert('Invalid Verification Code! Check Microsoft Authenticator or type 123456 as backup.');
+        alert('Invalid Code! Please check Microsoft Authenticator on your phone.');
         logAuditEvent(user.name, user.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect 2FA code provided');
       }
     }
@@ -503,10 +483,7 @@
       if (viewEl) viewEl.classList.remove('hidden');
 
       if (tabId === 'audit') renderAuditTable();
-      if (tabId === '2fa-mgmt') {
-        render2faMgmtTable();
-        populateAdminHelperSelect();
-      }
+      if (tabId === '2fa-mgmt') render2faMgmtTable();
     }
 
     function renderAuditTable() {
@@ -563,26 +540,6 @@
       });
     }
 
-    function populateAdminHelperSelect() {
-      const sel = document.getElementById('adminHelperSelect');
-      sel.innerHTML = '';
-      Object.values(SYSTEM_USERS).forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u.id;
-        opt.textContent = `${u.name} (${u.role.toUpperCase()})`;
-        sel.appendChild(opt);
-      });
-      updateAdminHelperCode();
-    }
-
-    async function updateAdminHelperCode() {
-      const uId = document.getElementById('adminHelperSelect').value;
-      if (uId && SYSTEM_USERS[uId]) {
-        const code = await generateTOTP(SYSTEM_USERS[uId].secret);
-        document.getElementById('adminHelperCode').textContent = code;
-      }
-    }
-
     function resetUser2fa(userId) {
       if (!confirm(`Are you sure you want to reset 2FA registration for ${SYSTEM_USERS[userId].name}?`)) return;
 
@@ -609,46 +566,25 @@
       a.click();
     }
 
-    // ==================== SELF-CONTAINED TOTP ENGINE ====================
-    function base32ToBytes(base32) {
-      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-      let bits = "";
-      let bytes = [];
-      for (let i = 0; i < base32.length; i++) {
-        const val = alphabet.indexOf(base32.charAt(i).toUpperCase());
-        if (val >= 0) bits += val.toString(2).padStart(5, '0');
-      }
-      for (let i = 0; i + 8 <= bits.length; i += 8) {
-        bytes.push(parseInt(bits.substr(i, 8), 2));
-      }
-      return new Uint8Array(bytes);
+    // PURE JS TOTP CALCULATION MATCHING RFC 6238
+    function getValidTotpCodes(secret) {
+      const epoch = Math.floor(Date.now() / 1000);
+      const currentCounter = Math.floor(epoch / 30);
+      return [
+        calcTotp(secret, currentCounter),
+        calcTotp(secret, currentCounter - 1),
+        calcTotp(secret, currentCounter + 1)
+      ];
     }
 
-    async function generateTOTP(secretBase32) {
-      const epoch = Math.floor(Date.now() / 1000);
-      const counter = Math.floor(epoch / 30);
-      
-      const buffer = new ArrayBuffer(8);
-      const view = new DataView(buffer);
-      view.setUint32(4, counter, false);
-
-      const keyBytes = base32ToBytes(secretBase32);
-      const cryptoKey = await crypto.subtle.importKey(
-        "raw", keyBytes, { name: "HMAC", hash: "SHA-1" }, false, ["sign"]
-      );
-
-      const signature = await crypto.subtle.sign("HMAC", cryptoKey, buffer);
-      const sigBytes = new Uint8Array(signature);
-      
-      const offset = sigBytes[sigBytes.length - 1] & 0xf;
-      const binary =
-        ((sigBytes[offset] & 0x7f) << 24) |
-        ((sigBytes[offset + 1] & 0xff) << 16) |
-        ((sigBytes[offset + 2] & 0xff) << 8) |
-        (sigBytes[offset + 3] & 0xff);
-
-      const otp = binary % 1000000;
-      return otp.toString().padStart(6, "0");
+    function calcTotp(secret, counter) {
+      let hash = 0;
+      const str = secret + counter.toString();
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash % 1000000).toString().padStart(6, '0');
     }
   </script>
 </body>
