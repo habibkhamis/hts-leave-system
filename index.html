@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technician Leave Planning System - GitHub Pages Edition</title>
+    <title>Technician Leave Planning System - Microsoft Authenticator Edition</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -33,21 +33,10 @@
         }
     </script>
     <style>
-        /* Custom scrollbar for modern feel */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-50">
@@ -55,22 +44,20 @@
     <!-- TOP HEADER BAR -->
     <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <!-- App Logo & Title -->
             <div class="flex items-center space-x-3">
                 <div class="bg-brand-600 p-2 rounded-lg text-white shadow-sm">
-                    <i class="fa-solid font-bold fa-calendar-check text-xl"></i>
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight text-white leading-none">TechLeave Hub</h1>
-                    <p class="text-xs text-slate-400 mt-0.5">Technician Leave Planning & Tracking System</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Technician Leave Planning System</p>
                 </div>
             </div>
 
-            <!-- Active User Indicator / Logout Button -->
             <div id="userHeaderSection" class="hidden items-center space-x-4">
                 <div class="hidden sm:flex flex-col text-right">
                     <span id="headerUserName" class="text-sm font-semibold text-slate-100">---</span>
-                    <span id="headerUserCPR" class="text-xs text-brand-400 font-mono">CPR: ---</span>
+                    <span id="headerUserRole" class="text-xs text-emerald-400 font-mono"><i class="fa-solid fa-lock text-[10px] mr-1"></i>2FA Verified</span>
                 </div>
                 <div class="h-8 w-px bg-slate-700 hidden sm:block"></div>
                 <button onclick="handleLogout()" class="inline-flex items-center space-x-2 bg-slate-800 hover:bg-rose-900/50 hover:text-rose-200 text-slate-300 text-xs font-medium py-2 px-3 rounded-lg transition-colors border border-slate-700 hover:border-rose-700/50">
@@ -79,32 +66,29 @@
                 </button>
             </div>
             
-            <!-- Logged out badge indicator -->
             <div id="guestHeaderBadge" class="flex items-center text-xs text-slate-400 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
                 <span class="w-2 h-2 rounded-full bg-amber-400 mr-2 animate-pulse"></span>
-                <span>Authentication Required</span>
+                <span>Authenticator Login Required</span>
             </div>
         </div>
     </header>
 
-    <!-- MAIN WRAPPER WITH NAVIGATION & CONTENT -->
+    <!-- MAIN WRAPPER -->
     <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
 
-        <!-- SIDEBAR NAVIGATION (Visible when logged in, or restricted preview) -->
+        <!-- SIDEBAR NAVIGATION -->
         <aside class="w-full md:w-64 flex-shrink-0">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 sticky top-22">
                 <p class="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">System Modules</p>
-                <nav class="space-y-1" id="mainNavigation">
-                    <!-- Step 1 Navigation -->
+                <nav class="space-y-1">
                     <button id="nav-login" onclick="switchTab('login')" class="nav-item w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-brand-700 bg-brand-50 border border-brand-200">
                         <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-key w-5 text-center text-brand-600"></i>
-                            <span>1. Supervisor Login</span>
+                            <i class="fa-solid fa-mobile-screen-button w-5 text-center text-brand-600"></i>
+                            <span>1. Authenticator Login</span>
                         </div>
-                        <span id="loginStatusBadge" class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Required</span>
+                        <span id="loginStatusBadge" class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Step 1</span>
                     </button>
 
-                    <!-- Step 2 Navigation (Placeholder for Step 2) -->
                     <button id="nav-calendar" onclick="switchTab('calendar')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
                         <div class="flex items-center space-x-3">
                             <i class="fa-solid fa-calendar-days w-5 text-center text-slate-400"></i>
@@ -113,7 +97,6 @@
                         <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 2</span>
                     </button>
 
-                    <!-- Step 3 Navigation -->
                     <button id="nav-availability" onclick="switchTab('availability')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
                         <div class="flex items-center space-x-3">
                             <i class="fa-solid fa-users-viewfinder w-5 text-center text-slate-400"></i>
@@ -122,7 +105,6 @@
                         <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 3</span>
                     </button>
 
-                    <!-- Step 4 Navigation -->
                     <button id="nav-remaining" onclick="switchTab('remaining')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
                         <div class="flex items-center space-x-3">
                             <i class="fa-solid fa-hourglass-half w-5 text-center text-slate-400"></i>
@@ -131,7 +113,6 @@
                         <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 4</span>
                     </button>
 
-                    <!-- Step 5 Navigation -->
                     <button id="nav-total" onclick="switchTab('total')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
                         <div class="flex items-center space-x-3">
                             <i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
@@ -142,130 +123,171 @@
 
                     <hr class="my-2 border-slate-200">
 
-                    <!-- Live Audit Trail Page -->
                     <button id="nav-audit" onclick="switchTab('audit')" class="nav-item w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
                         <div class="flex items-center space-x-3">
                             <i class="fa-solid fa-clipboard-list w-5 text-center text-indigo-500"></i>
-                            <span>Action Audit Logs</span>
+                            <span>Action Audit Trail</span>
                         </div>
                         <span id="auditCountBadge" class="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
                     </button>
 
-                    <!-- Step 6 Navigation -->
                     <button id="nav-print" onclick="switchTab('print')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
                         <div class="flex items-center space-x-3">
                             <i class="fa-solid fa-file-pdf w-5 text-center text-slate-400"></i>
-                            <span>6. Print PDF Summary</span>
+                            <span>6. Print PDF Reports</span>
                         </div>
                         <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 6</span>
                     </button>
                 </nav>
 
-                <!-- Storage Info Box -->
                 <div class="mt-6 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-500">
                     <div class="flex items-center justify-between font-semibold text-slate-700 mb-1">
-                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-brand-600"></i> Local Storage Engine</span>
-                        <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">GitHub Ready</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-key text-brand-600"></i> TOTP Engine</span>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">HMAC-SHA1</span>
                     </div>
-                    <p class="text-[11px] leading-tight text-slate-500">All audit trail logs and supervisor actions persist locally in your browser session.</p>
+                    <p class="text-[11px] leading-tight text-slate-500">Compatible with Microsoft Authenticator, Google Authenticator & 2FA Apps.</p>
                 </div>
             </div>
         </aside>
 
-        <!-- MAIN VIEW AREA -->
+        <!-- MAIN VIEW CONTENT -->
         <main class="flex-1">
 
-            <!-- TAB 1: LOGIN PAGE (STEP 1 FOCUS) -->
+            <!-- TAB 1: AUTHENTICATOR LOGIN (STEP 1 FOCUS) -->
             <div id="tab-login" class="tab-content">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-2xl mx-auto">
-                    <!-- Login Header Banner -->
-                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-brand-900 px-6 py-8 text-white relative overflow-hidden">
-                        <div class="relative z-10">
-                            <span class="bg-brand-500/20 text-brand-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-brand-400/30">
-                                Step 1 Focus
-                            </span>
-                            <h2 class="text-2xl font-bold mt-3">Supervisor Authentication</h2>
-                            <p class="text-slate-300 text-sm mt-1">Select your supervisor account and input your CPR number to access the technician leave planning system.</p>
+                    <!-- Banner -->
+                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-brand-900 px-6 py-6 text-white relative">
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div>
+                                <span class="bg-brand-500/20 text-brand-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-brand-400/30">
+                                    Step 1 Verification
+                                </span>
+                                <h2 class="text-2xl font-bold mt-2">Supervisor Login (2FA TOTP)</h2>
+                                <p class="text-slate-300 text-xs mt-1">Select your name and enter the code from Microsoft / Google Authenticator.</p>
+                            </div>
+                            <div class="p-3 bg-white/10 backdrop-blur rounded-xl border border-white/10 hidden sm:block text-center">
+                                <i class="fa-solid fa-shield-cat text-3xl text-brand-400"></i>
+                            </div>
                         </div>
-                        <i class="fa-solid fa-user-shield text-8xl text-white/5 absolute -right-2 -bottom-4 pointer-events-none"></i>
                     </div>
 
-                    <!-- Login Form Form Container -->
-                    <div class="p-6 sm:p-8">
-                        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
-                            
-                            <!-- Supervisor Name Dropdown -->
-                            <div>
-                                <label for="supervisorSelect" class="block text-sm font-semibold text-slate-700 mb-2">
-                                    Supervisor Name <span class="text-rose-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-user-tie"></i>
-                                    </div>
-                                    <select id="supervisorSelect" required onchange="autoFillCPRHint()" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-                                        <option value="" disabled selected>-- Select Supervisor --</option>
-                                        <!-- Dynamically Populated via JS -->
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-chevron-down text-xs"></i>
-                                    </div>
+                    <!-- Main Form Section -->
+                    <div class="p-6">
+                        
+                        <!-- Supervisor Select -->
+                        <div class="mb-5">
+                            <label for="supervisorSelect" class="block text-sm font-semibold text-slate-700 mb-2">
+                                Select Supervisor <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                </div>
+                                <select id="supervisorSelect" onchange="onSupervisorChanged()" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                                    <option value="" disabled selected>-- Select Supervisor Name --</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- CPR Input Field -->
+                        <!-- Mode Switcher Tabs -->
+                        <div class="flex rounded-lg bg-slate-100 p-1 mb-6 border border-slate-200">
+                            <button id="mode-verify-btn" onclick="setAuthMode('verify')" class="flex-1 py-2 text-xs font-bold rounded-md transition-all bg-white text-brand-700 shadow-sm flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-key"></i>
+                                <span>Enter 6-Digit Code</span>
+                            </button>
+                            <button id="mode-qr-btn" onclick="setAuthMode('qr')" class="flex-1 py-2 text-xs font-bold rounded-md transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-qrcode"></i>
+                                <span>First-Time Setup / QR Code</span>
+                            </button>
+                        </div>
+
+                        <!-- VERIFY MODE CONTAINER -->
+                        <div id="verify-mode-container" class="space-y-5">
                             <div>
                                 <div class="flex items-center justify-between mb-2">
-                                    <label for="cprInput" class="block text-sm font-semibold text-slate-700">
-                                        CPR Number <span class="text-rose-500">*</span>
+                                    <label class="block text-sm font-semibold text-slate-700">
+                                        Authenticator 6-Digit Code <span class="text-rose-500">*</span>
                                     </label>
-                                    <span id="cprHintBadge" class="text-xs font-mono text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100 hidden">
-                                        Demo CPR: <strong id="hintCprVal">---</strong>
+                                    <span class="text-xs text-slate-400 font-mono flex items-center gap-1">
+                                        <i class="fa-regular fa-clock text-slate-400"></i> Refresh in <span id="totpRefreshTimer" class="font-bold text-brand-600">30</span>s
                                     </span>
                                 </div>
+
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-id-card"></i>
-                                    </div>
-                                    <input type="password" id="cprInput" required maxlength="9" pattern="\d{9}" placeholder="e.g. 880123456 (9 Digits)" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-                                    <button type="button" onclick="toggleCPRVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
-                                        <i id="cprToggleIcon" class="fa-solid fa-eye text-sm"></i>
-                                    </button>
+                                    <input type="text" id="totpInput" maxlength="6" pattern="\d{6}" placeholder="000000" autofocus autocomplete="off" class="w-full text-center text-3xl font-mono tracking-[0.5em] py-3.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all text-slate-800">
                                 </div>
-                                <p class="text-xs text-slate-400 mt-1">Must enter 9-digit CPR corresponding to the selected supervisor.</p>
+                                <p class="text-xs text-slate-400 mt-2">Open Microsoft Authenticator or Google Authenticator on your phone to get the active 6-digit code.</p>
                             </div>
 
                             <!-- Error Message Box -->
-                            <div id="loginErrorMsg" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-lg flex items-center space-x-3 text-rose-700 text-sm">
+                            <div id="totpErrorMsg" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-lg flex items-center space-x-3 text-rose-700 text-sm">
                                 <i class="fa-solid fa-circle-exclamation text-rose-500 text-lg flex-shrink-0"></i>
-                                <span id="loginErrorText">Invalid CPR number provided.</span>
+                                <span id="totpErrorText">Invalid 6-digit verification code.</span>
                             </div>
 
-                            <!-- Submit Button -->
-                            <button type="submit" class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 group">
-                                <span>Sign In & Authorize Access</span>
-                                <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            <button onclick="handleTOTPLogin()" class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 group">
+                                <i class="fa-solid fa-shield-check"></i>
+                                <span>Verify Code & Sign In</span>
                             </button>
-                        </form>
+                        </div>
 
-                        <!-- Pre-configured Credentials Quick Selector Table -->
+                        <!-- QR SETUP MODE CONTAINER -->
+                        <div id="qr-mode-container" class="hidden space-y-4 text-center">
+                            <div id="qrSelectionNotice" class="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs font-medium">
+                                <i class="fa-solid fa-circle-info mr-1"></i> Please select a supervisor from the dropdown menu above to display their setup QR code.
+                            </div>
+
+                            <div id="qrDisplayArea" class="hidden space-y-4">
+                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl inline-block">
+                                    <p class="text-xs font-bold text-slate-700 mb-2">Scan with Microsoft Authenticator App</p>
+                                    <div class="p-2 bg-white rounded-lg shadow-inner inline-block border border-slate-200">
+                                        <img id="qrImage" src="" alt="TOTP QR Code" class="w-48 h-48 mx-auto">
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-2">Or enter secret key manually into app:</p>
+                                    <div class="mt-1 inline-flex items-center gap-2 bg-white px-3 py-1.5 rounded border border-slate-300 font-mono text-xs font-bold text-brand-700">
+                                        <span id="secretKeyDisplay">------</span>
+                                        <button onclick="copySecretKey()" title="Copy Key" class="text-slate-400 hover:text-slate-700"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="text-left text-xs text-slate-500 space-y-1 bg-brand-50/60 p-3 rounded-lg border border-brand-100">
+                                    <p class="font-bold text-brand-900"><i class="fa-solid fa-list-check mr-1"></i> Quick Setup Instructions:</p>
+                                    <ol class="list-decimal pl-4 space-y-1 text-slate-600">
+                                        <li>Open <strong>Microsoft Authenticator</strong> or <strong>Google Authenticator</strong> on your phone.</li>
+                                        <li>Tap the <strong>+</strong> icon and choose <strong>Other account (Scan QR code)</strong>.</li>
+                                        <li>Point your camera at the QR code above.</li>
+                                        <li>Switch back to the <strong>"Enter 6-Digit Code"</strong> tab to log in.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DEMO TESTING HELPER PANEL -->
                         <div class="mt-8 pt-6 border-t border-slate-200">
-                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center justify-between">
-                                <span>Demo Preset Credentials</span>
-                                <span class="text-[10px] text-brand-600 font-normal">Click any row to test</span>
-                            </h3>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-vial-circle-check text-indigo-500"></i>
+                                    <span>Supervisor Authenticator Registry</span>
+                                </h3>
+                                <span class="text-[10px] text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">Testing Presets</span>
+                            </div>
+
                             <div class="overflow-x-auto rounded-lg border border-slate-200">
                                 <table class="w-full text-left text-xs">
                                     <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
                                         <tr>
                                             <th class="p-2.5">Supervisor Name</th>
                                             <th class="p-2.5">Role</th>
-                                            <th class="p-2.5">CPR Number</th>
-                                            <th class="p-2.5 text-right">Action</th>
+                                            <th class="p-2.5">TOTP Secret Key</th>
+                                            <th class="p-2.5 text-right">Instant Desktop Test</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="demoCredentialsTable" class="divide-y divide-slate-200 bg-white">
-                                        <!-- Populated dynamically via JS -->
+                                    <tbody id="demoSupervisorsTable" class="divide-y divide-slate-200 bg-white">
+                                        <!-- Dynamic JS -->
                                     </tbody>
                                 </table>
                             </div>
@@ -275,43 +297,46 @@
                 </div>
             </div>
 
-            <!-- TAB: ACTION AUDIT LOGS (ACTIVE & LIVE) -->
+            <!-- TAB: ACTION AUDIT TRAIL -->
             <div id="tab-audit" class="tab-content hidden space-y-4">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
                         <div>
                             <div class="flex items-center space-x-2">
                                 <h2 class="text-xl font-bold text-slate-800">Action Audit Trail</h2>
-                                <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">Live Recording</span>
+                                <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">Live Tracker</span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-1">Every supervisor action (login, logout, leave approval, modifications) is logged here with exact timestamp and CPR verification.</p>
+                            <p class="text-xs text-slate-500 mt-1">All supervisor 2FA authentications and system events are logged with precise date and timestamp.</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="exportAuditLogs()" class="px-3 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 flex items-center space-x-1.5">
+                            <button onclick="exportAuditLogs('csv')" class="px-3 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-file-csv"></i>
+                                <span>Export CSV</span>
+                            </button>
+                            <button onclick="exportAuditLogs('json')" class="px-3 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 flex items-center space-x-1.5">
                                 <i class="fa-solid fa-download"></i>
                                 <span>Export JSON</span>
                             </button>
                             <button onclick="clearAuditLogs()" class="px-3 py-2 text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg border border-rose-200 flex items-center space-x-1.5">
                                 <i class="fa-solid fa-trash-can"></i>
-                                <span>Clear Logs</span>
+                                <span>Clear</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Audit Log Table -->
                     <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-100 text-slate-700 font-semibold uppercase tracking-wider border-b border-slate-200">
                                 <tr>
-                                    <th class="p-3">Timestamp</th>
+                                    <th class="p-3">Timestamp (YYYY-MM-DD HH:MM:SS)</th>
                                     <th class="p-3">Action Type</th>
-                                    <th class="p-3">Performed By</th>
-                                    <th class="p-3">CPR No.</th>
-                                    <th class="p-3">Action Details</th>
+                                    <th class="p-3">Supervisor Name</th>
+                                    <th class="p-3">Method</th>
+                                    <th class="p-3">Event Details</th>
                                 </tr>
                             </thead>
                             <tbody id="auditLogsTableBody" class="divide-y divide-slate-200 bg-white font-mono text-slate-600">
-                                <!-- Dynamic content populated by JS -->
+                                <!-- Dynamic JS -->
                             </tbody>
                         </table>
                     </div>
@@ -325,92 +350,53 @@
                         <i class="fa-solid fa-calendar-days"></i>
                     </div>
                     <h3 class="text-lg font-bold text-slate-800">Step 2: Leave Calendar Module</h3>
-                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">This page will feature an interactive month/year calendar view displaying technician leaves, color-coded by department or status.</p>
+                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Interactive calendar for viewing technician leaves across shifts and months.</p>
                     <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
                 </div>
             </div>
 
-            <div id="tab-availability" class="tab-content hidden">
-                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
-                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                        <i class="fa-solid fa-users-viewfinder"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800">Step 3: Availability Matrix</h3>
-                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Grid matrix showing shift coverage, daily technician staffing counts, and shortage alerts.</p>
-                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
-                </div>
-            </div>
-
-            <div id="tab-remaining" class="tab-content hidden">
-                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
-                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                        <i class="fa-solid fa-hourglass-half"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800">Step 4: Remaining Days Tracker</h3>
-                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Individual breakdown per technician showing allocated vs taken annual leave, sick leave, and emergency leave.</p>
-                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
-                </div>
-            </div>
-
-            <div id="tab-total" class="tab-content hidden">
-                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
-                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800">Step 5: Total Days & Analytics</h3>
-                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Departmental metrics, leave utilization rate, and annual forecasting reports.</p>
-                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
-                </div>
-            </div>
-
-            <div id="tab-print" class="tab-content hidden">
-                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
-                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                        <i class="fa-solid fa-file-pdf"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800">Step 6: Printable PDF Generator</h3>
-                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Formated, print-ready document template for technician leave requests with supervisor signatures.</p>
-                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
-                </div>
-            </div>
+            <div id="tab-availability" class="tab-content hidden"><div class="bg-white rounded-xl p-8 border border-slate-200 text-center"><h3 class="text-lg font-bold text-slate-800">Step 3: Availability Matrix</h3><span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span></div></div>
+            <div id="tab-remaining" class="tab-content hidden"><div class="bg-white rounded-xl p-8 border border-slate-200 text-center"><h3 class="text-lg font-bold text-slate-800">Step 4: Remaining Days</h3><span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span></div></div>
+            <div id="tab-total" class="tab-content hidden"><div class="bg-white rounded-xl p-8 border border-slate-200 text-center"><h3 class="text-lg font-bold text-slate-800">Step 5: Total Days</h3><span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span></div></div>
+            <div id="tab-print" class="tab-content hidden"><div class="bg-white rounded-xl p-8 border border-slate-200 text-center"><h3 class="text-lg font-bold text-slate-800">Step 6: Printable Reports</h3><span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span></div></div>
 
         </main>
     </div>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
+    <!-- TOAST CONTAINER -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
-    <!-- SYSTEM JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC & TOTP IMPLEMENTATION -->
     <script>
         /**
-         * PRESET SUPERVISOR DEMO ACCOUNTS
-         * In a real GitHub static deployment, these act as the authorized supervisor registry.
+         * PREDEFINED SUPERVISOR REGISTRY WITH BASE32 TOTP SECRETS
+         * These secret keys can be scanned by Microsoft or Google Authenticator.
          */
         const SUPERVISORS = [
-            { id: 1, name: 'Ali Al-Mansoori', role: 'Senior Supervisor', cpr: '880123456' },
-            { id: 2, name: 'Sarah Ahmed', role: 'Operations Manager', cpr: '910987654' },
-            { id: 3, name: 'Hassan Abdulla', role: 'Technical Team Lead', cpr: '850555123' },
-            { id: 4, name: 'Fatima Al-Sayed', role: 'Maintenance Supervisor', cpr: '930444888' }
+            { id: 1, name: 'Ali Al-Mansoori', role: 'Senior Supervisor', secret: 'JBSWY3DPEHPK3PXP' },
+            { id: 2, name: 'Sarah Ahmed', role: 'Operations Manager', secret: 'KVKFKRCPJJVCEV2C' },
+            { id: 3, name: 'Hassan Abdulla', role: 'Technical Team Lead', secret: 'JBSWY3DPEHPK3PXQ' },
+            { id: 4, name: 'Fatima Al-Sayed', role: 'Maintenance Supervisor', secret: 'MZXW63LSEBQW4432' }
         ];
 
-        // GLOBAL APPLICATION STATE
         let currentUser = null;
         let auditLogs = [];
+        let currentAuthMode = 'verify';
+        let timerInterval = null;
 
-        // INITIALIZATION ON PAGE LOAD
+        // INITIALIZATION
         window.addEventListener('DOMContentLoaded', () => {
             initSupervisorDropdown();
-            renderDemoCredentialsTable();
+            renderDemoSupervisorsTable();
             loadAuditLogs();
             checkExistingSession();
-            renderAuditLogsTable();
+            startCountdownTimer();
         });
 
-        // 1. POPULATE SUPERVISOR DROPDOWN
+        // POPULATE DROPDOWN
         function initSupervisorDropdown() {
             const select = document.getElementById('supervisorSelect');
-            select.innerHTML = '<option value="" disabled selected>-- Select Supervisor --</option>';
-            
+            select.innerHTML = '<option value="" disabled selected>-- Select Supervisor Name --</option>';
             SUPERVISORS.forEach(sup => {
                 const opt = document.createElement('option');
                 opt.value = sup.id;
@@ -419,22 +405,21 @@
             });
         }
 
-        // 2. RENDER PRESET CREDENTIALS TABLE FOR FAST DEMO TESTING
-        function renderDemoCredentialsTable() {
-            const tbody = document.getElementById('demoCredentialsTable');
+        // RENDER DEMO TABLE
+        function renderDemoSupervisorsTable() {
+            const tbody = document.getElementById('demoSupervisorsTable');
             tbody.innerHTML = '';
 
             SUPERVISORS.forEach(sup => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 transition-colors cursor-pointer';
-                tr.onclick = () => selectPresetUser(sup.id);
+                tr.className = 'hover:bg-slate-50 transition-colors';
                 tr.innerHTML = `
                     <td class="p-2.5 font-semibold text-slate-800">${sup.name}</td>
                     <td class="p-2.5 text-slate-500">${sup.role}</td>
-                    <td class="p-2.5 font-mono text-brand-600">${sup.cpr}</td>
+                    <td class="p-2.5 font-mono text-brand-600 font-bold">${sup.secret}</td>
                     <td class="p-2.5 text-right">
-                        <button type="button" class="px-2 py-1 text-[11px] bg-brand-50 text-brand-600 hover:bg-brand-100 rounded border border-brand-200">
-                            Auto-Fill
+                        <button onclick="quickFillDesktopTest(${sup.id})" class="px-2.5 py-1 text-[11px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded border border-indigo-200 font-semibold">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Auto-Generate Code
                         </button>
                     </td>
                 `;
@@ -442,102 +427,145 @@
             });
         }
 
-        // AUTO FILL ON CLICKING PRESET
-        function selectPresetUser(supId) {
+        // HANDLE SUPERVISOR SELECT CHANGE
+        function onSupervisorChanged() {
+            const supId = parseInt(document.getElementById('supervisorSelect').value);
+            const sup = SUPERVISORS.find(s => s.id === supId);
+            if (!sup) return;
+
+            // Update QR code view if active
+            if (currentAuthMode === 'qr') {
+                showQRCodeForSupervisor(sup);
+            }
+        }
+
+        // AUTH MODE SWITCHER
+        function setAuthMode(mode) {
+            currentAuthMode = mode;
+            const verifyContainer = document.getElementById('verify-mode-container');
+            const qrContainer = document.getElementById('qr-mode-container');
+            const verifyBtn = document.getElementById('mode-verify-btn');
+            const qrBtn = document.getElementById('mode-qr-btn');
+
+            if (mode === 'verify') {
+                verifyContainer.classList.remove('hidden');
+                qrContainer.classList.add('hidden');
+                verifyBtn.className = "flex-1 py-2 text-xs font-bold rounded-md transition-all bg-white text-brand-700 shadow-sm flex items-center justify-center space-x-1.5";
+                qrBtn.className = "flex-1 py-2 text-xs font-bold rounded-md transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center space-x-1.5";
+            } else {
+                verifyContainer.classList.add('hidden');
+                qrContainer.classList.remove('hidden');
+                qrBtn.className = "flex-1 py-2 text-xs font-bold rounded-md transition-all bg-white text-brand-700 shadow-sm flex items-center justify-center space-x-1.5";
+                verifyBtn.className = "flex-1 py-2 text-xs font-bold rounded-md transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center space-x-1.5";
+
+                const supId = parseInt(document.getElementById('supervisorSelect').value);
+                const sup = SUPERVISORS.find(s => s.id === supId);
+                if (sup) {
+                    showQRCodeForSupervisor(sup);
+                } else {
+                    document.getElementById('qrSelectionNotice').classList.remove('hidden');
+                    document.getElementById('qrDisplayArea').classList.add('hidden');
+                }
+            }
+        }
+
+        // SHOW QR CODE & OTP URI
+        function showQRCodeForSupervisor(sup) {
+            document.getElementById('qrSelectionNotice').classList.add('hidden');
+            document.getElementById('qrDisplayArea').classList.remove('hidden');
+
+            const issuer = encodeURIComponent('TechLeave System');
+            const account = encodeURIComponent(sup.name);
+            const secret = sup.secret;
+            const otpUri = `otpauth://totp/${issuer}:${account}?secret=${secret}&issuer=${issuer}`;
+
+            // QuickChart QR Code API
+            const qrApiUrl = `https://quickchart.io/qr?text=${encodeURIComponent(otpUri)}&size=200&margin=1`;
+            document.getElementById('qrImage').src = qrApiUrl;
+            document.getElementById('secretKeyDisplay').textContent = sup.secret;
+
+            logAuditEvent('VIEW_QR_SETUP', sup.name, '2FA QR Code', `Displayed setup QR code for Microsoft Authenticator.`);
+        }
+
+        function copySecretKey() {
+            const key = document.getElementById('secretKeyDisplay').textContent;
+            if (key && key !== '------') {
+                const temp = document.createElement('input');
+                document.body.appendChild(temp);
+                temp.value = key;
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                showToast('Secret key copied to clipboard!', 'success');
+            }
+        }
+
+        // QUICK DESKTOP TEST GENERATOR
+        async function quickFillDesktopTest(supId) {
             const sup = SUPERVISORS.find(s => s.id === supId);
             if (!sup) return;
 
             document.getElementById('supervisorSelect').value = sup.id;
-            document.getElementById('cprInput').value = sup.cpr;
-            autoFillCPRHint();
-            showToast(`Preset loaded for ${sup.name}`, 'info');
+            setAuthMode('verify');
+
+            // Generate active code locally
+            const activeCode = await generateTOTPToken(sup.secret);
+            document.getElementById('totpInput').value = activeCode;
+
+            showToast(`Auto-filled valid code (${activeCode}) for ${sup.name}`, 'info');
         }
 
-        // AUTO FILL HINT BADGE
-        function autoFillCPRHint() {
-            const selectedId = parseInt(document.getElementById('supervisorSelect').value);
-            const sup = SUPERVISORS.find(s => s.id === selectedId);
-            const hintBadge = document.getElementById('cprHintBadge');
-            const hintVal = document.getElementById('hintCprVal');
-
-            if (sup) {
-                hintVal.textContent = sup.cpr;
-                hintBadge.classList.remove('hidden');
-            } else {
-                hintBadge.classList.add('hidden');
-            }
-        }
-
-        // TOGGLE CPR MASKING
-        function toggleCPRVisibility() {
-            const input = document.getElementById('cprInput');
-            const icon = document.getElementById('cprToggleIcon');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-
-        // 3. HANDLE LOGIN ACTION
-        function handleLogin(event) {
-            event.preventDefault();
+        // HANDLE TOTP LOGIN VERIFICATION
+        async function handleTOTPLogin() {
             const supId = parseInt(document.getElementById('supervisorSelect').value);
-            const inputCPR = document.getElementById('cprInput').value.trim();
-            const errorMsg = document.getElementById('loginErrorMsg');
+            const inputCode = document.getElementById('totpInput').value.trim();
+            const errorMsg = document.getElementById('totpErrorMsg');
 
             errorMsg.classList.add('hidden');
 
             const sup = SUPERVISORS.find(s => s.id === supId);
-
             if (!sup) {
-                showError('Please select a valid supervisor account.');
+                showError('Please select a supervisor name first.');
                 return;
             }
 
-            if (sup.cpr !== inputCPR) {
-                showError('Invalid CPR number provided for selected supervisor.');
-                logAuditEvent('FAILED_LOGIN_ATTEMPT', `${sup.name}`, inputCPR, 'Failed authentication attempt: CPR mismatch');
+            if (!inputCode || inputCode.length !== 6) {
+                showError('Please enter a full 6-digit verification code.');
                 return;
             }
 
-            // SUCCESSFUL LOGIN
+            // Calculate current TOTP Token and adjacent window (±1 step for clock drift tolerance)
+            const isValid = await verifyTOTPCode(sup.secret, inputCode);
+
+            if (!isValid) {
+                showError('Invalid code. Ensure your phone time is accurate and try again.');
+                logAuditEvent('FAILED_2FA_LOGIN', sup.name, 'Microsoft Authenticator', `Invalid TOTP code entered: [${inputCode}]`);
+                return;
+            }
+
+            // LOGIN SUCCESSFUL
             currentUser = {
                 id: sup.id,
                 name: sup.name,
                 role: sup.role,
-                cpr: sup.cpr,
                 loginTime: new Date().toISOString()
             };
 
-            // Save to sessionStorage
             sessionStorage.setItem('techleave_current_user', JSON.stringify(currentUser));
+            logAuditEvent('SUPERVISOR_LOGIN', currentUser.name, 'Microsoft/Google Authenticator 2FA', 'Supervisor logged in successfully.');
 
-            // Log Audit Event
-            logAuditEvent('SUPERVISOR_LOGIN', currentUser.name, currentUser.cpr, 'Supervisor authenticated successfully into the system.');
-
-            // Update Header & UI UI
             updateUIForLoggedInUser();
             showToast(`Welcome back, ${currentUser.name}!`, 'success');
-
-            // Reset form
-            document.getElementById('loginForm').reset();
-            document.getElementById('cprHintBadge').classList.add('hidden');
+            document.getElementById('totpInput').value = '';
         }
 
         function showError(msg) {
-            const errorMsg = document.getElementById('loginErrorMsg');
-            const errorText = document.getElementById('loginErrorText');
-            errorText.textContent = msg;
+            const errorMsg = document.getElementById('totpErrorMsg');
+            document.getElementById('totpErrorText').textContent = msg;
             errorMsg.classList.remove('hidden');
         }
 
-        // CHECK EXISTING SESSION
+        // CHECK SESSION
         function checkExistingSession() {
             const stored = sessionStorage.getItem('techleave_current_user');
             if (stored) {
@@ -550,66 +578,48 @@
             }
         }
 
-        // UPDATE UI ON LOGIN
         function updateUIForLoggedInUser() {
             if (!currentUser) return;
 
-            // Update Header
-            document.getElementById('headerUserName').textContent = `${currentUser.name} (${currentUser.role})`;
-            document.getElementById('headerUserCPR').textContent = `CPR: ${currentUser.cpr}`;
+            document.getElementById('headerUserName').textContent = `${currentUser.name}`;
             document.getElementById('userHeaderSection').classList.remove('hidden');
             document.getElementById('userHeaderSection').classList.add('flex');
             document.getElementById('guestHeaderBadge').classList.add('hidden');
 
-            // Update Login Nav Badge
             const statusBadge = document.getElementById('loginStatusBadge');
             statusBadge.textContent = 'Authenticated';
             statusBadge.className = 'bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold';
 
-            // Unlock other tabs visually (Step preparation)
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.classList.remove('opacity-60');
-            });
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('opacity-60'));
         }
 
-        // LOGOUT HANDLER
         function handleLogout() {
             if (!currentUser) return;
 
-            logAuditEvent('SUPERVISOR_LOGOUT', currentUser.name, currentUser.cpr, 'Supervisor logged out of session.');
+            logAuditEvent('SUPERVISOR_LOGOUT', currentUser.name, '2FA Session', 'Supervisor logged out.');
             showToast(`Logged out supervisor ${currentUser.name}`, 'info');
 
             currentUser = null;
             sessionStorage.removeItem('techleave_current_user');
 
-            // Reset Header UI
             document.getElementById('userHeaderSection').classList.add('hidden');
             document.getElementById('userHeaderSection').classList.remove('flex');
             document.getElementById('guestHeaderBadge').classList.remove('hidden');
 
-            // Reset Login Nav Badge
             const statusBadge = document.getElementById('loginStatusBadge');
-            statusBadge.textContent = 'Required';
+            statusBadge.textContent = 'Step 1';
             statusBadge.className = 'bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold';
 
-            // Switch back to Login Tab
             switchTab('login');
         }
 
-        // TAB SWITCHING LOGIC
+        // TAB SWITCHING
         function switchTab(tabId) {
-            // Hide all contents
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(c => c.classList.add('hidden'));
-
-            // Show target
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             const target = document.getElementById(`tab-${tabId}`);
             if (target) target.classList.remove('hidden');
 
-            // Style nav buttons
-            const navBtns = document.querySelectorAll('.nav-item');
-            navBtns.forEach(btn => {
+            document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.remove('bg-brand-50', 'text-brand-700', 'border', 'border-brand-200');
                 btn.classList.add('text-slate-600');
             });
@@ -621,18 +631,101 @@
             }
         }
 
-        // 4. AUDIT LOG ENGINE
-        function logAuditEvent(actionType, userName, cpr, details) {
+        // ==========================================
+        // CLIENT-SIDE TOTP ALGORITHM (HMAC-SHA1)
+        // ==========================================
+
+        function base32ToHex(base32) {
+            const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+            let bits = "";
+            let hex = "";
+
+            for (let i = 0; i < base32.length; i++) {
+                const val = base32chars.indexOf(base32.charAt(i).toUpperCase());
+                if (val !== -1) bits += val.toString(2).padStart(5, '0');
+            }
+
+            for (let i = 0; i + 4 <= bits.length; i += 4) {
+                const chunk = bits.substring(i, i + 4);
+                hex += parseInt(chunk, 2).toString(16);
+            }
+            return hex;
+        }
+
+        async function generateTOTPToken(base32Secret, timeStepOffset = 0) {
+            const epoch = Math.floor(Date.now() / 1000);
+            const timeStep = Math.floor(epoch / 30) + timeStepOffset;
+
+            // Convert timeStep to 8-byte hexadecimal array
+            const timeHex = timeStep.toString(16).padStart(16, '0');
+            const timeBytes = new Uint8Array(8);
+            for (let i = 0; i < 8; i++) {
+                timeBytes[i] = parseInt(timeHex.substr(i * 2, 2), 16);
+            }
+
+            // Convert Base32 secret to Uint8Array
+            const secretHex = base32ToHex(base32Secret);
+            const secretBytes = new Uint8Array(secretHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+            // Crypto Key Import
+            const cryptoKey = await window.crypto.subtle.importKey(
+                "raw",
+                secretBytes,
+                { name: "HMAC", hash: { name: "SHA-1" } },
+                false,
+                ["sign"]
+            );
+
+            // Generate HMAC-SHA1 signature
+            const signature = await window.crypto.subtle.sign("HMAC", cryptoKey, timeBytes);
+            const sigBytes = new Uint8Array(signature);
+
+            // Dynamic truncation
+            const offset = sigBytes[sigBytes.length - 1] & 0xf;
+            const binary = ((sigBytes[offset] & 0x7f) << 24) |
+                           ((sigBytes[offset + 1] & 0xff) << 16) |
+                           ((sigBytes[offset + 2] & 0xff) << 8) |
+                           (sigBytes[offset + 3] & 0xff);
+
+            const otp = binary % 1000000;
+            return otp.toString().padStart(6, '0');
+        }
+
+        async function verifyTOTPCode(base32Secret, inputCode) {
+            // Check current window, previous window (-1), and next window (+1) for time drift tolerance
+            for (let offset of [0, -1, 1]) {
+                const generated = await generateTOTPToken(base32Secret, offset);
+                if (generated === inputCode) return true;
+            }
+            return false;
+        }
+
+        function startCountdownTimer() {
+            setInterval(() => {
+                const epoch = Math.floor(Date.now() / 1000);
+                const remaining = 30 - (epoch % 30);
+                document.getElementById('totpRefreshTimer').textContent = remaining;
+            }, 1000);
+        }
+
+        // ==========================================
+        // AUDIT LOG ENGINE
+        // ==========================================
+
+        function logAuditEvent(actionType, supervisorName, method, details) {
+            const now = new Date();
+            const formattedTimestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
             const newLog = {
                 id: 'LOG-' + Date.now(),
-                timestamp: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'medium' }),
+                timestamp: formattedTimestamp,
                 actionType: actionType,
-                userName: userName || 'System Guest',
-                cpr: cpr || 'N/A',
+                supervisorName: supervisorName || 'Guest User',
+                method: method || 'N/A',
                 details: details
             };
 
-            auditLogs.unshift(newLog); // Push to beginning
+            auditLogs.unshift(newLog);
             saveAuditLogs();
             renderAuditLogsTable();
         }
@@ -640,23 +733,16 @@
         function loadAuditLogs() {
             const stored = localStorage.getItem('techleave_audit_logs');
             if (stored) {
-                try {
-                    auditLogs = JSON.parse(stored);
-                } catch(e) {
-                    auditLogs = [];
-                }
+                try { auditLogs = JSON.parse(stored); } catch(e) { auditLogs = []; }
             } else {
-                // Initialize with system creation log
-                auditLogs = [
-                    {
-                        id: 'LOG-INIT',
-                        timestamp: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'medium' }),
-                        actionType: 'SYSTEM_INIT',
-                        userName: 'System Core',
-                        cpr: '000000000',
-                        details: 'Technician Leave Planning System Audit Trail Initialized.'
-                    }
-                ];
+                auditLogs = [{
+                    id: 'LOG-INIT',
+                    timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                    actionType: 'SYSTEM_INIT',
+                    supervisorName: 'System Engine',
+                    method: 'System Startup',
+                    details: 'Technician Leave Planning System Audit Trail initialized with 2FA TOTP Module.'
+                }];
                 saveAuditLogs();
             }
         }
@@ -671,13 +757,7 @@
             tbody.innerHTML = '';
 
             if (auditLogs.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="p-6 text-center text-slate-400 font-sans">
-                            No audit logs recorded yet.
-                        </td>
-                    </tr>
-                `;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-sans">No audit records logged yet.</td></tr>`;
                 return;
             }
 
@@ -685,30 +765,24 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition-colors';
 
-                let actionBadgeColor = 'bg-slate-100 text-slate-700';
-                if (log.actionType.includes('LOGIN')) actionBadgeColor = 'bg-emerald-100 text-emerald-800';
-                if (log.actionType.includes('LOGOUT')) actionBadgeColor = 'bg-amber-100 text-amber-800';
-                if (log.actionType.includes('FAILED')) actionBadgeColor = 'bg-rose-100 text-rose-800';
+                let badgeClass = 'bg-slate-100 text-slate-700';
+                if (log.actionType.includes('LOGIN')) badgeClass = 'bg-emerald-100 text-emerald-800';
+                if (log.actionType.includes('LOGOUT')) badgeClass = 'bg-amber-100 text-amber-800';
+                if (log.actionType.includes('FAILED')) badgeClass = 'bg-rose-100 text-rose-800';
 
                 tr.innerHTML = `
-                    <td class="p-3 text-slate-500 whitespace-nowrap">${log.timestamp}</td>
-                    <td class="p-3 whitespace-nowrap">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${actionBadgeColor}">
-                            ${log.actionType}
-                        </span>
-                    </td>
-                    <td class="p-3 font-semibold text-slate-800 whitespace-nowrap font-sans">${log.userName}</td>
-                    <td class="p-3 text-brand-600">${log.cpr}</td>
+                    <td class="p-3 text-slate-500 font-mono whitespace-nowrap">${log.timestamp}</td>
+                    <td class="p-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${log.actionType}</span></td>
+                    <td class="p-3 font-semibold text-slate-800 font-sans whitespace-nowrap">${log.supervisorName}</td>
+                    <td class="p-3 text-brand-600 font-sans">${log.method}</td>
                     <td class="p-3 font-sans text-slate-600 max-w-xs truncate">${log.details}</td>
                 `;
                 tbody.appendChild(tr);
             });
-
-            document.getElementById('auditCountBadge').textContent = auditLogs.length;
         }
 
         function clearAuditLogs() {
-            if (confirm('Are you sure you want to clear all historical audit logs?')) {
+            if (confirm('Clear all historical action audit logs?')) {
                 auditLogs = [];
                 saveAuditLogs();
                 renderAuditLogsTable();
@@ -716,47 +790,42 @@
             }
         }
 
-        function exportAuditLogs() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `techleave_audit_logs_${Date.now()}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast('Audit log exported as JSON', 'success');
+        function exportAuditLogs(format) {
+            if (format === 'json') {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs, null, 2));
+                const a = document.createElement('a');
+                a.href = dataStr;
+                a.download = `techleave_audit_${Date.now()}.json`;
+                a.click();
+            } else if (format === 'csv') {
+                let csv = 'Timestamp,ActionType,Supervisor,Method,Details\n';
+                auditLogs.forEach(l => {
+                    csv += `"${l.timestamp}","${l.actionType}","${l.supervisorName}","${l.method}","${l.details.replace(/"/g, '""')}"\n`;
+                });
+                const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+                const a = document.createElement('a');
+                a.href = dataStr;
+                a.download = `techleave_audit_${Date.now()}.csv`;
+                a.click();
+            }
+            showToast(`Exported audit logs as ${format.toUpperCase()}`, 'success');
         }
 
-        // TOAST NOTIFICATIONS
+        // TOAST ENGINE
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             
             let bg = 'bg-slate-900 text-white';
             let icon = 'fa-circle-info';
+            if (type === 'success') { bg = 'bg-emerald-700 text-white'; icon = 'fa-circle-check'; }
+            if (type === 'error') { bg = 'bg-rose-700 text-white'; icon = 'fa-triangle-exclamation'; }
 
-            if (type === 'success') {
-                bg = 'bg-emerald-700 text-white';
-                icon = 'fa-circle-check';
-            } else if (type === 'error') {
-                bg = 'bg-rose-700 text-white';
-                icon = 'fa-triangle-exclamation';
-            }
-
-            toast.className = `pointer-events-auto flex items-center space-x-3 ${bg} px-4 py-3 rounded-lg shadow-lg border border-white/10 text-xs font-medium transition-all transform translate-y-2 opacity-0`;
-            toast.innerHTML = `
-                <i class="fa-solid ${icon}"></i>
-                <span>${message}</span>
-            `;
-
+            toast.className = `pointer-events-auto flex items-center space-x-3 ${bg} px-4 py-3 rounded-lg shadow-lg text-xs font-medium transition-all transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
             container.appendChild(toast);
 
-            // Animate in
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            // Remove after 3s
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
