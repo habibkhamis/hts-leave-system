@@ -67,11 +67,6 @@
             <span>View Availability</span>
           </button>
 
-          <button onclick="switchTab('roster')" id="nav-roster" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-users-gear text-orange-400 w-4"></i>
-            <span>Tech Roster Hub</span>
-          </button>
-
           <button onclick="switchTab('remaining')" id="nav-remaining" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
             <i class="fa-solid fa-hourglass-half text-amber-400 w-4"></i>
             <span>Remaining Days</span>
@@ -95,6 +90,11 @@
             <span>Admin Control</span>
           </div>
 
+          <button onclick="switchTab('roster')" id="nav-roster" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-solid fa-users-gear text-orange-400 w-4"></i>
+            <span>Tech Roster Hub</span>
+          </button>
+
           <button onclick="switchTab('approvals')" id="nav-approvals" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
             <div class="flex items-center space-x-2.5">
               <i class="fa-solid fa-clipboard-check text-amber-400 w-4"></i>
@@ -112,7 +112,7 @@
 
       <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
         <span>Horizon Universal Sync</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v12.0</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v13.0</span>
       </div>
     </aside>
 
@@ -277,15 +277,15 @@
         <div id="availabilityTeamsContainer" class="space-y-4"></div>
       </div>
 
-      <!-- ==================== TECH ROSTER HUB MODULE ==================== -->
+      <!-- ==================== TECH ROSTER HUB MODULE (ADMIN EXCLUSIVE) ==================== -->
       <div id="view-roster" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
               <i class="fa-solid fa-users-gear text-orange-400"></i>
-              <span>Technician Roster Management Hub</span>
+              <span>Technician Roster Management Hub (Admin Master)</span>
             </h2>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">Add, update, or remove technician profiles. Supervisor changes require Admin Approval.</p>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Master roster of all technicians across all supervisor teams.</p>
           </div>
           <button onclick="openTechModal()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-lg">
             <i class="fa-solid fa-user-plus"></i>
@@ -300,7 +300,7 @@
                 <tr>
                   <th class="p-3">Tech ID</th>
                   <th class="p-3">Technician Name</th>
-                  <th class="p-3">CPR</th>
+                  <th class="p-3">CPR Number</th>
                   <th class="p-3">Supervisor</th>
                   <th class="p-3 text-center">Roster Actions</th>
                 </tr>
@@ -329,6 +329,7 @@
                   <th class="p-3">Tech ID</th>
                   <th class="p-3">Name</th>
                   <th class="p-3">CPR</th>
+                  <th class="p-3">Supervisor</th>
                   <th class="p-3">Balance (31-Dec-2027)</th>
                   <th class="p-3">Paid Days Taken</th>
                   <th class="p-3">Leave Remaining</th>
@@ -586,6 +587,16 @@
         </div>
 
         <div>
+          <label class="block text-slate-300 font-bold uppercase mb-1">Assign Supervisor Team</label>
+          <select id="formTechSupId" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+            <option value="sup_1">Zuhair Alsaffar</option>
+            <option value="sup_2">Jaafar Kadhem</option>
+            <option value="sup_3">Husain Yusuf</option>
+            <option value="sup_4">Sayed Mohammed Saeed</option>
+          </select>
+        </div>
+
+        <div>
           <label class="block text-slate-300 font-bold uppercase mb-1">Leave Balance (as of 31-Dec-2027)</label>
           <input type="number" id="formTechBalance" required value="30" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
         </div>
@@ -626,7 +637,7 @@
     };
 
     let TECHNICIANS_MASTER = [
-      // ZUHAIR ALSAFFAR'S TEAM (sup_1) - 16 TECHNICIANS
+      // ZUHAIR ALSAFFAR'S TEAM (sup_1)
       { id: '30908', name: 'ABDULLAH SHAMSUL HOQUE', cpr: '940512345', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '30964', name: 'ALAMIN MD SOLEMAN DALI', cpr: '910898765', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '27127', name: 'ANTONIO A CAMACLANG JR', cpr: '881122334', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
@@ -647,12 +658,49 @@
       // HUSAIN YUSUF'S TEAM (sup_3)
       { id: '31123', name: 'ABID GUL', cpr: '930112233', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '30966', name: 'AHMED GAMAL ABDELAZIZ GHAZY', cpr: '940223344', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31042', name: 'ALI JAAFAR SALEH', cpr: '950334455', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30515', name: 'ARAFAT AMEEN MOHAMMED ALI', cpr: '960445566', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '28814', name: 'FAWAD AHMAD', cpr: '970556677', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30517', name: 'KHALID NAZIR', cpr: '980667788', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31125', name: 'LIJO CHERIAN VARGHESE', cpr: '990778899', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31038', name: 'MAHMOOD HASSAN SALEH AHMED', cpr: '901889900', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31014', name: 'MOHAMED ABDULREDHA ALI MAHDI', cpr: '911990011', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30972', name: 'MUHAMMAD AKRAM', cpr: '921112233', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '29110', name: 'MUHAMMAD ASIF', cpr: '931223344', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30929', name: 'MUHAMMAD YASIN', cpr: '941334455', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31124', name: 'MUZAMMAL AHMAD', cpr: '951445566', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30840', name: 'SADDAM HEBJU MIAH', cpr: '961556677', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '29875', name: 'SHAMSUL ALAM JOYNAL ABEDIN', cpr: '971667788', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31021', name: 'MOHAMMED HASAN SALEH AHMED', cpr: '981778899', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
 
       // JAAFAR KADHEM'S TEAM (sup_2)
       { id: '27021', name: 'ALI SAEED MAHDI HABIB ALI ALAKER', cpr: '910334455', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31098', name: 'EDWARD EDINGTON DAVID', cpr: '920445566', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31023', name: 'HUSAIN HAMEED YUSUF MOHAMED ALMUGHANI', cpr: '930556677', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '18942', name: 'HUSSAIN ATEYA HASAN SALMAN ALHADDAR', cpr: '940667788', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30997', name: 'MAIN UDDIN', cpr: '950778899', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30844', name: 'MOHAMMED ARMAN HOSSAIN KHALILUR RAHMAN', cpr: '960889900', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30852', name: 'NAVEEN JOY THEKKEKARA', cpr: '970990011', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31079', name: 'VIGNESHWARAN DURAIRAJ', cpr: '980112233', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31093', name: 'ALI ABDULLA ISA HASAN SALEH', cpr: '990223344', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30831', name: 'JEBARAJ JOHNRAJ', cpr: '901334455', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30926', name: 'SHAMROZ ZAHID', cpr: '911445566', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30819', name: 'WAJAHAT MALIK MAHMOUD', cpr: '921556677', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
 
       // SAYED MOHAMMED SAEED'S TEAM (sup_4)
-      { id: '31130', name: 'ABDUL BASIT', cpr: '920445566', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' }
+      { id: '31130', name: 'ABDUL BASIT', cpr: '920445566', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '30915', name: 'KABEER VARAMANGALATH', cpr: '930556677', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31128', name: 'MAHMOUD GAMAL AHMED', cpr: '940667788', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '29112', name: 'MUHAMMAD MUZAFFAR', cpr: '950778899', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31136', name: 'MUHAMMAD ZUBAIR', cpr: '960889900', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31120', name: 'SOLOMON ACHU AWAH', cpr: '970990011', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31055', name: 'HASAN ABDULLA ISA HASAN SALEH', cpr: '980112233', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31132', name: 'AMEER AHSAN AHMED', cpr: '990223344', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31131', name: 'MUHAMMAD ALMAS', cpr: '901334455', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31138', name: 'MUHAMMAD NUMAN', cpr: '911445566', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31139', name: 'RANA TAMJID RAFIQ', cpr: '921556677', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31129', name: 'SHERAZ JAMIL', cpr: '931667788', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
+      { id: '31141', name: 'TOUSEEF AHMED', cpr: '941778899', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' }
     ];
 
     let LEAVE_APPLICATIONS = [];
@@ -690,6 +738,7 @@
       }
     })();
 
+    // SCOPE CONTROL: Admin sees ALL technicians, Supervisor sees ONLY HIS TEAM
     function getScopedTechnicians() {
       if (!currentUser) return [];
       if (currentUser.role === 'admin') {
@@ -887,18 +936,18 @@
       if (currentUser.role === 'admin') {
         document.getElementById('adminNavGroup').classList.remove('hidden');
         document.getElementById('adminTeamFilterContainer').classList.remove('hidden');
-        switchTab('calendar');
       } else {
         document.getElementById('adminNavGroup').classList.add('hidden');
         document.getElementById('adminTeamFilterContainer').classList.add('hidden');
-        switchTab('calendar');
       }
+      switchTab('calendar');
     }
 
     function switchTab(tabId) {
       hideAllViews();
 
-      if ((tabId === 'audit' || tabId === 'approvals') && currentUser.role !== 'admin') {
+      // BLOCK SUPERVISOR FROM ADMIN MODULES INCLUDING TECH ROSTER HUB
+      if ((tabId === 'audit' || tabId === 'approvals' || tabId === 'roster') && currentUser.role !== 'admin') {
         alert('Access Restricted: Only Administrators can view this module.');
         switchTab('calendar');
         return;
@@ -1004,14 +1053,16 @@
 
     // ==================== CREATE LEAVE APPLICATION LOGIC ====================
     function openLeaveRequestModal() {
-      const techList = getScopedTechnicians();
+      // ADMIN ACCESSES ALL TECHNICIANS FOR LEAVE CREATION, SUPERVISOR ACCESSES HIS TEAM
+      const techList = currentUser.role === 'admin' ? TECHNICIANS_MASTER : TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
       const select = document.getElementById('leaveFormTechSelect');
       select.innerHTML = '';
 
       techList.forEach(t => {
+        const supName = SYSTEM_USERS[t.supId]?.name || 'Unassigned';
         const opt = document.createElement('option');
         opt.value = t.id;
-        opt.textContent = `${t.id} - ${t.name}`;
+        opt.textContent = `${t.id} - ${t.name} (${supName})`;
         select.appendChild(opt);
       });
 
@@ -1119,7 +1170,7 @@
       doc.text("OFFICIAL LEAVE APPLICATION FORM", 20, 30);
       doc.line(20, 33, 190, 33);
 
-      // Main Form Table Data
+      // Form Table Data
       doc.setFontSize(11);
       doc.text(`Employee No (ID): ${app.techId}`, 20, 45);
       doc.text(`CPR No: ${app.cpr}`, 120, 45);
@@ -1161,14 +1212,25 @@
 
       let countDuty = 0, countPaid = 0, countUnpaid = 0;
 
+      // Segregate Technicians by Supervisor
       const grouped = {};
+
+      if (currentUser.role === 'admin') {
+        const filterVal = document.getElementById('adminTeamFilter')?.value || 'ALL';
+        Object.keys(SUPERVISOR_THEMES).forEach(supKey => {
+          if (filterVal === 'ALL' || filterVal === supKey) {
+            grouped[supKey] = TECHNICIANS_MASTER.filter(t => t.supId === supKey);
+          }
+        });
+      } else {
+        grouped[currentUser.id] = TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
+      }
+
+      // Calculate Total Counts across viewed scope
       techList.forEach(t => {
         if (t.status === 'On Duty') countDuty++;
         if (t.status === 'On Paid Leave') countPaid++;
         if (t.status === 'On Unpaid Leave') countUnpaid++;
-
-        if (!grouped[t.supId]) grouped[t.supId] = [];
-        grouped[t.supId].push(t);
       });
 
       document.getElementById('countOnDuty').textContent = countDuty;
@@ -1183,20 +1245,24 @@
         card.className = "bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden";
 
         let rowsHtml = '';
-        techs.forEach(t => {
-          rowsHtml += `
-            <tr class="hover:bg-slate-700/30 transition border-b border-slate-800/60">
-              <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
-              <td class="p-3 font-semibold text-white">${t.name}</td>
-              <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
-              <td class="p-3">
-                <span class="px-2.5 py-1 rounded text-xs font-bold ${t.status === 'On Duty' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
-                  ${t.status}
-                </span>
-              </td>
-            </tr>
-          `;
-        });
+        if (techs.length === 0) {
+          rowsHtml = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No technicians registered for this supervisor team.</td></tr>`;
+        } else {
+          techs.forEach(t => {
+            rowsHtml += `
+              <tr class="hover:bg-slate-700/30 transition border-b border-slate-800/60">
+                <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
+                <td class="p-3 font-semibold text-white">${t.name}</td>
+                <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
+                <td class="p-3">
+                  <span class="px-2.5 py-1 rounded text-xs font-bold ${t.status === 'On Duty' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+                    ${t.status}
+                  </span>
+                </td>
+              </tr>
+            `;
+          });
+        }
 
         card.innerHTML = `
           <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-700 flex justify-between items-center">
@@ -1220,13 +1286,12 @@
       });
     }
 
-    // ==================== TECH ROSTER HUB MODULE ====================
+    // ==================== TECH ROSTER HUB MODULE (ADMIN EXCLUSIVE) ====================
     function renderRosterTable() {
-      const techList = getScopedTechnicians();
       const tbody = document.getElementById('rosterTableBody');
       tbody.innerHTML = '';
 
-      techList.forEach(t => {
+      TECHNICIANS_MASTER.forEach(t => {
         const supName = SYSTEM_USERS[t.supId]?.name || '--';
 
         const tr = document.createElement('tr');
@@ -1255,6 +1320,7 @@
         document.getElementById('formTechId').value = tech.id;
         document.getElementById('formTechName').value = tech.name;
         document.getElementById('formTechCPR').value = tech.cpr;
+        document.getElementById('formTechSupId').value = tech.supId;
         document.getElementById('formTechBalance').value = tech.balance2027;
         document.getElementById('formTechStatus').value = tech.status;
       } else {
@@ -1277,6 +1343,7 @@
       const techId = document.getElementById('formTechId').value.trim();
       const techName = document.getElementById('formTechName').value.trim();
       const techCPR = document.getElementById('formTechCPR').value.trim();
+      const techSupId = document.getElementById('formTechSupId').value;
       const techBalance = parseInt(document.getElementById('formTechBalance').value) || 30;
       const techStatus = document.getElementById('formTechStatus').value;
 
@@ -1286,40 +1353,24 @@
         cpr: techCPR,
         balance2027: techBalance,
         status: techStatus,
-        supId: currentUser.role === 'admin' ? (origId ? TECHNICIANS_MASTER.find(t=>t.id===origId)?.supId : 'sup_1') : currentUser.id,
+        supId: techSupId,
         monthlyPaid: origId ? TECHNICIANS_MASTER.find(t=>t.id===origId)?.monthlyPaid || [0,0,0,0,0,0,0,0,0,0,0,0] : [0,0,0,0,0,0,0,0,0,0,0,0],
         monthlyUnpaid: origId ? TECHNICIANS_MASTER.find(t=>t.id===origId)?.monthlyUnpaid || [0,0,0,0,0,0,0,0,0,0,0,0] : [0,0,0,0,0,0,0,0,0,0,0,0]
       };
 
-      if (currentUser.role === 'admin') {
-        if (origId) {
-          const idx = TECHNICIANS_MASTER.findIndex(t => t.id === origId);
-          if (idx !== -1) TECHNICIANS_MASTER[idx] = payload;
-          await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Edit', `Updated technician ${techName} (${techId})`);
-        } else {
-          TECHNICIANS_MASTER.push(payload);
-          await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Add', `Added technician ${techName} (${techId})`);
-        }
-        saveDataToStorage();
-        closeTechModal();
-        switchTab('roster');
-        alert("Technician record updated directly!");
+      if (origId) {
+        const idx = TECHNICIANS_MASTER.findIndex(t => t.id === origId);
+        if (idx !== -1) TECHNICIANS_MASTER[idx] = payload;
+        await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Edit', `Updated technician ${techName} (${techId})`);
       } else {
-        const req = {
-          reqId: 'REQ_' + Date.now(),
-          timestamp: new Date().toLocaleString('en-GB'),
-          supId: currentUser.id,
-          supName: currentUser.name,
-          type: origId ? 'EDIT' : 'ADD',
-          origId: origId,
-          payload: payload
-        };
-        PENDING_APPROVALS.push(req);
-        saveDataToStorage();
-        await logAuditEvent(currentUser.name, 'Supervisor', 'Submitted Tech Request', `Submitted ${req.type} request for ${techName} (${techId}) pending Admin Approval.`);
-        closeTechModal();
-        alert("Your request has been submitted to Administrator for approval.");
+        TECHNICIANS_MASTER.push(payload);
+        await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Add', `Added technician ${techName} (${techId})`);
       }
+
+      saveDataToStorage();
+      closeTechModal();
+      renderRosterTable();
+      alert("Technician roster record saved successfully!");
     }
 
     async function deleteTech(techId) {
@@ -1328,27 +1379,11 @@
 
       if (!confirm(`Are you sure you want to delete technician ${tech.name} (${tech.id})?`)) return;
 
-      if (currentUser.role === 'admin') {
-        TECHNICIANS_MASTER = TECHNICIANS_MASTER.filter(t => t.id !== techId);
-        saveDataToStorage();
-        await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Delete', `Deleted technician ${tech.name} (${techId})`);
-        renderRosterTable();
-        alert("Technician deleted directly!");
-      } else {
-        const req = {
-          reqId: 'REQ_' + Date.now(),
-          timestamp: new Date().toLocaleString('en-GB'),
-          supId: currentUser.id,
-          supName: currentUser.name,
-          type: 'DELETE',
-          origId: techId,
-          payload: tech
-        };
-        PENDING_APPROVALS.push(req);
-        saveDataToStorage();
-        await logAuditEvent(currentUser.name, 'Supervisor', 'Submitted Delete Request', `Submitted DELETE request for ${tech.name} (${techId}) pending Admin Approval.`);
-        alert("Delete request submitted to Administrator for approval.");
-      }
+      TECHNICIANS_MASTER = TECHNICIANS_MASTER.filter(t => t.id !== techId);
+      saveDataToStorage();
+      await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Delete', `Deleted technician ${tech.name} (${techId})`);
+      renderRosterTable();
+      alert("Technician deleted directly!");
     }
 
     // ==================== EDIT REMAINING BALANCE ONLY ENGINE ====================
@@ -1391,7 +1426,13 @@
       const tbody = document.getElementById('remainingTableBody');
       tbody.innerHTML = '';
 
+      if (techList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No technician records found.</td></tr>`;
+        return;
+      }
+
       techList.forEach(t => {
+        const supName = SYSTEM_USERS[t.supId]?.name || '--';
         const totalPaidTaken = t.monthlyPaid.reduce((a, b) => a + b, 0);
         const remaining = t.balance2027 - totalPaidTaken;
 
@@ -1401,6 +1442,7 @@
           <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
           <td class="p-3 font-semibold text-white">${t.name}</td>
           <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
+          <td class="p-3 text-slate-400">${supName}</td>
           <td class="p-3 font-mono text-slate-300">${t.balance2027} Days</td>
           <td class="p-3 font-mono text-rose-400">${totalPaidTaken} Days</td>
           <td class="p-3 font-mono font-bold text-emerald-400">${remaining} Days</td>
@@ -1417,6 +1459,11 @@
       const techList = getScopedTechnicians();
       const tbody = document.getElementById('totalDaysTableBody');
       tbody.innerHTML = '';
+
+      if (techList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="17" class="p-4 text-center text-slate-500">No technician records found.</td></tr>`;
+        return;
+      }
 
       techList.forEach(t => {
         const totalPaid = t.monthlyPaid.reduce((a, b) => a + b, 0);
