@@ -88,6 +88,14 @@
             <span>Admin Control</span>
           </div>
 
+          <button onclick="switchTab('approvals')" id="nav-approvals" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <div class="flex items-center space-x-2.5">
+              <i class="fa-solid fa-clipboard-check text-amber-400 w-4"></i>
+              <span>Pending Approvals</span>
+            </div>
+            <span id="approvalBadgeCount" class="hidden bg-amber-500 text-slate-900 font-bold px-1.5 py-0.5 rounded-full text-[10px]">0</span>
+          </button>
+
           <button onclick="switchTab('audit')" id="nav-audit" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
             <i class="fa-solid fa-clock-rotate-left text-orange-400 w-4"></i>
             <span>Action Audit Trail</span>
@@ -97,7 +105,7 @@
 
       <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
         <span>Horizon Universal Sync</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v8.1</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v9.0</span>
       </div>
     </aside>
 
@@ -182,7 +190,7 @@
             </h2>
             <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Annual leave schedules with color-coded daily technician availability.</p>
           </div>
-          <!-- Admin Filter (Visible only for Admins) -->
+          <!-- Admin Filter -->
           <div id="adminTeamFilterContainer" class="hidden flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700">
             <span class="text-xs text-orange-400 font-semibold uppercase">Scope Filter:</span>
             <select id="adminTeamFilter" onchange="renderCalendar()" class="bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none">
@@ -213,12 +221,18 @@
 
       <!-- ==================== SYSTEM MODULE 2: AVAILABILITY VIEW ==================== -->
       <div id="view-availability" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
-          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-            <i class="fa-solid fa-users-viewfinder text-emerald-400"></i>
-            <span>Daily Technician Availability & Roster Status</span>
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time status overview: On Duty vs. Paid / Unpaid Leave.</p>
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-users-viewfinder text-emerald-400"></i>
+              <span>Daily Technician Availability & Roster Status</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time status overview: On Duty vs. Paid / Unpaid Leave.</p>
+          </div>
+          <button onclick="openTechModal()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-lg">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Add New Technician</span>
+          </button>
         </div>
 
         <!-- Summary Cards -->
@@ -247,6 +261,7 @@
                   <th class="p-3">CPR</th>
                   <th class="p-3">Current Status</th>
                   <th class="p-3">Supervisor</th>
+                  <th class="p-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody id="availabilityTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
@@ -276,6 +291,7 @@
                   <th class="p-3">Balance (31-Dec-2027)</th>
                   <th class="p-3">Total Days Taken</th>
                   <th class="p-3">Leave Remaining</th>
+                  <th class="p-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody id="remainingTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
@@ -330,6 +346,35 @@
         </div>
       </div>
 
+      <!-- ==================== ADMIN EXCLUSIVE: PENDING APPROVALS ==================== -->
+      <div id="view-approvals" class="hidden space-y-4">
+        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-clipboard-check text-amber-400"></i>
+            <span>Pending Supervisor Requests (Admin Approval Required)</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Review, approve, or reject addition/edits/deletions submitted by Supervisors.</p>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">Date</th>
+                  <th class="p-3">Supervisor</th>
+                  <th class="p-3">Action Type</th>
+                  <th class="p-3">Target Tech ID / Name</th>
+                  <th class="p-3">Proposed Details</th>
+                  <th class="p-3 text-center">Decision</th>
+                </tr>
+              </thead>
+              <tbody id="approvalsTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- ==================== ADMIN EXCLUSIVE: ACTION AUDIT TRAIL ==================== -->
       <div id="view-audit" class="hidden space-y-4">
         <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl space-y-4">
@@ -367,6 +412,54 @@
     </main>
   </div>
 
+  <!-- EDIT / ADD TECHNICIAN MODAL -->
+  <div id="techModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="bg-slate-900 p-4 border-b border-slate-700 flex items-center justify-between">
+        <h3 id="techModalTitle" class="text-sm font-bold text-white">Add Technician</h3>
+        <button onclick="closeTechModal()" class="text-slate-400 hover:text-white transition">&times;</button>
+      </div>
+
+      <form id="techForm" onsubmit="handleTechFormSubmit(event)" class="p-5 space-y-4 text-xs">
+        <input type="hidden" id="formOriginalId">
+
+        <div>
+          <label class="block text-slate-300 font-bold uppercase mb-1">Employee ID</label>
+          <input type="text" id="formTechId" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-bold uppercase mb-1">Employee Name</label>
+          <input type="text" id="formTechName" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-bold uppercase mb-1">CPR Number</label>
+          <input type="text" id="formTechCPR" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-bold uppercase mb-1">Leave Balance (as of 31-Dec-2027)</label>
+          <input type="number" id="formTechBalance" required value="30" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-bold uppercase mb-1">Status</label>
+          <select id="formTechStatus" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+            <option value="On Duty">On Duty</option>
+            <option value="On Paid Leave">On Paid Leave</option>
+            <option value="On Unpaid Leave">On Unpaid Leave</option>
+          </select>
+        </div>
+
+        <div class="pt-3 flex justify-end space-x-2 border-t border-slate-700">
+          <button type="button" onclick="closeTechModal()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition font-semibold">Cancel</button>
+          <button type="submit" class="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded-lg font-bold text-white transition">Submit Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     // SYSTEM USER ROSTER
     const SYSTEM_USERS = {
@@ -381,9 +474,8 @@
       'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', email: 'mohammed.saeed@horizon.bh' }
     };
 
-    // TECHNICIAN ROSTER (UPDATED EXACT ZUHAIR ALSAFFAR TEAM ROSTER)
-    const TECHNICIANS_MASTER = [
-      // ZUHAIR ALSAFFAR'S TEAM (sup_1) - 16 TECHNICIANS
+    // TECHNICIAN MASTER ARRAY (LOADS FROM CLOUD/LOCAL STORAGE)
+    let TECHNICIANS_MASTER = [
       { id: '30908', name: 'ABDULLAH SHAMSUL HOQUE', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
       { id: '30964', name: 'ALAMIN MD SOLEMAN DALI', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
       { id: '27127', name: 'ANTONIO A CAMACLANG JR', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
@@ -402,6 +494,8 @@
       { id: '30952', name: 'RAYHANUL HOQUE', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' }
     ];
 
+    let PENDING_APPROVALS = [];
+
     // EmailJS Credentials
     const EMAILJS_CONFIG = {
       PUBLIC_KEY: "PXjKMTnQ5tC-3AhQD",
@@ -414,7 +508,7 @@
     let activeUser = null;
     let generatedOtp = null;
     let currentUser = null;
-    let currentCalendarMonth = 0; // 0 = Jan 2027
+    let currentCalendarMonth = 0;
 
     // Initialize EmailJS
     (function(){
@@ -432,6 +526,34 @@
         return TECHNICIANS_MASTER.filter(t => t.supId === filterVal);
       }
       return TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
+    }
+
+    async function loadDataFromStorage() {
+      const savedTechs = localStorage.getItem('horizon_technicians_data');
+      if (savedTechs) TECHNICIANS_MASTER = JSON.parse(savedTechs);
+
+      const savedApprovals = localStorage.getItem('horizon_pending_approvals');
+      if (savedApprovals) PENDING_APPROVALS = JSON.parse(savedApprovals);
+
+      updateApprovalBadge();
+    }
+
+    function saveDataToStorage() {
+      localStorage.setItem('horizon_technicians_data', JSON.stringify(TECHNICIANS_MASTER));
+      localStorage.setItem('horizon_pending_approvals', JSON.stringify(PENDING_APPROVALS));
+      updateApprovalBadge();
+    }
+
+    function updateApprovalBadge() {
+      const badge = document.getElementById('approvalBadgeCount');
+      if (badge) {
+        if (PENDING_APPROVALS.length > 0) {
+          badge.textContent = PENDING_APPROVALS.length;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
     }
 
     async function getAuditTrail() {
@@ -477,6 +599,7 @@
     }
 
     window.onload = function() {
+      loadDataFromStorage();
       const savedSession = sessionStorage.getItem('horizon_active_session');
       if (savedSession) {
         currentUser = JSON.parse(savedSession);
@@ -496,7 +619,7 @@
     }
 
     function hideAllViews() {
-      const views = ['view-login', 'view-calendar', 'view-availability', 'view-remaining', 'view-total', 'view-pdf', 'view-audit'];
+      const views = ['view-login', 'view-calendar', 'view-availability', 'view-remaining', 'view-total', 'view-pdf', 'view-approvals', 'view-audit'];
       views.forEach(v => document.getElementById(v).classList.add('hidden'));
     }
 
@@ -599,8 +722,8 @@
     function switchTab(tabId) {
       hideAllViews();
 
-      if (tabId === 'audit' && currentUser.role !== 'admin') {
-        alert('Access Restricted: Only Administrators can view Audit Logs.');
+      if ((tabId === 'audit' || tabId === 'approvals') && currentUser.role !== 'admin') {
+        alert('Access Restricted: Only Administrators can view this module.');
         switchTab('calendar');
         return;
       }
@@ -612,7 +735,180 @@
       if (tabId === 'availability') renderAvailability();
       if (tabId === 'remaining') renderRemainingDays();
       if (tabId === 'total') renderTotalDays();
+      if (tabId === 'approvals') renderApprovalsTable();
       if (tabId === 'audit') renderAuditTable();
+    }
+
+    // ==================== MODAL AND CRUD LOGIC ====================
+    function openTechModal(tech = null) {
+      const modal = document.getElementById('techModal');
+      const title = document.getElementById('techModalTitle');
+
+      if (tech) {
+        title.textContent = "Edit Technician Information";
+        document.getElementById('formOriginalId').value = tech.id;
+        document.getElementById('formTechId').value = tech.id;
+        document.getElementById('formTechName').value = tech.name;
+        document.getElementById('formTechCPR').value = tech.cpr;
+        document.getElementById('formTechBalance').value = tech.balance2027;
+        document.getElementById('formTechStatus').value = tech.status;
+      } else {
+        title.textContent = "Add New Technician";
+        document.getElementById('techForm').reset();
+        document.getElementById('formOriginalId').value = "";
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeTechModal() {
+      document.getElementById('techModal').classList.add('hidden');
+    }
+
+    async function handleTechFormSubmit(e) {
+      e.preventDefault();
+
+      const origId = document.getElementById('formOriginalId').value;
+      const techId = document.getElementById('formTechId').value.trim();
+      const techName = document.getElementById('formTechName').value.trim();
+      const techCPR = document.getElementById('formTechCPR').value.trim();
+      const techBalance = parseInt(document.getElementById('formTechBalance').value) || 30;
+      const techStatus = document.getElementById('formTechStatus').value;
+
+      const payload = {
+        id: techId,
+        name: techName,
+        cpr: techCPR,
+        balance2027: techBalance,
+        status: techStatus,
+        supId: currentUser.role === 'admin' ? (origId ? TECHNICIANS_MASTER.find(t=>t.id===origId)?.supId : 'sup_1') : currentUser.id,
+        monthly: origId ? TECHNICIANS_MASTER.find(t=>t.id===origId)?.monthly || [0,0,0,0,0,0,0,0,0,0,0,0] : [0,0,0,0,0,0,0,0,0,0,0,0]
+      };
+
+      if (currentUser.role === 'admin') {
+        // DIRECT EXECUTION FOR ADMIN
+        if (origId) {
+          const idx = TECHNICIANS_MASTER.findIndex(t => t.id === origId);
+          if (idx !== -1) TECHNICIANS_MASTER[idx] = payload;
+          await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Edit', `Updated technician ${techName} (${techId})`);
+        } else {
+          TECHNICIANS_MASTER.push(payload);
+          await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Add', `Added technician ${techName} (${techId})`);
+        }
+        saveDataToStorage();
+        closeTechModal();
+        switchTab('availability');
+        alert("Technician record updated directly!");
+      } else {
+        // PENDING APPROVAL FOR SUPERVISOR
+        const req = {
+          reqId: 'REQ_' + Date.now(),
+          timestamp: new Date().toLocaleString('en-GB'),
+          supId: currentUser.id,
+          supName: currentUser.name,
+          type: origId ? 'EDIT' : 'ADD',
+          origId: origId,
+          payload: payload
+        };
+        PENDING_APPROVALS.push(req);
+        saveDataToStorage();
+        await logAuditEvent(currentUser.name, 'Supervisor', 'Submitted Tech Request', `Submitted ${req.type} request for ${techName} (${techId}) pending Admin Approval.`);
+        closeTechModal();
+        alert("Your request has been submitted to Administrator for approval.");
+      }
+    }
+
+    async function deleteTech(techId) {
+      const tech = TECHNICIANS_MASTER.find(t => t.id === techId);
+      if (!tech) return;
+
+      if (!confirm(`Are you sure you want to delete technician ${tech.name} (${tech.id})?`)) return;
+
+      if (currentUser.role === 'admin') {
+        TECHNICIANS_MASTER = TECHNICIANS_MASTER.filter(t => t.id !== techId);
+        saveDataToStorage();
+        await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Delete', `Deleted technician ${tech.name} (${techId})`);
+        renderAvailability();
+        alert("Technician deleted directly!");
+      } else {
+        const req = {
+          reqId: 'REQ_' + Date.now(),
+          timestamp: new Date().toLocaleString('en-GB'),
+          supId: currentUser.id,
+          supName: currentUser.name,
+          type: 'DELETE',
+          origId: techId,
+          payload: tech
+        };
+        PENDING_APPROVALS.push(req);
+        saveDataToStorage();
+        await logAuditEvent(currentUser.name, 'Supervisor', 'Submitted Delete Request', `Submitted DELETE request for ${tech.name} (${techId}) pending Admin Approval.`);
+        alert("Delete request submitted to Administrator for approval.");
+      }
+    }
+
+    // ==================== ADMIN APPROVALS ENGINE ====================
+    function renderApprovalsTable() {
+      const tbody = document.getElementById('approvalsTableBody');
+      tbody.innerHTML = '';
+
+      if (PENDING_APPROVALS.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No pending supervisor requests found.</td></tr>`;
+        return;
+      }
+
+      PENDING_APPROVALS.forEach(req => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
+        tr.innerHTML = `
+          <td class="p-3 font-mono text-slate-400">${req.timestamp}</td>
+          <td class="p-3 font-semibold text-white">${req.supName}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${req.type === 'ADD' ? 'bg-emerald-500/20 text-emerald-300' : (req.type === 'EDIT' ? 'bg-blue-500/20 text-blue-300' : 'bg-rose-500/20 text-rose-300')}">${req.type}</span></td>
+          <td class="p-3 font-mono font-bold text-orange-400">${req.payload.id} - ${req.payload.name}</td>
+          <td class="p-3 text-slate-300">CPR: ${req.payload.cpr} | Balance: ${req.payload.balance2027} | Status: ${req.payload.status}</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick="approveRequest('${req.reqId}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-bold transition">Approve</button>
+            <button onclick="rejectRequest('${req.reqId}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded text-xs font-bold transition">Reject</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function approveRequest(reqId) {
+      const reqIdx = PENDING_APPROVALS.findIndex(r => r.reqId === reqId);
+      if (reqIdx === -1) return;
+
+      const req = PENDING_APPROVALS[reqIdx];
+
+      if (req.type === 'ADD') {
+        TECHNICIANS_MASTER.push(req.payload);
+      } else if (req.type === 'EDIT') {
+        const idx = TECHNICIANS_MASTER.findIndex(t => t.id === req.origId);
+        if (idx !== -1) TECHNICIANS_MASTER[idx] = req.payload;
+      } else if (req.type === 'DELETE') {
+        TECHNICIANS_MASTER = TECHNICIANS_MASTER.filter(t => t.id !== req.origId);
+      }
+
+      PENDING_APPROVALS.splice(reqIdx, 1);
+      saveDataToStorage();
+
+      await logAuditEvent(currentUser.name, 'Admin', 'Approved Request', `Approved ${req.type} request from ${req.supName} for Tech ${req.payload.name} (${req.payload.id})`);
+      renderApprovalsTable();
+      alert("Request approved and applied directly!");
+    }
+
+    async function rejectRequest(reqId) {
+      const reqIdx = PENDING_APPROVALS.findIndex(r => r.reqId === reqId);
+      if (reqIdx === -1) return;
+
+      const req = PENDING_APPROVALS[reqIdx];
+      PENDING_APPROVALS.splice(reqIdx, 1);
+      saveDataToStorage();
+
+      await logAuditEvent(currentUser.name, 'Admin', 'Rejected Request', `Rejected ${req.type} request from ${req.supName} for Tech ${req.payload.name}`);
+      renderApprovalsTable();
+      alert("Supervisor request rejected.");
     }
 
     // ==================== RENDER MODULE 1: CALENDAR ====================
@@ -671,6 +967,10 @@
             </span>
           </td>
           <td class="p-3 text-slate-400">${supName}</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick='openTechModal(${JSON.stringify(t)})' class="bg-blue-600/80 hover:bg-blue-500 text-white p-1.5 rounded transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteTech('${t.id}')" class="bg-rose-600/80 hover:bg-rose-500 text-white p-1.5 rounded transition" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -699,6 +999,9 @@
           <td class="p-3 font-mono text-slate-300">${t.balance2027} Days</td>
           <td class="p-3 font-mono text-rose-400">${totalTaken} Days</td>
           <td class="p-3 font-mono font-bold text-emerald-400">${remaining} Days</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick='openTechModal(${JSON.stringify(t)})' class="bg-blue-600/80 hover:bg-blue-500 text-white p-1.5 rounded transition" title="Edit Balance/Details"><i class="fa-solid fa-pen-to-square"></i></button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
