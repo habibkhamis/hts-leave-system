@@ -97,7 +97,7 @@
 
       <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
         <span>Horizon Universal Sync</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v8.0</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v8.1</span>
       </div>
     </aside>
 
@@ -381,19 +381,25 @@
       'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', email: 'mohammed.saeed@horizon.bh' }
     };
 
-    // SAMPLE TECHNICIAN ROSTER (PRE-LOADED WITH ZUHAIR'S TEAM)
+    // TECHNICIAN ROSTER (UPDATED EXACT ZUHAIR ALSAFFAR TEAM ROSTER)
     const TECHNICIANS_MASTER = [
-      // ZUHAIR ALSAFFAR'S TEAM (sup_1)
-      { id: 'ZUH-01', name: 'Ali Ahmed Hassan', cpr: '940512345', supId: 'sup_1', balance2027: 30, monthly: [2, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
-      { id: 'ZUH-02', name: 'Mohammed Redha', cpr: '910898765', supId: 'sup_1', balance2027: 30, monthly: [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Paid Leave' },
-      { id: 'ZUH-03', name: 'Sadiq Abdulhusain', cpr: '881122334', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
-      { id: 'ZUH-04', name: 'Mahmood Salman', cpr: '950233445', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Unpaid Leave' },
-      // JAAFAR KADHEM'S TEAM (sup_2)
-      { id: 'JAF-01', name: 'Ebrahim Khalil', cpr: '930411223', supId: 'sup_2', balance2027: 30, monthly: [0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
-      // HUSAIN YUSUF'S TEAM (sup_3)
-      { id: 'YUS-01', name: 'Yousif Majeed', cpr: '960788990', supId: 'sup_3', balance2027: 30, monthly: [0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
-      // SAYED MOHAMMED'S TEAM (sup_4)
-      { id: 'SAY-01', name: 'Sayed Ali Mustafa', cpr: '920344556', supId: 'sup_4', balance2027: 30, monthly: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' }
+      // ZUHAIR ALSAFFAR'S TEAM (sup_1) - 16 TECHNICIANS
+      { id: '30908', name: 'ABDULLAH SHAMSUL HOQUE', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30964', name: 'ALAMIN MD SOLEMAN DALI', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '27127', name: 'ANTONIO A CAMACLANG JR', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30925', name: 'ASIF ABDUL HAMEED', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30988', name: 'ASIF SHAFIQUE', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '31083', name: 'HASAN ABDULAMEER HASAN ALI AHMED ALZAIN', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30987', name: 'MD SHAHIN ABDUL MALEK', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '31111', name: 'MOBARAK HOSSAIN', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30922', name: 'MOHAMMED JAHIR UDDIN ABDUL MUNAF', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '31140', name: 'MOHAMMED SHOAIB', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30843', name: 'MUHAMMAD RAMMEZ', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '31137', name: 'MUHAMMAD SUBHAN IDREES', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '31103', name: 'MURTADHA ABDALI MOHAMED ALI ABDULLA ALSAFFAR', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30920', name: 'SUMESH SUDHAKARAN', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30871', name: 'UMAR RIZWAN', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' },
+      { id: '30952', name: 'RAYHANUL HOQUE', cpr: 'N/A', supId: 'sup_1', balance2027: 30, monthly: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], status: 'On Duty' }
     ];
 
     // EmailJS Credentials
@@ -425,7 +431,6 @@
         if (filterVal === 'ALL') return TECHNICIANS_MASTER;
         return TECHNICIANS_MASTER.filter(t => t.supId === filterVal);
       }
-      // Supervisors only see their own assigned team members
       return TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
     }
 
@@ -621,7 +626,6 @@
       const techList = getScopedTechnicians();
 
       for (let day = 1; day <= 31; day++) {
-        // Find technicians on leave this month
         let leaveTechs = techList.filter(t => t.monthly[currentCalendarMonth] > 0 && day <= t.monthly[currentCalendarMonth]);
         let hasLeave = leaveTechs.length > 0;
 
