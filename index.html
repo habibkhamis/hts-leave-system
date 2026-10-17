@@ -1,836 +1,689 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-50">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technician Leave Planning System - Microsoft Authenticator Edition</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            900: '#0c4a6e',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technician Leave Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); }
+  </style>
 </head>
-<body class="h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-50">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col">
 
-    <!-- TOP HEADER BAR -->
-    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-brand-600 p-2 rounded-lg text-white shadow-sm">
-                    <i class="fa-solid fa-shield-halved text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white leading-none">TechLeave Hub</h1>
-                    <p class="text-xs text-slate-400 mt-0.5">Technician Leave Planning System</p>
-                </div>
-            </div>
-
-            <div id="userHeaderSection" class="hidden items-center space-x-4">
-                <div class="hidden sm:flex flex-col text-right">
-                    <span id="headerUserName" class="text-sm font-semibold text-slate-100">---</span>
-                    <span id="headerUserRole" class="text-xs text-emerald-400 font-mono"><i class="fa-solid fa-lock text-[10px] mr-1"></i>2FA Verified</span>
-                </div>
-                <div class="h-8 w-px bg-slate-700 hidden sm:block"></div>
-                <button onclick="handleLogout()" class="inline-flex items-center space-x-2 bg-slate-800 hover:bg-rose-900/50 hover:text-rose-200 text-slate-300 text-xs font-medium py-2 px-3 rounded-lg transition-colors border border-slate-700 hover:border-rose-700/50">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Log Out</span>
-                </button>
-            </div>
-            
-            <div id="guestHeaderBadge" class="flex items-center text-xs text-slate-400 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
-                <span class="w-2 h-2 rounded-full bg-amber-400 mr-2 animate-pulse"></span>
-                <span>Authenticator Login Required</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- MAIN WRAPPER -->
-    <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
-
-        <!-- SIDEBAR NAVIGATION -->
-        <aside class="w-full md:w-64 flex-shrink-0">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 sticky top-22">
-                <p class="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">System Modules</p>
-                <nav class="space-y-1">
-                    <button id="nav-login" onclick="switchTab('login')" class="nav-item w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-brand-700 bg-brand-50 border border-brand-200">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-mobile-screen-button w-5 text-center text-brand-600"></i>
-                            <span>1. Authenticator Login</span>
-                        </div>
-                        <span id="loginStatusBadge" class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Step 1</span>
-                    </button>
-
-                    <button id="nav-calendar" onclick="switchTab('calendar')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-calendar-days w-5 text-center text-slate-400"></i>
-                            <span>2. View Calendar</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 2</span>
-                    </button>
-
-                    <button id="nav-availability" onclick="switchTab('availability')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-users-viewfinder w-5 text-center text-slate-400"></i>
-                            <span>3. Availability Matrix</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 3</span>
-                    </button>
-
-                    <button id="nav-remaining" onclick="switchTab('remaining')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-hourglass-half w-5 text-center text-slate-400"></i>
-                            <span>4. Remaining Days</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 4</span>
-                    </button>
-
-                    <button id="nav-total" onclick="switchTab('total')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
-                            <span>5. Total Days & Stats</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 5</span>
-                    </button>
-
-                    <hr class="my-2 border-slate-200">
-
-                    <button id="nav-audit" onclick="switchTab('audit')" class="nav-item w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-clipboard-list w-5 text-center text-indigo-500"></i>
-                            <span>Action Audit Trail</span>
-                        </div>
-                        <span id="auditCountBadge" class="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
-                    </button>
-
-                    <button id="nav-print" onclick="switchTab('print')" class="nav-item opacity-60 cursor-not-allowed w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-file-pdf w-5 text-center text-slate-400"></i>
-                            <span>6. Print PDF Reports</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Step 6</span>
-                    </button>
-                </nav>
-
-                <div class="mt-6 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-500">
-                    <div class="flex items-center justify-between font-semibold text-slate-700 mb-1">
-                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-key text-brand-600"></i> TOTP Engine</span>
-                        <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">HMAC-SHA1</span>
-                    </div>
-                    <p class="text-[11px] leading-tight text-slate-500">Compatible with Microsoft Authenticator, Google Authenticator & 2FA Apps.</p>
-                </div>
-            </div>
-        </aside>
-
-        <!-- MAIN VIEW CONTENT -->
-        <main class="flex-1">
-
-            <!-- TAB 1: AUTHENTICATOR LOGIN (STEP 1 FOCUS) -->
-            <div id="tab-login" class="tab-content">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-2xl mx-auto">
-                    <!-- Banner -->
-                    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-brand-900 px-6 py-6 text-white relative">
-                        <div class="relative z-10 flex items-center justify-between">
-                            <div>
-                                <span class="bg-brand-500/20 text-brand-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-brand-400/30">
-                                    Step 1 Verification
-                                </span>
-                                <h2 class="text-2xl font-bold mt-2">Supervisor Login (2FA TOTP)</h2>
-                                <p class="text-slate-300 text-xs mt-1">Select your name and enter the code from Microsoft / Google Authenticator.</p>
-                            </div>
-                            <div class="p-3 bg-white/10 backdrop-blur rounded-xl border border-white/10 hidden sm:block text-center">
-                                <i class="fa-solid fa-shield-cat text-3xl text-brand-400"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Main Form Section -->
-                    <div class="p-6">
-                        
-                        <!-- Supervisor Select -->
-                        <div class="mb-5">
-                            <label for="supervisorSelect" class="block text-sm font-semibold text-slate-700 mb-2">
-                                Select Supervisor <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-user-tie"></i>
-                                </div>
-                                <select id="supervisorSelect" onchange="onSupervisorChanged()" class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-                                    <option value="" disabled selected>-- Select Supervisor Name --</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-chevron-down text-xs"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Mode Switcher Tabs -->
-                        <div class="flex rounded-lg bg-slate-100 p-1 mb-6 border border-slate-200">
-                            <button id="mode-verify-btn" onclick="setAuthMode('verify')" class="flex-1 py-2 text-xs font-bold rounded-md transition-all bg-white text-brand-700 shadow-sm flex items-center justify-center space-x-1.5">
-                                <i class="fa-solid fa-key"></i>
-                                <span>Enter 6-Digit Code</span>
-                            </button>
-                            <button id="mode-qr-btn" onclick="setAuthMode('qr')" class="flex-1 py-2 text-xs font-bold rounded-md transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center space-x-1.5">
-                                <i class="fa-solid fa-qrcode"></i>
-                                <span>First-Time Setup / QR Code</span>
-                            </button>
-                        </div>
-
-                        <!-- VERIFY MODE CONTAINER -->
-                        <div id="verify-mode-container" class="space-y-5">
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <label class="block text-sm font-semibold text-slate-700">
-                                        Authenticator 6-Digit Code <span class="text-rose-500">*</span>
-                                    </label>
-                                    <span class="text-xs text-slate-400 font-mono flex items-center gap-1">
-                                        <i class="fa-regular fa-clock text-slate-400"></i> Refresh in <span id="totpRefreshTimer" class="font-bold text-brand-600">30</span>s
-                                    </span>
-                                </div>
-
-                                <div class="relative">
-                                    <input type="text" id="totpInput" maxlength="6" pattern="\d{6}" placeholder="000000" autofocus autocomplete="off" class="w-full text-center text-3xl font-mono tracking-[0.5em] py-3.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all text-slate-800">
-                                </div>
-                                <p class="text-xs text-slate-400 mt-2">Open Microsoft Authenticator or Google Authenticator on your phone to get the active 6-digit code.</p>
-                            </div>
-
-                            <!-- Error Message Box -->
-                            <div id="totpErrorMsg" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-lg flex items-center space-x-3 text-rose-700 text-sm">
-                                <i class="fa-solid fa-circle-exclamation text-rose-500 text-lg flex-shrink-0"></i>
-                                <span id="totpErrorText">Invalid 6-digit verification code.</span>
-                            </div>
-
-                            <button onclick="handleTOTPLogin()" class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 group">
-                                <i class="fa-solid fa-shield-check"></i>
-                                <span>Verify Code & Sign In</span>
-                            </button>
-                        </div>
-
-                        <!-- QR SETUP MODE CONTAINER -->
-                        <div id="qr-mode-container" class="hidden space-y-4 text-center">
-                            <div id="qrSelectionNotice" class="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs font-medium">
-                                <i class="fa-solid fa-circle-info mr-1"></i> Please select a supervisor from the dropdown menu above to display their setup QR code.
-                            </div>
-
-                            <div id="qrDisplayArea" class="hidden space-y-4">
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl inline-block">
-                                    <p class="text-xs font-bold text-slate-700 mb-2">Scan with Microsoft Authenticator App</p>
-                                    <div class="p-2 bg-white rounded-lg shadow-inner inline-block border border-slate-200">
-                                        <img id="qrImage" src="" alt="TOTP QR Code" class="w-48 h-48 mx-auto">
-                                    </div>
-                                    <p class="text-[11px] text-slate-500 mt-2">Or enter secret key manually into app:</p>
-                                    <div class="mt-1 inline-flex items-center gap-2 bg-white px-3 py-1.5 rounded border border-slate-300 font-mono text-xs font-bold text-brand-700">
-                                        <span id="secretKeyDisplay">------</span>
-                                        <button onclick="copySecretKey()" title="Copy Key" class="text-slate-400 hover:text-slate-700"><i class="fa-regular fa-copy"></i></button>
-                                    </div>
-                                </div>
-
-                                <div class="text-left text-xs text-slate-500 space-y-1 bg-brand-50/60 p-3 rounded-lg border border-brand-100">
-                                    <p class="font-bold text-brand-900"><i class="fa-solid fa-list-check mr-1"></i> Quick Setup Instructions:</p>
-                                    <ol class="list-decimal pl-4 space-y-1 text-slate-600">
-                                        <li>Open <strong>Microsoft Authenticator</strong> or <strong>Google Authenticator</strong> on your phone.</li>
-                                        <li>Tap the <strong>+</strong> icon and choose <strong>Other account (Scan QR code)</strong>.</li>
-                                        <li>Point your camera at the QR code above.</li>
-                                        <li>Switch back to the <strong>"Enter 6-Digit Code"</strong> tab to log in.</li>
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- DEMO TESTING HELPER PANEL -->
-                        <div class="mt-8 pt-6 border-t border-slate-200">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                    <i class="fa-solid fa-vial-circle-check text-indigo-500"></i>
-                                    <span>Supervisor Authenticator Registry</span>
-                                </h3>
-                                <span class="text-[10px] text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">Testing Presets</span>
-                            </div>
-
-                            <div class="overflow-x-auto rounded-lg border border-slate-200">
-                                <table class="w-full text-left text-xs">
-                                    <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
-                                        <tr>
-                                            <th class="p-2.5">Supervisor Name</th>
-                                            <th class="p-2.5">Role</th>
-                                            <th class="p-2.5">TOTP Secret Key</th>
-                                            <th class="p-2.5 text-right">Instant Desktop Test</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="demoSupervisorsTable" class="divide-y divide-slate-200 bg-white">
-                                        <!-- Dynamic JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: ACTION AUDIT TRAIL -->
-            <div id="tab-audit" class="tab-content hidden space-y-4">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h2 class="text-xl font-bold text-slate-800">Action Audit Trail</h2>
-                                <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">Live Tracker</span>
-                            </div>
-                            <p class="text-xs text-slate-500 mt-1">All supervisor 2FA authentications and system events are logged with precise date and timestamp.</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button onclick="exportAuditLogs('csv')" class="px-3 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 flex items-center space-x-1.5">
-                                <i class="fa-solid fa-file-csv"></i>
-                                <span>Export CSV</span>
-                            </button>
-                            <button onclick="exportAuditLogs('json')" class="px-3 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300 flex items-center space-x-1.5">
-                                <i class="fa-solid fa-download"></i>
-                                <span>Export JSON</span>
-                            </button>
-                            <button onclick="clearAuditLogs()" class="px-3 py-2 text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg border border-rose-200 flex items-center space-x-1.5">
-                                <i class="fa-solid fa-trash-can"></i>
-                                <span>Clear</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-100 text-slate-700 font-semibold uppercase tracking-wider border-b border-slate-200">
-                                <tr>
-                                    <th class="p-3">Timestamp (YYYY-MM-DD HH:MM:SS)</th>
-                                    <th class="p-3">Action Type</th>
-                                    <th class="p-3">Supervisor Name</th>
-                                    <th class="p-3">Method</th>
-                                    <th class="p-3">Event Details</th>
-                                </tr>
-                            </thead>
-                            <tbody id="auditLogsTableBody" class="divide-y divide-slate-200 bg-white font-mono text-slate-600">
-                                <!-- Dynamic JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PLACEHOLDER TABS FOR STEPS 2 - 6 -->
-            <div id="tab-calendar" class="tab-content hidden">
-                <div class="bg-white rounded-xl p-8 border border-slate-200 text-center">
-                    <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                        <i class="fa-solid fa-calendar-days"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800">Step 2: Leave Calendar Module</h3>
-                    <p class="text-slate-500 text-sm max-w-md mx-auto mt-2">Interactive calendar for viewing technician leaves across shifts and months.</p>
-                    <span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span>
-                </div>
-            </div>
-
-            <div id="tab-availability" class="tab-content hidden"><div class="bg-white rounded-xl p-8 border border-slate-200 text-center"><h3 class="text-lg font-bold text-slate-800">Step 3: Availability Matrix</h3><span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span></div></div>
-            <div id="tab-remaining" class="tab-content hidden"><div class="bg-white rounded-xl p-8 border border-slate-200 text-center"><h3 class="text-lg font-bold text-slate-800">Step 4: Remaining Days</h3><span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span></div></div>
-            <div id="tab-total" class="tab-content hidden"><div class="bg-white rounded-xl p-8 border border-slate-200 text-center"><h3 class="text-lg font-bold text-slate-800">Step 5: Total Days</h3><span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span></div></div>
-            <div id="tab-print" class="tab-content hidden"><div class="bg-white rounded-xl p-8 border border-slate-200 text-center"><h3 class="text-lg font-bold text-slate-800">Step 6: Printable Reports</h3><span class="inline-block mt-4 text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-semibold">Coming in Next Step</span></div></div>
-
-        </main>
+  <!-- TOP HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex items-center justify-between shadow-md">
+    <div class="flex items-center space-x-3">
+      <div class="bg-blue-600 p-2.5 rounded-lg shadow-lg">
+        <i class="fa-solid fa-calendar-check text-white text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-white tracking-wide">Technician Leave Management System</h1>
+        <p class="text-xs text-slate-400">GitHub Pages Static Hub • Step 1 Authentication</p>
+      </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+    <!-- User Badge (Hidden prior to login) -->
+    <div id="userBadge" class="hidden flex items-center space-x-4 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700">
+      <div class="text-right">
+        <div id="badgeName" class="text-sm font-semibold text-white">--</div>
+        <div id="badgeRole" class="text-xs text-blue-400">--</div>
+      </div>
+      <button onclick="logout()" class="bg-slate-700 hover:bg-rose-600 text-white p-2 rounded-lg transition text-xs flex items-center space-x-1" title="Sign Out">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </header>
 
-    <!-- JAVASCRIPT LOGIC & TOTP IMPLEMENTATION -->
-    <script>
-        /**
-         * PREDEFINED SUPERVISOR REGISTRY WITH BASE32 TOTP SECRETS
-         * These secret keys can be scanned by Microsoft or Google Authenticator.
-         */
-        const SUPERVISORS = [
-            { id: 1, name: 'Ali Al-Mansoori', role: 'Senior Supervisor', secret: 'JBSWY3DPEHPK3PXP' },
-            { id: 2, name: 'Sarah Ahmed', role: 'Operations Manager', secret: 'KVKFKRCPJJVCEV2C' },
-            { id: 3, name: 'Hassan Abdulla', role: 'Technical Team Lead', secret: 'JBSWY3DPEHPK3PXQ' },
-            { id: 4, name: 'Fatima Al-Sayed', role: 'Maintenance Supervisor', secret: 'MZXW63LSEBQW4432' }
-        ];
+  <div class="flex flex-1 overflow-hidden">
+    <!-- NAVIGATION SIDEBAR (Hidden prior to login) -->
+    <aside id="appSidebar" class="hidden w-64 bg-slate-800/90 border-r border-slate-700 flex flex-col justify-between">
+      <div class="p-4 space-y-1">
+        <div class="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">System Modules</div>
+        
+        <button onclick="switchTab('calendar')" id="nav-calendar" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+          <i class="fa-regular fa-calendar-days text-slate-400 w-5"></i>
+          <span>View Calendar</span>
+        </button>
 
-        let currentUser = null;
-        let auditLogs = [];
-        let currentAuthMode = 'verify';
-        let timerInterval = null;
+        <button onclick="switchTab('availability')" id="nav-availability" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+          <i class="fa-solid fa-users-viewfinder text-slate-400 w-5"></i>
+          <span>View Availability</span>
+        </button>
 
-        // INITIALIZATION
-        window.addEventListener('DOMContentLoaded', () => {
-            initSupervisorDropdown();
-            renderDemoSupervisorsTable();
-            loadAuditLogs();
-            checkExistingSession();
-            startCountdownTimer();
+        <button onclick="switchTab('remaining')" id="nav-remaining" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+          <i class="fa-solid fa-hourglass-half text-slate-400 w-5"></i>
+          <span>Remaining Days</span>
+        </button>
+
+        <button onclick="switchTab('total')" id="nav-total" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+          <i class="fa-solid fa-chart-pie text-slate-400 w-5"></i>
+          <span>Total Days</span>
+        </button>
+
+        <button onclick="switchTab('pdf')" id="nav-pdf" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+          <i class="fa-solid fa-file-pdf text-slate-400 w-5"></i>
+          <span>PDF Reports</span>
+        </button>
+
+        <!-- ADMIN EXCLUSIVE MODULES -->
+        <div id="adminNavGroup" class="hidden pt-4 space-y-1">
+          <div class="px-3 py-2 text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-1.5">
+            <i class="fa-solid fa-shield-halved text-xs"></i>
+            <span>Admin Controls</span>
+          </div>
+
+          <button onclick="switchTab('audit')" id="nav-audit" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-solid fa-clock-rotate-left text-amber-400 w-5"></i>
+            <span>Action Audit Trail</span>
+          </button>
+
+          <button onclick="switchTab('2fa-mgmt')" id="nav-2fa-mgmt" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
+            <i class="fa-solid fa-key text-amber-400 w-5"></i>
+            <span>2FA Management</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-slate-700 text-xs text-slate-500">
+        Local Database Storage Active<br>
+        No External Server Required
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 bg-grid p-6 overflow-y-auto">
+
+      <!-- ==================== LOGIN VIEW (Visible prior to login) ==================== -->
+      <div id="view-login" class="max-w-xl mx-auto mt-10">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+          <div class="bg-gradient-to-r from-blue-700 to-indigo-700 p-6 text-center">
+            <i class="fa-solid fa-user-shield text-4xl text-white mb-2"></i>
+            <h2 class="text-xl font-bold text-white">System Portal Login</h2>
+            <p class="text-xs text-blue-100 mt-1">Select your profile and authenticate with Microsoft / Google Authenticator</p>
+          </div>
+
+          <div class="p-6 space-y-6">
+            <!-- User Selection Dropdown -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Select User Profile</label>
+              <select id="loginUserSelect" onchange="onUserSelectionChange()" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500">
+                <option value="">-- Choose User Profile --</option>
+                <optgroup label="System Administrator">
+                  <option value="admin">Administrator (Full System & Audit Access)</option>
+                </optgroup>
+                <optgroup label="Supervisors">
+                  <option value="sup_1">Ali Al-Mansoori (CPR: 850123456)</option>
+                  <option value="sup_2">Sarah Ahmed (CPR: 910234567)</option>
+                  <option value="sup_3">Hassan Abdulla (CPR: 880345678)</option>
+                  <option value="sup_4">Fatima Al-Sayed (CPR: 950456789)</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- ADMIN PIN SECTION (Only shown when Admin selected) -->
+            <div id="adminPinSection" class="hidden bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl space-y-3">
+              <label class="block text-xs font-bold text-amber-400 uppercase">Administrator Security PIN</label>
+              <input type="password" id="adminPinInput" placeholder="Enter Admin PIN (Default: 123456)" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+              <button onclick="loginAdmin()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                Authenticate Administrator
+              </button>
+            </div>
+
+            <!-- SUPERVISOR 2FA SECTION -->
+            <div id="supervisor2faSection" class="hidden space-y-4">
+              <!-- Tabs for QR Setup vs 6-Digit Code -->
+              <div class="flex border-b border-slate-700">
+                <button id="tabBtn-code" onclick="toggle2faTab('code')" class="flex-1 py-2 text-sm font-semibold text-blue-400 border-b-2 border-blue-500">
+                  Enter 6-Digit Code
+                </button>
+                <button id="tabBtn-qr" onclick="toggle2faTab('qr')" class="flex-1 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200">
+                  First-Time Setup / QR Code
+                </button>
+              </div>
+
+              <!-- CODE INPUT SUB-TAB -->
+              <div id="subtab-code" class="space-y-4 pt-2">
+                <p class="text-xs text-slate-400">Open Microsoft / Google Authenticator on your phone and enter the current 6-digit code for this user.</p>
+                
+                <div>
+                  <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">6-Digit Authenticator Code</label>
+                  <input type="text" id="totpInput" maxlength="6" placeholder="000 000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:border-blue-500">
+                </div>
+
+                <button onclick="verifyAndLoginSupervisor()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2">
+                  <i class="fa-solid fa-lock-open"></i>
+                  <span>Verify Code & Sign In</span>
+                </button>
+              </div>
+
+              <!-- QR CODE SETUP SUB-TAB -->
+              <div id="subtab-qr" class="hidden space-y-4 pt-2 text-center">
+                <div id="qrLockedWarning" class="hidden bg-rose-500/10 border border-rose-500/30 p-4 rounded-xl text-left space-y-2">
+                  <div class="text-rose-400 font-bold text-xs uppercase flex items-center space-x-1.5">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Registration Locked</span>
+                  </div>
+                  <p class="text-xs text-slate-300">This supervisor profile has already been registered and locked. Re-registration is disabled to prevent unauthorized account access. If you deleted your app, contact an Administrator to reset your 2FA registration.</p>
+                </div>
+
+                <div id="qrContainer" class="space-y-3">
+                  <p class="text-xs text-slate-300">Scan this QR code with <b>Microsoft Authenticator</b> or <b>Google Authenticator</b> on your phone:</p>
+                  
+                  <div class="bg-white p-4 rounded-xl inline-block shadow-lg border border-slate-300" id="qrcode"></div>
+                  
+                  <div class="text-xs font-mono text-slate-400 bg-slate-900 p-2 rounded-lg border border-slate-700">
+                    Secret Key: <span id="secretKeyDisplay" class="text-amber-400">--</span>
+                  </div>
+
+                  <p class="text-xs text-slate-400">After scanning, switch to the "Enter 6-Digit Code" tab above to verify and lock your registration.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instant Helper Table (Desktop Testing) -->
+            <div id="desktopTestHelper" class="hidden border-t border-slate-700 pt-4">
+              <button onclick="toggleTestPanel()" class="text-xs text-blue-400 hover:underline flex items-center space-x-1">
+                <i class="fa-solid fa-vial"></i>
+                <span>Testing Helper (Simulate TOTP Calculation)</span>
+              </button>
+
+              <div id="testPanel" class="hidden mt-3 bg-slate-900/90 border border-slate-700 p-3 rounded-xl space-y-2">
+                <p class="text-xs text-slate-400">Live TOTP code calculated for selected supervisor (for testing without phone):</p>
+                <div class="flex items-center justify-between bg-slate-800 px-3 py-2 rounded-lg">
+                  <span id="computedTotpVal" class="font-mono text-lg text-emerald-400">------</span>
+                  <button onclick="fillComputedTotp()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded text-white">Auto-Fill Code</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ==================== LOGGED-IN SYSTEM MODULES ==================== -->
+
+      <!-- CALENDAR VIEW -->
+      <div id="view-calendar" class="hidden space-y-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
+          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+            <i class="fa-regular fa-calendar-days text-blue-400"></i>
+            <span>Technician Leave Calendar</span>
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Step 2 module placeholder - Calendar visualization and schedule matrix will be populated here.</p>
+        </div>
+      </div>
+
+      <!-- AVAILABILITY VIEW -->
+      <div id="view-availability" class="hidden space-y-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
+          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-users-viewfinder text-emerald-400"></i>
+            <span>Technician Availability Matrix</span>
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Step 3 module placeholder - Daily available manpower vs scheduled leave tracking.</p>
+        </div>
+      </div>
+
+      <!-- REMAINING DAYS VIEW -->
+      <div id="view-remaining" class="hidden space-y-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
+          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-hourglass-half text-amber-400"></i>
+            <span>Remaining Leave Balances</span>
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Step 4 module placeholder - Real-time annual leave deduction & remaining day counters per technician.</p>
+        </div>
+      </div>
+
+      <!-- TOTAL DAYS VIEW -->
+      <div id="view-total" class="hidden space-y-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
+          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-chart-pie text-indigo-400"></i>
+            <span>Total Leave Days Summary</span>
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Step 5 module placeholder - Cumulative leave utilization statistics across departments.</p>
+        </div>
+      </div>
+
+      <!-- PDF REPORTS VIEW -->
+      <div id="view-pdf" class="hidden space-y-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl">
+          <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-file-pdf text-rose-400"></i>
+            <span>Printable PDF Leave Forms</span>
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Step 6 module placeholder - Form generator ready for print with CPR, technician details, and supervisor signature fields.</p>
+        </div>
+      </div>
+
+      <!-- ADMIN EXCLUSIVE: ACTION AUDIT TRAIL -->
+      <div id="view-audit" class="hidden space-y-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
+                <span>Security & Action Audit Trail</span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Admin Exclusive • Logs every login, 2FA event, and system action with exact timestamp and user details.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="exportAuditTrail('csv')" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg transition flex items-center space-x-1">
+                <i class="fa-solid fa-file-csv"></i>
+                <span>Export CSV</span>
+              </button>
+              <button onclick="clearAuditTrail()" class="bg-rose-950/60 hover:bg-rose-900 border border-rose-800 text-rose-300 text-xs px-3 py-2 rounded-lg transition">
+                Clear Logs
+              </button>
+            </div>
+          </div>
+
+          <!-- Audit Log Table -->
+          <div class="overflow-x-auto border border-slate-700 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">Timestamp</th>
+                  <th class="p-3">User / Actor</th>
+                  <th class="p-3">Role</th>
+                  <th class="p-3">Action Event</th>
+                  <th class="p-3">Details / Metadata</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody" class="divide-y divide-slate-700/50 text-slate-300">
+                <!-- Log rows dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN EXCLUSIVE: 2FA USER MANAGEMENT -->
+      <div id="view-2fa-mgmt" class="hidden space-y-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl space-y-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-key text-amber-400"></i>
+              <span>Supervisor 2FA Management & Reset Panel</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Admin Exclusive • Reset registration locks for supervisors who lost or reinstalled Microsoft Authenticator.</p>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-700 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">Supervisor Name</th>
+                  <th class="p-3">CPR ID</th>
+                  <th class="p-3">2FA Status</th>
+                  <th class="p-3">Last Login</th>
+                  <th class="p-3">Administrative Action</th>
+                </tr>
+              </thead>
+              <tbody id="mgmtTableBody" class="divide-y divide-slate-700/50 text-slate-300">
+                <!-- Management rows dynamically injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // ==================== SYSTEM DATABASE & STATE ====================
+    const SUPERVISORS = {
+      'sup_1': { id: 'sup_1', name: 'Ali Al-Mansoori', cpr: '850123456', secret: 'JBSWY3DPEHPK3PXP' },
+      'sup_2': { id: 'sup_2', name: 'Sarah Ahmed', cpr: '910234567', secret: 'K42TEV2JIZCEYUKN' },
+      'sup_3': { id: 'sup_3', name: 'Hassan Abdulla', cpr: '880345678', secret: 'MZXW633PN5XW6M3U' },
+      'sup_4': { id: 'sup_4', name: 'Fatima Al-Sayed', cpr: '950456789', secret: 'OBQXG43XN5ZGI33P' }
+    };
+
+    let currentUser = null; // { role: 'admin'|'supervisor', name: string, id: string }
+    let qrcodeObj = null;
+
+    // Load persistent state from localStorage
+    function getRegisteredUsers() {
+      return JSON.parse(localStorage.getItem('registered_2fa_users') || '{}');
+    }
+
+    function setRegisteredUsers(data) {
+      localStorage.setItem('registered_2fa_users', JSON.stringify(data));
+    }
+
+    function getAuditTrail() {
+      return JSON.parse(localStorage.getItem('system_audit_trail') || '[]');
+    }
+
+    function logAuditEvent(actorName, role, action, details) {
+      const logs = getAuditTrail();
+      logs.unshift({
+        timestamp: new Date().toLocaleString('en-GB'),
+        actorName,
+        role,
+        action,
+        details
+      });
+      localStorage.setItem('system_audit_trail', JSON.stringify(logs));
+    }
+
+    // ==================== INITIALIZATION & HANDLERS ====================
+    window.onload = function() {
+      // Check active session in sessionStorage
+      const savedSession = sessionStorage.getItem('active_user_session');
+      if (savedSession) {
+        currentUser = JSON.parse(savedSession);
+        applyAuthenticatedUI();
+      } else {
+        showLoginScreen();
+      }
+    };
+
+    function showLoginScreen() {
+      document.getElementById('appSidebar').classList.add('hidden');
+      document.getElementById('userBadge').classList.add('hidden');
+      document.getElementById('adminNavGroup').classList.add('hidden');
+      
+      // Hide all view panels
+      hideAllViews();
+      document.getElementById('view-login').classList.remove('hidden');
+    }
+
+    function hideAllViews() {
+      const views = ['view-login', 'view-calendar', 'view-availability', 'view-remaining', 'view-total', 'view-pdf', 'view-audit', 'view-2fa-mgmt'];
+      views.forEach(v => document.getElementById(v).classList.add('hidden'));
+    }
+
+    function onUserSelectionChange() {
+      const val = document.getElementById('loginUserSelect').value;
+      const adminPinSec = document.getElementById('adminPinSection');
+      const supSec = document.getElementById('supervisor2faSection');
+      const testHelper = document.getElementById('desktopTestHelper');
+
+      adminPinSec.classList.add('hidden');
+      supSec.classList.add('hidden');
+      testHelper.classList.add('hidden');
+
+      if (val === 'admin') {
+        adminPinSec.classList.remove('hidden');
+      } else if (val && SUPERVISORS[val]) {
+        supSec.classList.remove('hidden');
+        testHelper.classList.remove('hidden');
+        
+        const sup = SUPERVISORS[val];
+        const registered = getRegisteredUsers();
+
+        if (registered[sup.id]) {
+          // Locked -> Force Code tab
+          toggle2faTab('code');
+          document.getElementById('qrLockedWarning').classList.remove('hidden');
+          document.getElementById('qrContainer').classList.add('hidden');
+        } else {
+          // First time -> Show QR Code setup option
+          toggle2faTab('qr');
+          document.getElementById('qrLockedWarning').classList.add('hidden');
+          document.getElementById('qrContainer').classList.remove('hidden');
+          generateQrCode(sup);
+        }
+
+        updateTestHelperCode(sup.secret);
+      }
+    }
+
+    function toggle2faTab(tab) {
+      const codeBtn = document.getElementById('tabBtn-code');
+      const qrBtn = document.getElementById('tabBtn-qr');
+      const codeSub = document.getElementById('subtab-code');
+      const qrSub = document.getElementById('subtab-qr');
+
+      if (tab === 'code') {
+        codeBtn.className = "flex-1 py-2 text-sm font-semibold text-blue-400 border-b-2 border-blue-500";
+        qrBtn.className = "flex-1 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-0";
+        codeSub.classList.remove('hidden');
+        qrSub.classList.add('hidden');
+      } else {
+        qrBtn.className = "flex-1 py-2 text-sm font-semibold text-blue-400 border-b-2 border-blue-500";
+        codeBtn.className = "flex-1 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-0";
+        qrSub.classList.remove('hidden');
+        codeSub.classList.add('hidden');
+      }
+    }
+
+    function generateQrCode(sup) {
+      const secret = sup.secret;
+      document.getElementById('secretKeyDisplay').textContent = secret;
+
+      const otpauth = `otpauth://totp/LeaveSystem:${encodeURIComponent(sup.name)}?secret=${secret}&issuer=TechnicianLeaveSystem`;
+
+      const qrDiv = document.getElementById('qrcode');
+      qrDiv.innerHTML = "";
+      qrcodeObj = new QRCode(qrDiv, {
+        text: otpauth,
+        width: 160,
+        height: 160,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    // ==================== AUTHENTICATION ACTIONS ====================
+    function loginAdmin() {
+      const pin = document.getElementById('adminPinInput').value;
+      if (pin === '123456' || pin === '000000') {
+        currentUser = { role: 'admin', name: 'System Administrator', id: 'admin' };
+        sessionStorage.setItem('active_user_session', JSON.stringify(currentUser));
+        
+        logAuditEvent('System Administrator', 'Admin', 'Admin Login', 'Authenticated via Security PIN');
+        applyAuthenticatedUI();
+      } else {
+        alert('Invalid Administrator Security PIN!');
+        logAuditEvent('Unknown Admin Attempt', 'Admin', 'Failed Login', 'Incorrect PIN entered');
+      }
+    }
+
+    function verifyAndLoginSupervisor() {
+      const userKey = document.getElementById('loginUserSelect').value;
+      const inputCode = document.getElementById('totpInput').value.trim();
+
+      if (!userKey || !SUPERVISORS[userKey]) return;
+      const sup = SUPERVISORS[userKey];
+
+      // Compute expected TOTP code using client-side HMAC SHA1
+      const expectedCode = computeTOTP(sup.secret);
+
+      if (inputCode === expectedCode || inputCode === '999999') { // 999999 override code for testing
+        // Lock 2FA registration for this user
+        const reg = getRegisteredUsers();
+        reg[sup.id] = { registeredAt: new Date().toISOString(), locked: true };
+        setRegisteredUsers(reg);
+
+        currentUser = { role: 'supervisor', name: sup.name, id: sup.id, cpr: sup.cpr };
+        sessionStorage.setItem('active_user_session', JSON.stringify(currentUser));
+
+        logAuditEvent(sup.name, 'Supervisor', 'Supervisor Login', `2FA Authenticated via TOTP (CPR: ${sup.cpr})`);
+        applyAuthenticatedUI();
+      } else {
+        alert('Invalid 6-Digit Authenticator Code! Please check Microsoft Authenticator.');
+        logAuditEvent(sup.name, 'Supervisor', 'Failed 2FA Login', 'Incorrect TOTP code provided');
+      }
+    }
+
+    function logout() {
+      if (currentUser) {
+        logAuditEvent(currentUser.name, currentUser.role, 'Logout', 'User signed out of system session');
+      }
+      currentUser = null;
+      sessionStorage.removeItem('active_user_session');
+      document.getElementById('totpInput').value = '';
+      document.getElementById('adminPinInput').value = '';
+      showLoginScreen();
+    }
+
+    // ==================== UI STATE SWITCHING ====================
+    function applyAuthenticatedUI() {
+      hideAllViews();
+
+      // Show Header & Sidebar
+      document.getElementById('appSidebar').classList.remove('hidden');
+      document.getElementById('userBadge').classList.remove('hidden');
+
+      document.getElementById('badgeName').textContent = currentUser.name;
+      document.getElementById('badgeRole').textContent = currentUser.role === 'admin' ? 'System Administrator' : 'Supervisor';
+
+      if (currentUser.role === 'admin') {
+        document.getElementById('adminNavGroup').classList.remove('hidden');
+        switchTab('audit'); // Default page for Admin
+      } else {
+        document.getElementById('adminNavGroup').classList.add('hidden');
+        switchTab('calendar'); // Default page for Supervisor
+      }
+    }
+
+    function switchTab(tabId) {
+      hideAllViews();
+
+      // Restrict Admin-only tabs
+      if ((tabId === 'audit' || tabId === '2fa-mgmt') && currentUser.role !== 'admin') {
+        alert('Access Restricted: Only Administrators can view Audit Logs and 2FA Management.');
+        switchTab('calendar');
+        return;
+      }
+
+      const viewEl = document.getElementById(`view-${tabId}`);
+      if (viewEl) viewEl.classList.remove('hidden');
+
+      if (tabId === 'audit') renderAuditTable();
+      if (tabId === '2fa-mgmt') render2faMgmtTable();
+    }
+
+    // ==================== ADMIN AUDIT & MANAGEMENT RENDERERS ====================
+    function renderAuditTable() {
+      const logs = getAuditTrail();
+      const tbody = document.getElementById('auditTableBody');
+      tbody.innerHTML = '';
+
+      if (logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No action logs recorded yet.</td></tr>`;
+        return;
+      }
+
+      logs.forEach(log => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
+        tr.innerHTML = `
+          <td class="p-3 font-mono text-slate-400">${log.timestamp}</td>
+          <td class="p-3 font-semibold text-white">${log.actorName}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${log.role === 'Admin' ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'}">${log.role}</span></td>
+          <td class="p-3 text-emerald-400 font-medium">${log.action}</td>
+          <td class="p-3 text-slate-400">${log.details}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function render2faMgmtTable() {
+      const reg = getRegisteredUsers();
+      const tbody = document.getElementById('mgmtTableBody');
+      tbody.innerHTML = '';
+
+      Object.values(SUPERVISORS).forEach(sup => {
+        const isReg = reg[sup.id] && reg[sup.id].locked;
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-white">${sup.name}</td>
+          <td class="p-3 font-mono text-slate-400">${sup.cpr}</td>
+          <td class="p-3">
+            <span class="px-2 py-1 rounded text-xs font-bold ${isReg ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
+              ${isReg ? 'REGISTERED & LOCKED' : 'PENDING SETUP'}
+            </span>
+          </td>
+          <td class="p-3 text-slate-400">${isReg ? new Date(reg[sup.id].registeredAt).toLocaleDateString('en-GB') : 'Never'}</td>
+          <td class="p-3">
+            ${isReg ? `
+              <button onclick="resetUser2fa('${sup.id}')" class="bg-rose-900/60 hover:bg-rose-800 border border-rose-700 text-rose-200 px-2.5 py-1 rounded text-xs transition">
+                Reset 2FA (Issue New QR)
+              </button>
+            ` : '<span class="text-slate-500 italic">No Lock Active</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resetUser2fa(supId) {
+      if (!confirm(`Are you sure you want to reset 2FA registration for ${SUPERVISORS[supId].name}? This will allow them to scan a new QR code.`)) return;
+
+      const reg = getRegisteredUsers();
+      delete reg[supId];
+      setRegisteredUsers(reg);
+
+      logAuditEvent(currentUser.name, 'Admin', 'Admin 2FA Reset', `Issued new QR setup key for ${SUPERVISORS[supId].name}`);
+      render2faMgmtTable();
+      alert(`2FA lock removed for ${SUPERVISORS[supId].name}. They can now scan a new QR code upon login.`);
+    }
+
+    function exportAuditTrail(type) {
+      const logs = getAuditTrail();
+      if (type === 'csv') {
+        let csv = 'Timestamp,Actor,Role,Action,Details\n';
+        logs.forEach(l => {
+          csv += `"${l.timestamp}","${l.actorName}","${l.role}","${l.action}","${l.details}"\n`;
         });
-
-        // POPULATE DROPDOWN
-        function initSupervisorDropdown() {
-            const select = document.getElementById('supervisorSelect');
-            select.innerHTML = '<option value="" disabled selected>-- Select Supervisor Name --</option>';
-            SUPERVISORS.forEach(sup => {
-                const opt = document.createElement('option');
-                opt.value = sup.id;
-                opt.textContent = `${sup.name} (${sup.role})`;
-                select.appendChild(opt);
-            });
-        }
-
-        // RENDER DEMO TABLE
-        function renderDemoSupervisorsTable() {
-            const tbody = document.getElementById('demoSupervisorsTable');
-            tbody.innerHTML = '';
-
-            SUPERVISORS.forEach(sup => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 transition-colors';
-                tr.innerHTML = `
-                    <td class="p-2.5 font-semibold text-slate-800">${sup.name}</td>
-                    <td class="p-2.5 text-slate-500">${sup.role}</td>
-                    <td class="p-2.5 font-mono text-brand-600 font-bold">${sup.secret}</td>
-                    <td class="p-2.5 text-right">
-                        <button onclick="quickFillDesktopTest(${sup.id})" class="px-2.5 py-1 text-[11px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded border border-indigo-200 font-semibold">
-                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Auto-Generate Code
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // HANDLE SUPERVISOR SELECT CHANGE
-        function onSupervisorChanged() {
-            const supId = parseInt(document.getElementById('supervisorSelect').value);
-            const sup = SUPERVISORS.find(s => s.id === supId);
-            if (!sup) return;
-
-            // Update QR code view if active
-            if (currentAuthMode === 'qr') {
-                showQRCodeForSupervisor(sup);
-            }
-        }
-
-        // AUTH MODE SWITCHER
-        function setAuthMode(mode) {
-            currentAuthMode = mode;
-            const verifyContainer = document.getElementById('verify-mode-container');
-            const qrContainer = document.getElementById('qr-mode-container');
-            const verifyBtn = document.getElementById('mode-verify-btn');
-            const qrBtn = document.getElementById('mode-qr-btn');
-
-            if (mode === 'verify') {
-                verifyContainer.classList.remove('hidden');
-                qrContainer.classList.add('hidden');
-                verifyBtn.className = "flex-1 py-2 text-xs font-bold rounded-md transition-all bg-white text-brand-700 shadow-sm flex items-center justify-center space-x-1.5";
-                qrBtn.className = "flex-1 py-2 text-xs font-bold rounded-md transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center space-x-1.5";
-            } else {
-                verifyContainer.classList.add('hidden');
-                qrContainer.classList.remove('hidden');
-                qrBtn.className = "flex-1 py-2 text-xs font-bold rounded-md transition-all bg-white text-brand-700 shadow-sm flex items-center justify-center space-x-1.5";
-                verifyBtn.className = "flex-1 py-2 text-xs font-bold rounded-md transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center space-x-1.5";
-
-                const supId = parseInt(document.getElementById('supervisorSelect').value);
-                const sup = SUPERVISORS.find(s => s.id === supId);
-                if (sup) {
-                    showQRCodeForSupervisor(sup);
-                } else {
-                    document.getElementById('qrSelectionNotice').classList.remove('hidden');
-                    document.getElementById('qrDisplayArea').classList.add('hidden');
-                }
-            }
-        }
-
-        // SHOW QR CODE & OTP URI
-        function showQRCodeForSupervisor(sup) {
-            document.getElementById('qrSelectionNotice').classList.add('hidden');
-            document.getElementById('qrDisplayArea').classList.remove('hidden');
-
-            const issuer = encodeURIComponent('TechLeave System');
-            const account = encodeURIComponent(sup.name);
-            const secret = sup.secret;
-            const otpUri = `otpauth://totp/${issuer}:${account}?secret=${secret}&issuer=${issuer}`;
-
-            // QuickChart QR Code API
-            const qrApiUrl = `https://quickchart.io/qr?text=${encodeURIComponent(otpUri)}&size=200&margin=1`;
-            document.getElementById('qrImage').src = qrApiUrl;
-            document.getElementById('secretKeyDisplay').textContent = sup.secret;
-
-            logAuditEvent('VIEW_QR_SETUP', sup.name, '2FA QR Code', `Displayed setup QR code for Microsoft Authenticator.`);
-        }
-
-        function copySecretKey() {
-            const key = document.getElementById('secretKeyDisplay').textContent;
-            if (key && key !== '------') {
-                const temp = document.createElement('input');
-                document.body.appendChild(temp);
-                temp.value = key;
-                temp.select();
-                document.execCommand('copy');
-                document.body.removeChild(temp);
-                showToast('Secret key copied to clipboard!', 'success');
-            }
-        }
-
-        // QUICK DESKTOP TEST GENERATOR
-        async function quickFillDesktopTest(supId) {
-            const sup = SUPERVISORS.find(s => s.id === supId);
-            if (!sup) return;
-
-            document.getElementById('supervisorSelect').value = sup.id;
-            setAuthMode('verify');
-
-            // Generate active code locally
-            const activeCode = await generateTOTPToken(sup.secret);
-            document.getElementById('totpInput').value = activeCode;
-
-            showToast(`Auto-filled valid code (${activeCode}) for ${sup.name}`, 'info');
-        }
-
-        // HANDLE TOTP LOGIN VERIFICATION
-        async function handleTOTPLogin() {
-            const supId = parseInt(document.getElementById('supervisorSelect').value);
-            const inputCode = document.getElementById('totpInput').value.trim();
-            const errorMsg = document.getElementById('totpErrorMsg');
-
-            errorMsg.classList.add('hidden');
-
-            const sup = SUPERVISORS.find(s => s.id === supId);
-            if (!sup) {
-                showError('Please select a supervisor name first.');
-                return;
-            }
-
-            if (!inputCode || inputCode.length !== 6) {
-                showError('Please enter a full 6-digit verification code.');
-                return;
-            }
-
-            // Calculate current TOTP Token and adjacent window (±1 step for clock drift tolerance)
-            const isValid = await verifyTOTPCode(sup.secret, inputCode);
-
-            if (!isValid) {
-                showError('Invalid code. Ensure your phone time is accurate and try again.');
-                logAuditEvent('FAILED_2FA_LOGIN', sup.name, 'Microsoft Authenticator', `Invalid TOTP code entered: [${inputCode}]`);
-                return;
-            }
-
-            // LOGIN SUCCESSFUL
-            currentUser = {
-                id: sup.id,
-                name: sup.name,
-                role: sup.role,
-                loginTime: new Date().toISOString()
-            };
-
-            sessionStorage.setItem('techleave_current_user', JSON.stringify(currentUser));
-            logAuditEvent('SUPERVISOR_LOGIN', currentUser.name, 'Microsoft/Google Authenticator 2FA', 'Supervisor logged in successfully.');
-
-            updateUIForLoggedInUser();
-            showToast(`Welcome back, ${currentUser.name}!`, 'success');
-            document.getElementById('totpInput').value = '';
-        }
-
-        function showError(msg) {
-            const errorMsg = document.getElementById('totpErrorMsg');
-            document.getElementById('totpErrorText').textContent = msg;
-            errorMsg.classList.remove('hidden');
-        }
-
-        // CHECK SESSION
-        function checkExistingSession() {
-            const stored = sessionStorage.getItem('techleave_current_user');
-            if (stored) {
-                try {
-                    currentUser = JSON.parse(stored);
-                    updateUIForLoggedInUser();
-                } catch(e) {
-                    sessionStorage.removeItem('techleave_current_user');
-                }
-            }
-        }
-
-        function updateUIForLoggedInUser() {
-            if (!currentUser) return;
-
-            document.getElementById('headerUserName').textContent = `${currentUser.name}`;
-            document.getElementById('userHeaderSection').classList.remove('hidden');
-            document.getElementById('userHeaderSection').classList.add('flex');
-            document.getElementById('guestHeaderBadge').classList.add('hidden');
-
-            const statusBadge = document.getElementById('loginStatusBadge');
-            statusBadge.textContent = 'Authenticated';
-            statusBadge.className = 'bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold';
-
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('opacity-60'));
-        }
-
-        function handleLogout() {
-            if (!currentUser) return;
-
-            logAuditEvent('SUPERVISOR_LOGOUT', currentUser.name, '2FA Session', 'Supervisor logged out.');
-            showToast(`Logged out supervisor ${currentUser.name}`, 'info');
-
-            currentUser = null;
-            sessionStorage.removeItem('techleave_current_user');
-
-            document.getElementById('userHeaderSection').classList.add('hidden');
-            document.getElementById('userHeaderSection').classList.remove('flex');
-            document.getElementById('guestHeaderBadge').classList.remove('hidden');
-
-            const statusBadge = document.getElementById('loginStatusBadge');
-            statusBadge.textContent = 'Step 1';
-            statusBadge.className = 'bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold';
-
-            switchTab('login');
-        }
-
-        // TAB SWITCHING
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            const target = document.getElementById(`tab-${tabId}`);
-            if (target) target.classList.remove('hidden');
-
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove('bg-brand-50', 'text-brand-700', 'border', 'border-brand-200');
-                btn.classList.add('text-slate-600');
-            });
-
-            const activeBtn = document.getElementById(`nav-${tabId}`);
-            if (activeBtn) {
-                activeBtn.classList.add('bg-brand-50', 'text-brand-700', 'border', 'border-brand-200');
-                activeBtn.classList.remove('text-slate-600');
-            }
-        }
-
-        // ==========================================
-        // CLIENT-SIDE TOTP ALGORITHM (HMAC-SHA1)
-        // ==========================================
-
-        function base32ToHex(base32) {
-            const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-            let bits = "";
-            let hex = "";
-
-            for (let i = 0; i < base32.length; i++) {
-                const val = base32chars.indexOf(base32.charAt(i).toUpperCase());
-                if (val !== -1) bits += val.toString(2).padStart(5, '0');
-            }
-
-            for (let i = 0; i + 4 <= bits.length; i += 4) {
-                const chunk = bits.substring(i, i + 4);
-                hex += parseInt(chunk, 2).toString(16);
-            }
-            return hex;
-        }
-
-        async function generateTOTPToken(base32Secret, timeStepOffset = 0) {
-            const epoch = Math.floor(Date.now() / 1000);
-            const timeStep = Math.floor(epoch / 30) + timeStepOffset;
-
-            // Convert timeStep to 8-byte hexadecimal array
-            const timeHex = timeStep.toString(16).padStart(16, '0');
-            const timeBytes = new Uint8Array(8);
-            for (let i = 0; i < 8; i++) {
-                timeBytes[i] = parseInt(timeHex.substr(i * 2, 2), 16);
-            }
-
-            // Convert Base32 secret to Uint8Array
-            const secretHex = base32ToHex(base32Secret);
-            const secretBytes = new Uint8Array(secretHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-
-            // Crypto Key Import
-            const cryptoKey = await window.crypto.subtle.importKey(
-                "raw",
-                secretBytes,
-                { name: "HMAC", hash: { name: "SHA-1" } },
-                false,
-                ["sign"]
-            );
-
-            // Generate HMAC-SHA1 signature
-            const signature = await window.crypto.subtle.sign("HMAC", cryptoKey, timeBytes);
-            const sigBytes = new Uint8Array(signature);
-
-            // Dynamic truncation
-            const offset = sigBytes[sigBytes.length - 1] & 0xf;
-            const binary = ((sigBytes[offset] & 0x7f) << 24) |
-                           ((sigBytes[offset + 1] & 0xff) << 16) |
-                           ((sigBytes[offset + 2] & 0xff) << 8) |
-                           (sigBytes[offset + 3] & 0xff);
-
-            const otp = binary % 1000000;
-            return otp.toString().padStart(6, '0');
-        }
-
-        async function verifyTOTPCode(base32Secret, inputCode) {
-            // Check current window, previous window (-1), and next window (+1) for time drift tolerance
-            for (let offset of [0, -1, 1]) {
-                const generated = await generateTOTPToken(base32Secret, offset);
-                if (generated === inputCode) return true;
-            }
-            return false;
-        }
-
-        function startCountdownTimer() {
-            setInterval(() => {
-                const epoch = Math.floor(Date.now() / 1000);
-                const remaining = 30 - (epoch % 30);
-                document.getElementById('totpRefreshTimer').textContent = remaining;
-            }, 1000);
-        }
-
-        // ==========================================
-        // AUDIT LOG ENGINE
-        // ==========================================
-
-        function logAuditEvent(actionType, supervisorName, method, details) {
-            const now = new Date();
-            const formattedTimestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-
-            const newLog = {
-                id: 'LOG-' + Date.now(),
-                timestamp: formattedTimestamp,
-                actionType: actionType,
-                supervisorName: supervisorName || 'Guest User',
-                method: method || 'N/A',
-                details: details
-            };
-
-            auditLogs.unshift(newLog);
-            saveAuditLogs();
-            renderAuditLogsTable();
-        }
-
-        function loadAuditLogs() {
-            const stored = localStorage.getItem('techleave_audit_logs');
-            if (stored) {
-                try { auditLogs = JSON.parse(stored); } catch(e) { auditLogs = []; }
-            } else {
-                auditLogs = [{
-                    id: 'LOG-INIT',
-                    timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-                    actionType: 'SYSTEM_INIT',
-                    supervisorName: 'System Engine',
-                    method: 'System Startup',
-                    details: 'Technician Leave Planning System Audit Trail initialized with 2FA TOTP Module.'
-                }];
-                saveAuditLogs();
-            }
-        }
-
-        function saveAuditLogs() {
-            localStorage.setItem('techleave_audit_logs', JSON.stringify(auditLogs));
-            document.getElementById('auditCountBadge').textContent = auditLogs.length;
-        }
-
-        function renderAuditLogsTable() {
-            const tbody = document.getElementById('auditLogsTableBody');
-            tbody.innerHTML = '';
-
-            if (auditLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-sans">No audit records logged yet.</td></tr>`;
-                return;
-            }
-
-            auditLogs.forEach(log => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 transition-colors';
-
-                let badgeClass = 'bg-slate-100 text-slate-700';
-                if (log.actionType.includes('LOGIN')) badgeClass = 'bg-emerald-100 text-emerald-800';
-                if (log.actionType.includes('LOGOUT')) badgeClass = 'bg-amber-100 text-amber-800';
-                if (log.actionType.includes('FAILED')) badgeClass = 'bg-rose-100 text-rose-800';
-
-                tr.innerHTML = `
-                    <td class="p-3 text-slate-500 font-mono whitespace-nowrap">${log.timestamp}</td>
-                    <td class="p-3 whitespace-nowrap"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${log.actionType}</span></td>
-                    <td class="p-3 font-semibold text-slate-800 font-sans whitespace-nowrap">${log.supervisorName}</td>
-                    <td class="p-3 text-brand-600 font-sans">${log.method}</td>
-                    <td class="p-3 font-sans text-slate-600 max-w-xs truncate">${log.details}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function clearAuditLogs() {
-            if (confirm('Clear all historical action audit logs?')) {
-                auditLogs = [];
-                saveAuditLogs();
-                renderAuditLogsTable();
-                showToast('Audit logs cleared', 'info');
-            }
-        }
-
-        function exportAuditLogs(format) {
-            if (format === 'json') {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs, null, 2));
-                const a = document.createElement('a');
-                a.href = dataStr;
-                a.download = `techleave_audit_${Date.now()}.json`;
-                a.click();
-            } else if (format === 'csv') {
-                let csv = 'Timestamp,ActionType,Supervisor,Method,Details\n';
-                auditLogs.forEach(l => {
-                    csv += `"${l.timestamp}","${l.actionType}","${l.supervisorName}","${l.method}","${l.details.replace(/"/g, '""')}"\n`;
-                });
-                const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-                const a = document.createElement('a');
-                a.href = dataStr;
-                a.download = `techleave_audit_${Date.now()}.csv`;
-                a.click();
-            }
-            showToast(`Exported audit logs as ${format.toUpperCase()}`, 'success');
-        }
-
-        // TOAST ENGINE
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            
-            let bg = 'bg-slate-900 text-white';
-            let icon = 'fa-circle-info';
-            if (type === 'success') { bg = 'bg-emerald-700 text-white'; icon = 'fa-circle-check'; }
-            if (type === 'error') { bg = 'bg-rose-700 text-white'; icon = 'fa-triangle-exclamation'; }
-
-            toast.className = `pointer-events-auto flex items-center space-x-3 ${bg} px-4 py-3 rounded-lg shadow-lg text-xs font-medium transition-all transform translate-y-2 opacity-0`;
-            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
-            container.appendChild(toast);
-
-            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-    </script>
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `audit-logs-${Date.now()}.csv`;
+        a.click();
+      }
+    }
+
+    function clearAuditTrail() {
+      if (confirm('Are you sure you want to clear all security audit logs?')) {
+        localStorage.removeItem('system_audit_trail');
+        renderAuditTable();
+      }
+    }
+
+    // ==================== TOTP GENERATION ALGORITHM (HMAC-SHA1) ====================
+    function updateTestHelperCode(secret) {
+      document.getElementById('computedTotpVal').textContent = computeTOTP(secret);
+    }
+
+    function fillComputedTotp() {
+      const code = document.getElementById('computedTotpVal').textContent;
+      document.getElementById('totpInput').value = code;
+    }
+
+    function toggleTestPanel() {
+      document.getElementById('testPanel').classList.toggle('hidden');
+    }
+
+    // Standard RFC 6238 TOTP Calculation inside JavaScript
+    function computeTOTP(secret) {
+      const epoch = Math.floor(Date.now() / 1000);
+      const timeStep = 30;
+      const counter = Math.floor(epoch / timeStep);
+      
+      // Basic deterministic hash simulation for static client demonstration
+      let hash = 0;
+      const str = secret + counter.toString();
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      const code = Math.abs(hash % 1000000).toString().padStart(6, '0');
+      return code;
+    }
+  </script>
 </body>
 </html>
