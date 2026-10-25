@@ -23,6 +23,7 @@
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(148,163,184,0.15) 1px, transparent 1px); }
   </style>
@@ -32,7 +33,6 @@
   <!-- TOP HEADER WITH ADAPTIVE VECTOR LOGO BADGE -->
   <header class="bg-white/95 dark:bg-slate-800/95 backdrop-blur border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
     <div class="flex items-center space-x-3 sm:space-x-4">
-      <!-- Adaptive Horizon Badge Logo -->
       <div class="bg-white dark:bg-slate-900 px-3 sm:px-4 py-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-2 select-none">
         <div class="bg-orange-500 text-white font-black text-lg w-7 h-7 rounded flex items-center justify-center font-sans tracking-tight">H</div>
         <div class="flex flex-col leading-none">
@@ -960,45 +960,166 @@
             <td class="p-3 font-mono">${app.from} to ${app.to}</td>
             <td class="p-3 font-bold text-emerald-500">${app.days} Days</td>
             <td class="p-3 font-bold text-slate-700 dark:text-slate-300">${app.actionBy || '--'}</td>
-            <td class="p-3 text-center"><button onclick="downloadPdfForm('${app.appId}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded font-bold text-xs">Download PDF</button></td>
+            <td class="p-3 text-center"><button onclick="downloadPdfForm('${app.appId}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded font-bold text-xs">Download & Print PDF</button></td>
           </tr>
         `;
       });
     }
 
-    // PLACEHOLDER FOR EXACT CUSTOM COMPANY PDF TEMPLATE
-    function downloadPdfForm(appId) {
+    // EXACT CANVAS-OVERLAY OFFICIAL PDF GENERATOR & DIRECT PRINT
+    async function downloadPdfForm(appId) {
       const app = LEAVE_APPLICATIONS.find(a => a.appId === appId);
       if (!app) return;
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
 
-      doc.setFontSize(16);
-      doc.setTextColor(249, 115, 22);
-      doc.text("HORIZON TELECOM SERVICES", 20, 20);
+      const submissionDate = app.timestamp ? app.timestamp.split(' ')[0] : getFormattedTimestamp().split(' ')[0];
+      const isAnnual = app.type.includes('Annual') ? '✓' : '';
+      const isEmergency = app.type.includes('Emergency') ? '✓' : '';
+      const isUnpaid = app.type.includes('Unpaid') ? '✓' : '';
 
-      doc.setFontSize(12);
-      doc.setTextColor(30, 41, 59);
-      doc.text("OFFICIAL LEAVE APPLICATION FORM", 20, 30);
-      doc.line(20, 33, 190, 33);
+      // Hidden Render Container matching A4 Ratio
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.left = '-9999px';
+      wrapper.style.top = '0';
+      wrapper.style.width = '794px';
+      wrapper.style.height = '1123px';
+      wrapper.style.backgroundColor = '#ffffff';
+      wrapper.style.fontFamily = 'Arial, sans-serif';
+      wrapper.style.color = '#000000';
 
-      doc.setFontSize(10);
-      doc.text(`Unique App ID: ${app.appId}`, 20, 45);
-      doc.text(`Employee ID: ${app.techId}`, 120, 45);
-      doc.text(`Employee Name: ${app.techName}`, 20, 55);
-      doc.text(`CPR No: ${app.cpr}`, 120, 55);
-      doc.text(`Leave Type: ${app.type}`, 20, 65);
-      doc.text(`Action Status: ${app.action}`, 120, 65);
-      doc.text(`Period: ${app.from} to ${app.to}`, 20, 75);
-      doc.text(`Total Duration: ${app.days} Days`, 120, 75);
-      doc.text(`Action By: ${app.actionBy || '--'}`, 20, 85);
-      doc.text(`Timestamp: ${app.timestamp}`, 120, 85);
+      wrapper.innerHTML = `
+        <div style="position: relative; width: 794px; height: 1123px; padding: 40px; box-sizing: border-box;">
+          <!-- TEMPLATE SVG BACKGROUND -->
+          <svg width="714" height="1043" viewBox="0 0 714 1043" style="position: absolute; top: 40px; left: 40px; z-index: 1;">
+            <!-- Header Border & Logo -->
+            <rect x="0" y="0" width="714" height="1043" fill="none" stroke="#000000" stroke-width="2"/>
+            
+            <!-- Company Header Block -->
+            <text x="20" y="35" font-size="20" font-weight="bold" fill="#f97316">HORIZON TELECOM SERVICES</text>
+            <text x="500" y="30" font-size="16" font-weight="bold">Leave Application / طلب إجازة</text>
+            
+            <line x1="0" y1="50" x2="714" y2="50" stroke="#000000" stroke-width="1.5"/>
 
-      doc.line(20, 95, 190, 95);
-      doc.text("Line Manager Signature: ______________________", 20, 115);
-      doc.text("HR Manager Signature: ______________________", 20, 135);
+            <!-- Grid Lines -->
+            <line x1="0" y1="90" x2="714" y2="90" stroke="#000000" stroke-width="1"/>
+            <line x1="0" y1="130" x2="714" y2="130" stroke="#000000" stroke-width="1"/>
+            <line x1="0" y1="170" x2="714" y2="170" stroke="#000000" stroke-width="1"/>
+            <line x1="0" y1="210" x2="714" y2="210" stroke="#000000" stroke-width="1"/>
 
-      doc.save(`Horizon_Leave_Form_${app.techId}.pdf`);
+            <!-- Section Headers -->
+            <text x="15" y="75" font-size="11" font-weight="bold">Date / التاريخ:</text>
+            <text x="350" y="75" font-size="11" font-weight="bold">Employee No / رقم الموظف:</text>
+            <text x="530" y="75" font-size="11" font-weight="bold">CPR no / رقم الشخصي:</text>
+
+            <text x="15" y="115" font-size="11" font-weight="bold">Employee Name / اسم الموظف:</text>
+            <text x="450" y="115" font-size="11" font-weight="bold">Position / الوظيفة:</text>
+
+            <!-- Checkbox Box Section -->
+            <text x="15" y="190" font-size="11" font-weight="bold">Please check / الرجاء الاختيار:</text>
+            <rect x="20" y="225" width="14" height="14" fill="none" stroke="#000000" stroke-width="1.5"/>
+            <text x="40" y="237" font-size="10">Annual Leave / إجازة سنوية</text>
+
+            <rect x="250" y="225" width="14" height="14" fill="none" stroke="#000000" stroke-width="1.5"/>
+            <text x="270" y="237" font-size="10">Emergency Leave / إجازة طارئة</text>
+
+            <rect x="480" y="225" width="14" height="14" fill="none" stroke="#000000" stroke-width="1.5"/>
+            <text x="500" y="237" font-size="10">Unpaid Leave / إجازة غير مدفوعه</text>
+
+            <rect x="20" y="260" width="14" height="14" fill="none" stroke="#000000" stroke-width="1.5"/>
+            <text x="40" y="272" font-size="10">Maternity Leave / إجازة أمومه</text>
+
+            <rect x="250" y="260" width="14" height="14" fill="none" stroke="#000000" stroke-width="1.5"/>
+            <text x="270" y="272" font-size="10">Other type of Leave / أخرى (التفاصيل)</text>
+
+            <!-- Leave Dates Box -->
+            <line x1="0" y1="300" x2="714" y2="300" stroke="#000000" stroke-width="1.5"/>
+            <text x="15" y="325" font-size="11" font-weight="bold">Leave Date from / تاریخ بداية الإجازة:</text>
+            <text x="270" y="325" font-size="11" font-weight="bold">Leave Date To / تاريخ نهاية الإجازة:</text>
+            <text x="530" y="325" font-size="11" font-weight="bold">Total Days / عدد الأيام:</text>
+            <line x1="0" y1="345" x2="714" y2="345" stroke="#000000" stroke-width="1.5"/>
+
+            <!-- Cover Details Box -->
+            <text x="15" y="375" font-size="11" font-weight="bold">Address & Telephone Number While on Leave / العنوان ورقم الهاتف:</text>
+            <text x="15" y="445" font-size="11" font-weight="bold">Replacement during leave / البديل خلال الاجازه:</text>
+
+            <line x1="0" y1="500" x2="714" y2="500" stroke="#000000" stroke-width="1.5"/>
+
+            <!-- Signatures Section -->
+            <text x="15" y="530" font-size="11" font-weight="bold">Employee Signature / توقيع الموظف:</text>
+            <text x="450" y="530" font-size="11" font-weight="bold">Date / التاريخ:</text>
+
+            <text x="15" y="610" font-size="11" font-weight="bold">Line Manager Signature / توقيع المدير المباشر:</text>
+            <text x="450" y="610" font-size="11" font-weight="bold">Date / التاريخ:</text>
+
+            <text x="15" y="690" font-size="11" font-weight="bold">HR Signature / توقيع موظف الموارد البشرية:</text>
+            <text x="450" y="690" font-size="11" font-weight="bold">Date / التاريخ:</text>
+
+            <!-- Accounting Checkboxes -->
+            <rect x="20" y="740" width="14" height="14" fill="none" stroke="#000000" stroke-width="1.5"/>
+            <text x="40" y="752" font-size="10">Deduct from Annual Leave / استقطاع من رصيد الإجازات</text>
+
+            <rect x="350" y="740" width="14" height="14" fill="none" stroke="#000000" stroke-width="1.5"/>
+            <text x="370" y="752" font-size="10">Deduct from Salary / استقطاع من الراتب</text>
+
+            <!-- Legal Warning Clause -->
+            <rect x="10" y="800" width="694" height="80" fill="none" stroke="#000000" stroke-dasharray="3,3"/>
+            <text x="20" y="825" font-size="9" font-style="italic">As per the Bahraini Labour Law, if you are absent from duty for more than ten consecutive days without notification, the</text>
+            <text x="20" y="840" font-size="9" font-style="italic">employer shall have the right to terminate you without notice and indemnity.</text>
+            <text x="20" y="860" font-size="9" font-style="italic">وفقًا لقانون العمل البحريني ، إذا تغيبت عن العمل لأكثر من عشرة أيام متتالية دون أي سبب وجيه ، يحق لصاحب العمل إنهاء خدمتك دون إشعار مسبق أو تعويض.</text>
+          </svg>
+
+          <!-- DYNAMIC DATA OVERLAYS -->
+          <div style="position: absolute; top: 110px; left: 140px; z-index: 10; font-weight: bold; font-size: 13px;">${submissionDate}</div>
+          <div style="position: absolute; top: 110px; left: 510px; z-index: 10; font-weight: bold; font-size: 13px;">${app.techId}</div>
+          <div style="position: absolute; top: 110px; left: 660px; z-index: 10; font-weight: bold; font-size: 13px;">${app.cpr}</div>
+
+          <div style="position: absolute; top: 150px; left: 220px; z-index: 10; font-weight: bold; font-size: 13px;">${app.techName}</div>
+          <div style="position: absolute; top: 150px; left: 580px; z-index: 10; font-weight: bold; font-size: 13px;">Technician</div>
+
+          <!-- CHECKBOX TICKS -->
+          <div style="position: absolute; top: 261px; left: 63px; z-index: 10; font-weight: font-black; font-size: 16px; color: #000;">${isAnnual}</div>
+          <div style="position: absolute; top: 261px; left: 293px; z-index: 10; font-weight: font-black; font-size: 16px; color: #000;">${isEmergency}</div>
+          <div style="position: absolute; top: 261px; left: 523px; z-index: 10; font-weight: font-black; font-size: 16px; color: #000;">${isUnpaid}</div>
+
+          <!-- LEAVE DATES OVERLAYS -->
+          <div style="position: absolute; top: 360px; left: 230px; z-index: 10; font-weight: bold; font-size: 13px;">${app.from}</div>
+          <div style="position: absolute; top: 360px; left: 470px; z-index: 10; font-weight: bold; font-size: 13px;">${app.to}</div>
+          <div style="position: absolute; top: 360px; left: 680px; z-index: 10; font-weight: bold; font-size: 13px;">${app.days} Days</div>
+
+          <!-- SUBMISSION DATES FOR SIGNATURES -->
+          <div style="position: absolute; top: 565px; left: 510px; z-index: 10; font-size: 12px;">${submissionDate}</div>
+          <div style="position: absolute; top: 645px; left: 510px; z-index: 10; font-size: 12px;">${submissionDate}</div>
+          <div style="position: absolute; top: 725px; left: 510px; z-index: 10; font-size: 12px;">${submissionDate}</div>
+
+          <!-- DEDUCTION CHECKBOX OVERLAY -->
+          <div style="position: absolute; top: 776px; left: 63px; z-index: 10; font-weight: font-black; font-size: 16px; color: #000;">${isAnnual}</div>
+        </div>
+      `;
+
+      document.body.appendChild(wrapper);
+
+      try {
+        const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+
+        const fileName = `Horizon_Leave_Form_${app.techId}_${app.appId}.pdf`;
+        pdf.save(fileName);
+
+        setTimeout(() => {
+          pdf.autoPrint();
+          window.open(pdf.output('bloburl'), '_blank');
+        }, 300);
+
+      } catch (err) {
+        console.error("PDF Generation error:", err);
+        alert("Failed to render printable PDF form.");
+      } finally {
+        document.body.removeChild(wrapper);
+      }
     }
 
     function renderAuditTable() {
