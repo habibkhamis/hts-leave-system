@@ -1,238 +1,205 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Horizon Telecom Services - Leave Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            horizon: {
+              orange: '#f97316',
+              darkBg: '#0f172a',
+              cardDark: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- EMAILJS SDK -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <!-- JSPDF FOR AUTOMATIC PDF GENERATION -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); }
+    .bg-grid { background-size: 20px 20px; background-image: radial-gradient(circle, rgba(148,163,184,0.15) 1px, transparent 1px); }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col antialiased selection:bg-orange-500 selection:text-white">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans flex flex-col antialiased transition-colors duration-300">
 
-  <!-- TOP HEADER WITH OFFICIAL LOGO -->
-  <header class="bg-slate-800/95 backdrop-blur border-b border-slate-700 px-4 sm:px-6 py-3 flex items-center justify-between shadow-lg sticky top-0 z-50">
+  <!-- TOP HEADER WITH OFFICIAL HORIZON LOGO & THEME TOGGLE -->
+  <header class="bg-white/95 dark:bg-slate-800/95 backdrop-blur border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-3 flex items-center justify-between shadow-md sticky top-0 z-50">
     <div class="flex items-center space-x-3 sm:space-x-4">
-      <div class="bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-md flex items-center space-x-2 select-none">
-        <div class="border-2 border-orange-500 bg-white w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center font-black text-orange-500 text-sm sm:text-base leading-none">H</div>
+      <div class="bg-white px-3 sm:px-4 py-1.5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-2 select-none">
+        <div class="bg-orange-500 text-white font-black text-lg w-7 h-7 rounded flex items-center justify-center font-sans tracking-tight">H</div>
         <div class="flex flex-col leading-none">
-          <span class="text-sm sm:text-base font-extrabold tracking-wider text-slate-700 font-sans uppercase">HORIZON</span>
-          <span class="text-[7px] sm:text-[8px] tracking-[0.2em] sm:tracking-[0.25em] text-slate-500 font-medium uppercase mt-0.5">TELECOM SERVICES</span>
+          <span class="text-sm sm:text-base font-black tracking-wider text-slate-800 uppercase">HORIZON</span>
+          <span class="text-[7px] sm:text-[8px] tracking-[0.2em] text-orange-600 font-bold uppercase mt-0.5">TELECOM SERVICES</span>
         </div>
       </div>
       
-      <div class="h-7 w-px bg-slate-700 hidden md:block"></div>
+      <div class="h-7 w-px bg-slate-300 dark:bg-slate-700 hidden md:block"></div>
       <div class="hidden md:block">
-        <h1 class="text-sm sm:text-base font-bold text-white tracking-wide flex items-center gap-2">
-          <span>Technician Leave Management System</span>
-          <span class="text-xs bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full font-normal">Internal Hub</span>
+        <h1 class="text-sm sm:text-base font-bold text-slate-800 dark:text-white tracking-wide flex items-center gap-2">
+          <span>Technician Leave Portal</span>
+          <span class="text-xs bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full font-normal">OneDrive Automated Sync</span>
         </h1>
-        <p class="text-[11px] text-slate-400">Horizon Bahrain • Operational Leave Planning Portal</p>
       </div>
     </div>
 
-    <!-- User Badge -->
-    <div id="userBadge" class="hidden flex items-center space-x-3 sm:space-x-4 bg-slate-900/90 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-slate-700">
-      <div class="text-right">
-        <div id="badgeName" class="text-xs sm:text-sm font-bold text-white">--</div>
-        <div id="badgeRole" class="text-[10px] sm:text-xs text-orange-400 font-medium">--</div>
-      </div>
-      <button onclick="logout()" class="bg-slate-800 hover:bg-rose-600 border border-slate-700 text-white p-2 rounded-lg transition text-xs flex items-center space-x-1" title="Sign Out">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        <span class="hidden sm:inline">Logout</span>
+    <div class="flex items-center space-x-2 sm:space-x-4">
+      <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-amber-400 hover:opacity-80 transition" title="Toggle Light/Dark Theme">
+        <i id="themeToggleIcon" class="fa-solid fa-moon text-sm sm:text-base"></i>
       </button>
+
+      <div id="userBadge" class="hidden flex items-center space-x-3 bg-slate-200 dark:bg-slate-900 px-3 sm:px-4 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700">
+        <div class="text-right">
+          <div id="badgeName" class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white">--</div>
+          <div id="badgeRole" class="text-[10px] sm:text-xs text-orange-600 dark:text-orange-400 font-medium">--</div>
+        </div>
+        <button onclick="logout()" class="bg-slate-300 dark:bg-slate-800 hover:bg-rose-600 hover:text-white border border-slate-400 dark:border-slate-700 text-slate-700 dark:text-white p-2 rounded-lg transition text-xs flex items-center space-x-1" title="Sign Out">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
     </div>
   </header>
 
   <div class="flex flex-1 flex-col md:flex-row overflow-hidden">
     <!-- NAVIGATION SIDEBAR -->
-    <aside id="appSidebar" class="hidden w-full md:w-64 bg-slate-800/95 border-b md:border-b-0 md:border-r border-slate-700 flex flex-col justify-between">
+    <aside id="appSidebar" class="hidden w-full md:w-64 bg-white dark:bg-slate-800/95 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700 flex flex-col justify-between">
       <div class="p-3 sm:p-4 space-y-1">
         <div class="px-3 py-1.5 text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Leave Modules</div>
         
         <div class="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-col gap-1">
-          <button onclick="switchTab('calendar')" id="nav-calendar" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-regular fa-calendar-days text-blue-400 w-4"></i>
+          <button onclick="switchTab('calendar')" id="nav-calendar" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-regular fa-calendar-days text-blue-500 w-4"></i>
             <span>View Calendar</span>
           </button>
 
-          <button onclick="switchTab('availability')" id="nav-availability" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-users-viewfinder text-emerald-400 w-4"></i>
-            <span>View Availability</span>
+          <button onclick="switchTab('manage-leaves')" id="nav-manage-leaves" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-calendar-xmark text-rose-500 w-4"></i>
+            <span>Manage / Edit / Cancel</span>
           </button>
 
-          <button onclick="switchTab('remaining')" id="nav-remaining" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-hourglass-half text-amber-400 w-4"></i>
+          <button onclick="switchTab('availability')" id="nav-availability" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-users-viewfinder text-emerald-500 w-4"></i>
+            <span>Duty Availability</span>
+          </button>
+
+          <button onclick="switchTab('presence')" id="nav-presence" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <div class="flex items-center space-x-2.5">
+              <i class="fa-solid fa-circle-dot text-emerald-500 w-4"></i>
+              <span>Who is Online</span>
+            </div>
+            <span id="onlineCountBadge" class="bg-emerald-500 text-white font-bold px-1.5 py-0.5 rounded-full text-[10px]">1</span>
+          </button>
+
+          <button onclick="switchTab('remaining')" id="nav-remaining" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-hourglass-half text-amber-500 w-4"></i>
             <span>Remaining Days</span>
           </button>
 
-          <button onclick="switchTab('total')" id="nav-total" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-chart-pie text-indigo-400 w-4"></i>
+          <button onclick="switchTab('total')" id="nav-total" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-chart-pie text-indigo-500 w-4"></i>
             <span>Total Days</span>
           </button>
 
-          <button onclick="switchTab('pdf')" id="nav-pdf" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-file-pdf text-rose-400 w-4"></i>
+          <button onclick="switchTab('pdf')" id="nav-pdf" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-file-pdf text-rose-500 w-4"></i>
             <span>PDF Reports</span>
           </button>
         </div>
 
-        <!-- ADMIN EXCLUSIVE MODULES -->
-        <div id="adminNavGroup" class="hidden pt-3 space-y-1 border-t border-slate-700/60 mt-3">
-          <div class="px-3 py-1 text-[10px] sm:text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center space-x-1.5">
-            <i class="fa-solid fa-shield-halved text-[10px]"></i>
-            <span>Admin Control</span>
-          </div>
+        <div id="adminNavGroup" class="hidden pt-3 space-y-1 border-t border-slate-200 dark:border-slate-700 mt-3">
+          <div class="px-3 py-1 text-[10px] sm:text-xs font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider">Admin Control</div>
 
-          <button onclick="switchTab('roster')" id="nav-roster" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-users-gear text-orange-400 w-4"></i>
+          <button onclick="switchTab('roster')" id="nav-roster" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-users-gear text-orange-500 w-4"></i>
             <span>Tech Roster Hub</span>
           </button>
 
-          <button onclick="switchTab('approvals')" id="nav-approvals" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <div class="flex items-center space-x-2.5">
-              <i class="fa-solid fa-clipboard-check text-amber-400 w-4"></i>
-              <span>Pending Approvals</span>
-            </div>
-            <span id="approvalBadgeCount" class="hidden bg-amber-500 text-slate-900 font-bold px-1.5 py-0.5 rounded-full text-[10px]">0</span>
-          </button>
-
-          <button onclick="switchTab('audit')" id="nav-audit" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <i class="fa-solid fa-clock-rotate-left text-orange-400 w-4"></i>
-            <span>Action Audit Trail</span>
+          <button onclick="switchTab('audit')" id="nav-audit" class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs sm:text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-clock-rotate-left text-orange-500 w-4"></i>
+            <span>OneDrive Audit Trail</span>
           </button>
         </div>
       </div>
 
-      <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
-        <span>Horizon M365 Sync</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v16.0</span>
+      <div class="hidden md:flex p-4 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 justify-between items-center">
+        <span>OneDrive Sync Connected</span>
+        <span class="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono px-2 py-0.5 rounded font-bold">LIVE</span>
       </div>
     </aside>
 
     <!-- MAIN CONTENT CONTAINER -->
     <main class="flex-1 bg-grid p-4 sm:p-6 overflow-y-auto">
 
-      <!-- ==================== LOGIN VIEW ==================== -->
+      <!-- LOGIN VIEW -->
       <div id="view-login" class="max-w-md w-full mx-auto my-4 sm:my-10 px-2 sm:px-0">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
-          
-          <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-6 sm:p-8 text-center border-b border-slate-700 flex flex-col items-center">
-            <div class="bg-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl shadow-lg mb-3 sm:mb-4 flex items-center space-x-2.5 select-none">
-              <div class="border-2 border-orange-500 bg-white w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center font-black text-orange-500 text-lg sm:text-xl leading-none">H</div>
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+          <div class="p-6 sm:p-8 text-center border-b border-slate-200 dark:border-slate-700 flex flex-col items-center">
+            <div class="bg-white px-4 py-2 rounded-xl shadow border border-slate-200 mb-3 flex items-center space-x-2 select-none">
+              <div class="bg-orange-500 text-white font-black text-xl w-8 h-8 rounded flex items-center justify-center">H</div>
               <div class="flex flex-col text-left leading-none">
-                <span class="text-lg sm:text-xl font-extrabold tracking-wider text-slate-800 font-sans uppercase">HORIZON</span>
-                <span class="text-[8px] sm:text-[9px] tracking-[0.2em] sm:tracking-[0.25em] text-slate-500 font-bold uppercase mt-1">TELECOM SERVICES</span>
+                <span class="text-lg font-black tracking-wider text-slate-800 uppercase">HORIZON</span>
+                <span class="text-[9px] tracking-[0.2em] text-orange-600 font-bold uppercase mt-0.5">TELECOM SERVICES</span>
               </div>
             </div>
-            <h2 class="text-base sm:text-lg font-bold text-white tracking-wide">Email Verification Portal</h2>
-            <p class="text-xs text-slate-400 mt-1">Select your account to receive a fast 6-digit OTP email</p>
+            <h2 class="text-base sm:text-lg font-bold text-slate-800 dark:text-white tracking-wide">Email Verification Portal</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Select account to log in & broadcast live presence</p>
           </div>
 
-          <div class="p-5 sm:p-6 space-y-5 sm:space-y-6">
-            <!-- Step 1: Select Profile & Request Email OTP -->
-            <div id="step-request-otp" class="space-y-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Select User Account</label>
-                <select id="loginUserSelect" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 shadow-inner">
-                  <option value="">-- Choose User Profile --</option>
-                  <optgroup label="System Administrator">
-                    <option value="admin_1">Habib Khamis (System Administrator)</option>
-                  </optgroup>
-                  <optgroup label="Team Supervisors">
-                    <option value="sup_1">Zuhair Alsaffar (Supervisor)</option>
-                    <option value="sup_2">Jaafar Kadhem (Supervisor)</option>
-                    <option value="sup_3">Husain Yusuf (Supervisor)</option>
-                    <option value="sup_4">Sayed Mohammed Saeed (Supervisor)</option>
-                  </optgroup>
-                </select>
-              </div>
-
-              <button onclick="requestEmailOtp()" id="btnSendOtp" class="w-full bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
-                <i class="fa-solid fa-paper-plane"></i>
-                <span>Send OTP Code to Email</span>
-              </button>
-            </div>
-
-            <!-- Step 2: Enter Email OTP -->
-            <div id="step-verify-otp" class="hidden space-y-4 border-t border-slate-700 pt-4">
-              <div class="bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl">
-                <p class="text-xs text-slate-300">An email with a 6-digit verification code was sent to <b id="displayTargetEmail" class="text-orange-400">user@horizon.bh</b>.</p>
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Enter 6-Digit Verification Code</label>
-                <input type="text" id="emailOtpInput" maxlength="6" placeholder="000 000" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-widest text-white focus:outline-none focus:border-orange-500">
-              </div>
-
-              <button onclick="verifyEmailOtp()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
-                <i class="fa-solid fa-lock-open"></i>
-                <span>Verify OTP & Sign In</span>
-              </button>
-
-              <button onclick="resetLoginStep()" class="w-full text-xs text-slate-400 hover:text-white transition text-center pt-1">
-                &larr; Select a different profile
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ==================== SYSTEM MODULE 1: CALENDAR VIEW ==================== -->
-      <div id="view-calendar" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-              <i class="fa-regular fa-calendar-days text-blue-400"></i>
-              <span>Technician Leave Calendar (2026 - 2027)</span>
-            </h2>
-            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Click any date to inspect details or create a new leave application.</p>
-          </div>
-
-          <div class="flex items-center space-x-3">
-            <div id="adminTeamFilterContainer" class="hidden flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700">
-              <span class="text-xs text-orange-400 font-semibold uppercase">Calendar View Filter:</span>
-              <select id="adminTeamFilter" onchange="renderCalendar()" class="bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none">
-                <option value="ALL">All Teams (Combined View)</option>
-                <option value="sup_1">Zuhair Alsaffar's Team</option>
-                <option value="sup_2">Jaafar Kadhem's Team</option>
-                <option value="sup_3">Husain Yusuf's Team</option>
-                <option value="sup_4">Sayed Mohammed Saeed's Team</option>
+          <div class="p-5 sm:p-6 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2">Select User Account</label>
+              <select id="loginUserSelect" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:border-orange-500">
+                <option value="">-- Select Profile --</option>
+                <optgroup label="System Administrator">
+                  <option value="admin_1">Habib Khamis (System Administrator)</option>
+                </optgroup>
+                <optgroup label="Team Supervisors">
+                  <option value="sup_1">Zuhair Alsaffar (Supervisor)</option>
+                  <option value="sup_2">Jaafar Kadhem (Supervisor)</option>
+                  <option value="sup_3">Husain Yusuf (Supervisor)</option>
+                  <option value="sup_4">Sayed Mohammed Saeed (Supervisor)</option>
+                </optgroup>
               </select>
             </div>
 
-            <button onclick="openLeaveRequestModal()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center space-x-1.5 shadow-lg">
-              <i class="fa-solid fa-calendar-plus"></i>
-              <span>Create Leave Request</span>
+            <button onclick="requestEmailOtp()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3.5 rounded-xl transition text-sm flex items-center justify-center space-x-2 shadow-lg">
+              <i class="fa-solid fa-right-to-bracket"></i>
+              <span>Access Leave Portal</span>
             </button>
           </div>
         </div>
+      </div>
 
-        <!-- Color Legend for Admin -->
-        <div class="flex flex-wrap items-center gap-3 bg-slate-800/80 border border-slate-700 p-3 rounded-xl text-xs">
-          <span class="font-bold text-slate-400 uppercase text-[10px]">Supervisor Legend:</span>
-          <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40">Zuhair Alsaffar</span>
-          <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Jaafar Kadhem</span>
-          <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">Husain Yusuf</span>
-          <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">Sayed Mohammed Saeed</span>
+      <!-- CALENDAR VIEW -->
+      <div id="view-calendar" class="hidden space-y-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+              <i class="fa-regular fa-calendar-days text-blue-500"></i>
+              <span>Technician Leave Calendar (2026 - 2027)</span>
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Click any day cell to inspect leaves or apply for a new request.</p>
+          </div>
+
+          <button onclick="openLeaveRequestModal()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5 shadow-md">
+            <i class="fa-solid fa-calendar-plus"></i>
+            <span>Create Leave Request</span>
+          </button>
         </div>
 
-        <!-- Month Navigation -->
-        <div class="flex items-center justify-between bg-slate-800 border border-slate-700 p-3 rounded-xl">
-          <button onclick="changeCalendarMonth(-1)" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold transition">&larr; Previous</button>
-          <span id="calendarMonthTitle" class="text-sm font-bold text-white">October 2026</span>
-          <button onclick="changeCalendarMonth(1)" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold transition">Next &rarr;</button>
+        <div class="flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-sm">
+          <button onclick="changeCalendarMonth(-1)" class="bg-slate-200 dark:bg-slate-700 hover:opacity-80 px-3 py-1.5 rounded-lg text-xs font-bold transition">&larr; Previous</button>
+          <span id="calendarMonthTitle" class="text-sm font-bold text-slate-800 dark:text-white">October 2026</span>
+          <button onclick="changeCalendarMonth(1)" class="bg-slate-200 dark:bg-slate-700 hover:opacity-80 px-3 py-1.5 rounded-lg text-xs font-bold transition">Next &rarr;</button>
         </div>
 
-        <!-- Calendar Grid -->
-        <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm">
           <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 uppercase mb-2">
             <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
           </div>
@@ -240,229 +207,195 @@
         </div>
       </div>
 
-      <!-- ==================== SYSTEM MODULE 2: AVAILABILITY VIEW ==================== -->
-      <div id="view-availability" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-              <i class="fa-solid fa-users-viewfinder text-emerald-400"></i>
-              <span>Technician Duty Availability & Status Overview</span>
-            </h2>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">Read-only operational status grouped by supervisor team.</p>
-          </div>
-          <div class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-right">
-            <span class="text-[10px] text-slate-500 font-bold uppercase block">Live Operational Timestamp</span>
-            <span id="liveTimestampDisplay" class="font-mono text-xs text-orange-400 font-bold">--</span>
-          </div>
+      <!-- MANAGE / EDIT / CANCEL LEAVES -->
+      <div id="view-manage-leaves" class="hidden space-y-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-calendar-xmark text-rose-500"></i>
+            <span>Manage, Amend or Cancel Leave Applications</span>
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Canceling automatically credits days back and triggers an action entry in OneDrive.</p>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-2xl text-center">
-            <span class="text-xs text-emerald-400 font-bold uppercase">On Duty Today</span>
-            <div id="countOnDuty" class="text-3xl font-bold text-white mt-1">0</div>
-          </div>
-          <div class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-2xl text-center">
-            <span class="text-xs text-blue-400 font-bold uppercase">On Annual (Paid) Leave</span>
-            <div id="countPaidLeave" class="text-3xl font-bold text-white mt-1">0</div>
-          </div>
-          <div class="bg-rose-500/10 border border-rose-500/30 p-4 rounded-2xl text-center">
-            <span class="text-xs text-rose-400 font-bold uppercase">On Unpaid / Emergency Leave</span>
-            <div id="countUnpaidLeave" class="text-3xl font-bold text-white mt-1">0</div>
-          </div>
-        </div>
-
-        <div id="availabilityTeamsContainer" class="space-y-4"></div>
-      </div>
-
-      <!-- ==================== TECH ROSTER HUB MODULE (ADMIN EXCLUSIVE) ==================== -->
-      <div id="view-roster" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-              <i class="fa-solid fa-users-gear text-orange-400"></i>
-              <span>Technician Roster Management Hub (Admin Master)</span>
-            </h2>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">Master roster of all technicians across all supervisor teams.</p>
-          </div>
-          <button onclick="openTechModal()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-lg">
-            <i class="fa-solid fa-user-plus"></i>
-            <span>Add New Technician</span>
-          </button>
-        </div>
-
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+              <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase font-semibold">
                 <tr>
-                  <th class="p-3">Tech ID</th>
-                  <th class="p-3">Technician Name</th>
-                  <th class="p-3">CPR Number</th>
-                  <th class="p-3">Supervisor</th>
-                  <th class="p-3 text-center">Roster Actions</th>
+                  <th class="p-3">Unique App ID</th>
+                  <th class="p-3">Tech ID & Name</th>
+                  <th class="p-3">Leave Type</th>
+                  <th class="p-3">Period</th>
+                  <th class="p-3">Total Days</th>
+                  <th class="p-3">Action State</th>
+                  <th class="p-3 text-center">Manage Actions</th>
                 </tr>
               </thead>
-              <tbody id="rosterTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+              <tbody id="manageLeavesTableBody" class="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SYSTEM MODULE 3: REMAINING DAYS VIEW ==================== -->
-      <div id="view-remaining" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
-          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-            <i class="fa-solid fa-hourglass-half text-amber-400"></i>
-            <span>Leave Remaining as of Today</span>
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Calculated as: <b>(Leave Balance as of 31-Dec-2027) - (Total Annual Paid Leave Days Taken)</b>.</p>
+      <!-- WHO IS ONLINE -->
+      <div id="view-presence" class="hidden space-y-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-sm flex justify-between items-center">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+              <i class="fa-solid fa-circle-dot text-emerald-500 animate-pulse"></i>
+              <span>Live System Presence (Who is Online)</span>
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Real-time presence monitoring for all active users.</p>
+          </div>
+          <button onclick="renderPresence()" class="bg-slate-200 dark:bg-slate-700 hover:opacity-80 text-xs px-3 py-2 rounded-xl transition">
+            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Status
+          </button>
         </div>
 
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+        <div id="presenceCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <!-- DUTY AVAILABILITY -->
+      <div id="view-availability" class="hidden space-y-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-users-viewfinder text-emerald-500"></i>
+            <span>Technician Duty Availability</span>
+          </h2>
+        </div>
+        <div id="availabilityTeamsContainer" class="space-y-4"></div>
+      </div>
+
+      <!-- REMAINING DAYS -->
+      <div id="view-remaining" class="hidden space-y-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-hourglass-half text-amber-500"></i>
+            <span>Leave Remaining Balance</span>
+          </h2>
+        </div>
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+              <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase font-semibold">
                 <tr>
                   <th class="p-3">Tech ID</th>
                   <th class="p-3">Name</th>
                   <th class="p-3">CPR</th>
                   <th class="p-3">Supervisor</th>
-                  <th class="p-3">Balance (31-Dec-2027)</th>
-                  <th class="p-3">Paid Days Taken</th>
+                  <th class="p-3">Balance</th>
+                  <th class="p-3">Paid Taken</th>
                   <th class="p-3">Leave Remaining</th>
-                  <th class="p-3 text-center">Edit Balance Only</th>
                 </tr>
               </thead>
-              <tbody id="remainingTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+              <tbody id="remainingTableBody" class="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SYSTEM MODULE 4: TOTAL DAYS VIEW ==================== -->
+      <!-- TOTAL DAYS -->
       <div id="view-total" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
-          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-            <i class="fa-solid fa-chart-pie text-indigo-400"></i>
-            <span>Total Leave Days Summary (Paid vs Unpaid Breakdown)</span>
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-chart-pie text-indigo-500"></i>
+            <span>Total Days Monthly & Annual Tally</span>
           </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Comprehensive tally of annual paid, unpaid, and combined total leave days per technician.</p>
         </div>
-
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+              <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase font-semibold">
                 <tr>
                   <th class="p-3">Tech ID</th>
                   <th class="p-3">Name</th>
-                  <th class="p-3">Supervisor</th>
                   <th class="p-3">Jan</th><th class="p-3">Feb</th><th class="p-3">Mar</th><th class="p-3">Apr</th>
                   <th class="p-3">May</th><th class="p-3">Jun</th><th class="p-3">Jul</th><th class="p-3">Aug</th>
                   <th class="p-3">Sep</th><th class="p-3">Oct</th><th class="p-3">Nov</th><th class="p-3">Dec</th>
-                  <th class="p-3 font-bold text-blue-400">Annual (Paid)</th>
-                  <th class="p-3 font-bold text-rose-400">Unpaid / Emergency</th>
-                  <th class="p-3 font-bold text-orange-400">Total Leave Days</th>
+                  <th class="p-3 font-bold text-blue-500">Paid</th>
+                  <th class="p-3 font-bold text-rose-500">Unpaid</th>
+                  <th class="p-3 font-bold text-orange-500">Total</th>
                 </tr>
               </thead>
-              <tbody id="totalDaysTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+              <tbody id="totalDaysTableBody" class="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SYSTEM MODULE 5: PDF REPORTS ==================== -->
+      <!-- PDF REPORTS -->
       <div id="view-pdf" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
-          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-            <i class="fa-solid fa-file-pdf text-rose-400"></i>
-            <span>Generated Printable Leave Application PDF Forms</span>
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-file-pdf text-rose-500"></i>
+            <span>Printable Leave Applications</span>
           </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Automatically populates official Horizon Leave Application PDF for every leave request submitted.</p>
         </div>
-
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+              <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase font-semibold">
                 <tr>
-                  <th class="p-3">App ID</th>
-                  <th class="p-3">Employee No (ID)</th>
-                  <th class="p-3">Employee Name</th>
-                  <th class="p-3">CPR No</th>
-                  <th class="p-3">Position</th>
-                  <th class="p-3">Leave Type</th>
-                  <th class="p-3">Period (From - To)</th>
-                  <th class="p-3">Total Days</th>
-                  <th class="p-3">Application Date</th>
-                  <th class="p-3 text-center">PDF Action</th>
+                  <th class="p-3">Unique App ID</th>
+                  <th class="p-3">Employee</th>
+                  <th class="p-3">Type</th>
+                  <th class="p-3">Period</th>
+                  <th class="p-3">Days</th>
+                  <th class="p-3 text-center">Download Official Form</th>
                 </tr>
               </thead>
-              <tbody id="pdfTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+              <tbody id="pdfTableBody" class="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- ==================== ADMIN EXCLUSIVE: PENDING APPROVALS ==================== -->
-      <div id="view-approvals" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl">
-          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-            <i class="fa-solid fa-clipboard-check text-amber-400"></i>
-            <span>Pending Supervisor Requests (Admin Approval Required)</span>
+      <!-- ADMIN ROSTER -->
+      <div id="view-roster" class="hidden space-y-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl flex justify-between items-center shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-users-gear text-orange-500"></i>
+            <span>Master Technician Roster</span>
           </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Review, approve, or reject addition/edits/deletions submitted by Supervisors.</p>
         </div>
-
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+              <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase font-semibold">
                 <tr>
-                  <th class="p-3">Date</th>
+                  <th class="p-3">Tech ID</th>
+                  <th class="p-3">Name</th>
+                  <th class="p-3">CPR Number</th>
                   <th class="p-3">Supervisor</th>
-                  <th class="p-3">Action Type</th>
-                  <th class="p-3">Target Tech ID / Name</th>
-                  <th class="p-3">Proposed Details</th>
-                  <th class="p-3 text-center">Decision</th>
                 </tr>
               </thead>
-              <tbody id="approvalsTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+              <tbody id="rosterTableBody" class="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- ==================== ADMIN EXCLUSIVE: ACTION AUDIT TRAIL ==================== -->
+      <!-- AUDIT LOGS -->
       <div id="view-audit" class="hidden space-y-4">
-        <div class="bg-slate-800 border border-slate-700 p-5 sm:p-6 rounded-2xl space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h2 class="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
-                <i class="fa-solid fa-clock-rotate-left text-orange-400"></i>
-                <span>Action Audit Trail (Universal Cloud Sync)</span>
-              </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Admin Restricted • Timestamped tracking across all devices and browsers.</p>
-            </div>
-            <button onclick="exportAuditTrail()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg transition flex items-center justify-center space-x-1 border border-slate-600 w-full sm:w-auto">
-              <i class="fa-solid fa-file-csv"></i>
-              <span>Export Audit CSV</span>
-            </button>
-          </div>
-
-          <div class="overflow-x-auto border border-slate-700 rounded-xl">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-clock-rotate-left text-orange-500"></i>
+            <span>OneDrive Backup Audit Log</span>
+          </h2>
+        </div>
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900 text-slate-400 uppercase font-semibold">
+              <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 uppercase font-semibold">
                 <tr>
                   <th class="p-3">Timestamp</th>
                   <th class="p-3">User</th>
                   <th class="p-3">Role</th>
-                  <th class="p-3">Event Action</th>
+                  <th class="p-3">Action</th>
                   <th class="p-3">Details</th>
                 </tr>
               </thead>
-              <tbody id="auditTableBody" class="divide-y divide-slate-700/50 text-slate-300"></tbody>
+              <tbody id="auditTableBody" class="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300"></tbody>
             </table>
           </div>
         </div>
@@ -471,23 +404,25 @@
     </main>
   </div>
 
-  <!-- CREATE LEAVE REQUEST MODAL -->
+  <!-- CREATE / AMEND LEAVE MODAL -->
   <div id="leaveRequestModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-      <div class="bg-slate-900 p-4 border-b border-slate-700 flex items-center justify-between">
-        <h3 class="text-sm font-bold text-white">Create New Leave Application</h3>
-        <button onclick="closeLeaveRequestModal()" class="text-slate-400 hover:text-white transition">&times;</button>
+    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="bg-slate-100 dark:bg-slate-900 p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <h3 id="modalTitle" class="text-sm font-bold text-slate-800 dark:text-white">Create Leave Application</h3>
+        <button onclick="closeLeaveRequestModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition">&times;</button>
       </div>
 
       <form onsubmit="handleLeaveRequestSubmit(event)" class="p-5 space-y-4 text-xs">
+        <input type="hidden" id="editAppId" value="">
+
         <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">Select Technician</label>
-          <select id="leaveFormTechSelect" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500"></select>
+          <label class="block text-slate-700 dark:text-slate-300 font-bold uppercase mb-1">Select Technician</label>
+          <select id="leaveFormTechSelect" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-orange-500"></select>
         </div>
 
         <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">Leave Type</label>
-          <select id="leaveFormType" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+          <label class="block text-slate-700 dark:text-slate-300 font-bold uppercase mb-1">Leave Type</label>
+          <select id="leaveFormType" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-orange-500">
             <option value="Annual (Paid)">Annual (Paid) Leave</option>
             <option value="Unpaid">Unpaid Leave</option>
             <option value="Emergency">Emergency Leave</option>
@@ -496,338 +431,105 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-slate-300 font-bold uppercase mb-1">Leave Date From</label>
-            <input type="date" id="leaveFormFrom" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+            <label class="block text-slate-700 dark:text-slate-300 font-bold uppercase mb-1">From Date</label>
+            <input type="date" id="leaveFormFrom" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-orange-500">
           </div>
           <div>
-            <label class="block text-slate-300 font-bold uppercase mb-1">Leave Date To</label>
-            <input type="date" id="leaveFormTo" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+            <label class="block text-slate-700 dark:text-slate-300 font-bold uppercase mb-1">To Date</label>
+            <input type="date" id="leaveFormTo" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-orange-500">
           </div>
         </div>
 
-        <div class="pt-3 flex justify-end space-x-2 border-t border-slate-700">
-          <button type="button" onclick="closeLeaveRequestModal()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition font-semibold">Cancel</button>
-          <button type="submit" class="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded-lg font-bold text-white transition">Apply Leave & Generate PDF</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- DAY INSPECTOR MODAL -->
-  <div id="dayInspectorModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
-      <div class="bg-slate-900 p-4 border-b border-slate-700 flex items-center justify-between">
-        <h3 id="dayInspectorTitle" class="text-sm font-bold text-white">Date Details</h3>
-        <button onclick="closeDayInspectorModal()" class="text-slate-400 hover:text-white transition">&times;</button>
-      </div>
-
-      <div class="p-5 space-y-4">
-        <div id="dayInspectorList" class="space-y-2 text-xs"></div>
-        <div class="pt-3 flex justify-end border-t border-slate-700">
-          <button onclick="closeDayInspectorModal()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition font-semibold text-xs">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- EDIT REMAINING BALANCE ONLY MODAL -->
-  <div id="editBalanceModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
-      <div class="bg-slate-900 p-4 border-b border-slate-700 flex items-center justify-between">
-        <h3 class="text-sm font-bold text-white">Update Leave Remaining Balance</h3>
-        <button onclick="closeEditBalanceModal()" class="text-slate-400 hover:text-white transition">&times;</button>
-      </div>
-
-      <form onsubmit="handleEditBalanceSubmit(event)" class="p-5 space-y-4 text-xs">
-        <input type="hidden" id="balanceTargetTechId">
-
-        <div>
-          <label class="block text-slate-400 mb-1">Technician Name</label>
-          <div id="balanceTechNameDisplay" class="font-bold text-white text-sm bg-slate-900 p-2.5 rounded-lg border border-slate-700">--</div>
-        </div>
-
-        <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">Leave Balance as of 31-Dec-2027</label>
-          <input type="number" id="balanceInputNumber" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white text-base font-mono font-bold focus:outline-none focus:border-orange-500">
-        </div>
-
-        <div class="pt-3 flex justify-end space-x-2 border-t border-slate-700">
-          <button type="button" onclick="closeEditBalanceModal()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition font-semibold">Cancel</button>
-          <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg font-bold text-white transition">Update Balance</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- EDIT / ADD TECHNICIAN MODAL (ROSTER MODULE) -->
-  <div id="techModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-      <div class="bg-slate-900 p-4 border-b border-slate-700 flex items-center justify-between">
-        <h3 id="techModalTitle" class="text-sm font-bold text-white">Add Technician</h3>
-        <button onclick="closeTechModal()" class="text-slate-400 hover:text-white transition">&times;</button>
-      </div>
-
-      <form id="techForm" onsubmit="handleTechFormSubmit(event)" class="p-5 space-y-4 text-xs">
-        <input type="hidden" id="formOriginalId">
-
-        <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">Employee ID</label>
-          <input type="text" id="formTechId" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
-        </div>
-
-        <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">Employee Name</label>
-          <input type="text" id="formTechName" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
-        </div>
-
-        <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">CPR Number</label>
-          <input type="text" id="formTechCPR" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
-        </div>
-
-        <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">Assign Supervisor Team</label>
-          <select id="formTechSupId" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
-            <option value="sup_1">Zuhair Alsaffar</option>
-            <option value="sup_2">Jaafar Kadhem</option>
-            <option value="sup_3">Husain Yusuf</option>
-            <option value="sup_4">Sayed Mohammed Saeed</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">Leave Balance (as of 31-Dec-2027)</label>
-          <input type="number" id="formTechBalance" required value="30" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
-        </div>
-
-        <div>
-          <label class="block text-slate-300 font-bold uppercase mb-1">Status</label>
-          <select id="formTechStatus" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500">
-            <option value="On Duty">On Duty</option>
-            <option value="On Paid Leave">On Paid Leave</option>
-            <option value="On Unpaid Leave">On Unpaid Leave</option>
-          </select>
-        </div>
-
-        <div class="pt-3 flex justify-end space-x-2 border-t border-slate-700">
-          <button type="button" onclick="closeTechModal()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition font-semibold">Cancel</button>
-          <button type="submit" class="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded-lg font-bold text-white transition">Submit Changes</button>
+        <div class="pt-3 flex justify-end space-x-2 border-t border-slate-200 dark:border-slate-700">
+          <button type="button" onclick="closeLeaveRequestModal()" class="bg-slate-200 dark:bg-slate-700 px-4 py-2 rounded-lg font-semibold">Cancel</button>
+          <button type="submit" class="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded-lg font-bold text-white transition">Save & Sync to OneDrive</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    const SUPERVISOR_THEMES = {
-      'sup_1': { name: 'Zuhair Alsaffar', bg: 'bg-blue-500/20', border: 'border-blue-500/40', text: 'text-blue-300' },
-      'sup_2': { name: 'Jaafar Kadhem', bg: 'bg-emerald-500/20', border: 'border-emerald-500/40', text: 'text-emerald-300' },
-      'sup_3': { name: 'Husain Yusuf', bg: 'bg-purple-500/20', border: 'border-purple-500/40', text: 'text-purple-300' },
-      'sup_4': { name: 'Sayed Mohammed Saeed', bg: 'bg-amber-500/20', border: 'border-amber-500/40', text: 'text-amber-300' }
-    };
-
-    // SYSTEM USERS - HABIB KHAMIS SET AS SOLE SYSTEM ADMINISTRATOR
+    // SYSTEM CONSTANTS
     const SYSTEM_USERS = {
-      'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', email: 'habib.khamis@horizon.bh' },
-      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', email: 'zuhaer@horizon.bh' },
-      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', email: 'kadhem@horizon.bh' },
-      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', email: 'yusuf@horizon.bh' },
-      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor', email: 'mohammed.saeed@horizon.bh' }
+      'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin' },
+      'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor' },
+      'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor' },
+      'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor' },
+      'sup_4': { id: 'sup_4', name: 'Sayed Mohammed Saeed', role: 'supervisor' }
     };
 
     let TECHNICIANS_MASTER = [
-      // ZUHAIR ALSAFFAR'S TEAM (sup_1) - 16 TECHNICIANS
       { id: '30908', name: 'ABDULLAH SHAMSUL HOQUE', cpr: '940512345', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
       { id: '30964', name: 'ALAMIN MD SOLEMAN DALI', cpr: '910898765', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '27127', name: 'ANTONIO A CAMACLANG JR', cpr: '881122334', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30925', name: 'ASIF ABDUL HAMEED', cpr: '950233445', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30988', name: 'ASIF SHAFIQUE', cpr: '930411223', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31083', name: 'HASAN ABDULAMEER HASAN ALI AHMED ALZAIN', cpr: '960788990', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30987', name: 'MD SHAHIN ABDUL MALEK', cpr: '920344556', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31111', name: 'MOBARAK HOSSAIN', cpr: '970112233', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30922', name: 'MOHAMMED JAHIR UDDIN ABDUL MUNAF', cpr: '910223344', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31140', name: 'MOHAMMED SHOAIB', cpr: '940334455', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30843', name: 'MUHAMMAD RAMMEZ', cpr: '980445566', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31137', name: 'MUHAMMAD SUBHAN IDREES', cpr: '930556677', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31103', name: 'MURTADHA ABDALI MOHAMED ALI ABDULLA ALSAFFAR', cpr: '900667788', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30920', name: 'SUMESH SUDHAKARAN', cpr: '920778899', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30871', name: 'UMAR RIZWAN', cpr: '950889900', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30952', name: 'RAYHANUL HOQUE', cpr: '960990011', supId: 'sup_1', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-
-      // JAAFAR KADHEM'S TEAM (sup_2) - 12 TECHNICIANS
       { id: '27021', name: 'ALI SAEED MAHDI HABIB ALI ALAKER', cpr: '910334455', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31098', name: 'EDWARD EDINGTON DAVID', cpr: '920445566', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31023', name: 'HUSAIN HAMEED YUSUF MOHAMED ALMUGHANI', cpr: '930556677', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '18942', name: 'HUSSAIN ATEYA HASAN SALMAN ALHADDAR', cpr: '940667788', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30997', name: 'MAIN UDDIN', cpr: '950778899', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30844', name: 'MOHAMMED ARMAN HOSSAIN KHALILUR RAHMAN', cpr: '960889900', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30852', name: 'NAVEEN JOY THEKKEKARA', cpr: '970990011', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31079', name: 'VIGNESHWARAN DURAIRAJ', cpr: '980112233', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31093', name: 'ALI ABDULLA ISA HASAN SALEH', cpr: '990223344', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30831', name: 'JEBARAJ JOHNRAJ', cpr: '901334455', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30926', name: 'SHAMROZ ZAHID', cpr: '911445566', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30819', name: 'WAJAHAT MALIK MAHMOUD', cpr: '921556677', supId: 'sup_2', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-
-      // HUSAIN YUSUF'S TEAM (sup_3) - 16 TECHNICIANS
       { id: '31123', name: 'ABID GUL', cpr: '930112233', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30966', name: 'AHMED GAMAL ABDELAZIZ GHAZY', cpr: '940223344', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31042', name: 'ALI JAAFAR SALEH', cpr: '950334455', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30515', name: 'ARAFAT AMEEN MOHAMMED ALI', cpr: '960445566', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '28814', name: 'FAWAD AHMAD', cpr: '970556677', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30517', name: 'KHALID NAZIR', cpr: '980667788', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31125', name: 'LIJO CHERIAN VARGHESE', cpr: '990778899', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31038', name: 'MAHMOOD HASSAN SALEH AHMED', cpr: '901889900', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31014', name: 'MOHAMED ABDULREDHA ALI MAHDI', cpr: '911990011', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30972', name: 'MUHAMMAD AKRAM', cpr: '921112233', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '29110', name: 'MUHAMMAD ASIF', cpr: '931223344', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30929', name: 'MUHAMMAD YASIN', cpr: '941334455', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31124', name: 'MUZAMMAL AHMAD', cpr: '951445566', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30840', name: 'SADDAM HEBJU MIAH', cpr: '961556677', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '29875', name: 'SHAMSUL ALAM JOYNAL ABEDIN', cpr: '971667788', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31021', name: 'MOHAMMED HASAN SALEH AHMED', cpr: '981778899', supId: 'sup_3', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-
-      // SAYED MOHAMMED SAEED'S TEAM (sup_4) - 14 TECHNICIANS
-      { id: '31130', name: 'ABDUL BASIT', cpr: '920445566', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '30915', name: 'KABEER VARAMANGALATH', cpr: '930556677', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31128', name: 'MAHMOUD GAMAL AHMED', cpr: '940667788', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '29112', name: 'MUHAMMAD MUZAFFAR', cpr: '950778899', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31136', name: 'MUHAMMAD ZUBAIR', cpr: '960889900', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31120', name: 'SOLOMON ACHU AWAH', cpr: '970990011', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31055', name: 'HASAN ABDULLA ISA HASAN SALEH', cpr: '980112233', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31132', name: 'AMEER AHSAN AHMED', cpr: '990223344', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31131', name: 'MUHAMMAD ALMAS', cpr: '901334455', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31138', name: 'MUHAMMAD NUMAN', cpr: '911445566', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31139', name: 'RANA TAMJID RAFIQ', cpr: '921556677', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31129', name: 'SHERAZ JAMIL', cpr: '931667788', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' },
-      { id: '31141', name: 'TOUSEEF AHMED', cpr: '941778899', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' }
+      { id: '31130', name: 'ABDUL BASIT', cpr: '920445566', supId: 'sup_4', balance2027: 30, monthlyPaid: [0,0,0,0,0,0,0,0,0,0,0,0], monthlyUnpaid: [0,0,0,0,0,0,0,0,0,0,0,0], status: 'On Duty' }
     ];
 
     let LEAVE_APPLICATIONS = [];
-    let PENDING_APPROVALS = [];
-
-    const EMAILJS_CONFIG = {
-      PUBLIC_KEY: "PXjKMTnQ5tC-3AhQD",
-      SERVICE_ID: "service_7xbrdob",
-      TEMPLATE_ID: "template_o66i275"
-    };
-
-    const FIREBASE_DB_URL = "https://YOUR-FIREBASE-PROJECT.firebaseio.com"; 
-
-    let activeUser = null;
-    let generatedOtp = null;
     let currentUser = null;
-    let currentCalendarIndex = 9; // Oct 2026
+    let currentCalendarIndex = 9;
 
-    // Live Timestamp Ticker
-    setInterval(() => {
-      const el = document.getElementById('liveTimestampDisplay');
-      if (el) {
-        const now = new Date();
-        const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-        const dStr = `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-        const tStr = now.toLocaleTimeString('en-US');
-        el.textContent = `${dStr} ${tStr}`;
-      }
-    }, 1000);
+    // UNIQUE APP ID GENERATOR FUNCTION
+    function generateUniqueAppId() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      const millis = String(now.getMilliseconds()).padStart(3, '0');
 
-    (function(){
-      if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.PUBLIC_KEY) {
-        emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
-      }
-    })();
-
-    function getScopedTechnicians() {
-      if (!currentUser) return [];
-      if (currentUser.role === 'admin') {
-        return TECHNICIANS_MASTER;
-      }
-      return TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
+      return `app_${year}-${month}-${day}_${hours}${mins}${secs}${millis}`;
     }
 
-    function loadDataFromStorage() {
-      const savedTechs = localStorage.getItem('horizon_technicians_data');
-      if (savedTechs) {
-        const parsed = JSON.parse(savedTechs);
-        if (parsed.length >= 50) {
-          TECHNICIANS_MASTER = parsed;
-        } else {
-          localStorage.setItem('horizon_technicians_data', JSON.stringify(TECHNICIANS_MASTER));
-        }
+    // TIMESTAMP GENERATOR FUNCTION
+    function getFormattedTimestamp() {
+      const now = new Date();
+      const datePart = now.toISOString().split('T')[0];
+      const timePart = now.toTimeString().split(' ')[0];
+      return `${datePart} ${timePart}`;
+    }
+
+    // THEME SWITCHER
+    function toggleTheme() {
+      const html = document.documentElement;
+      const icon = document.getElementById('themeToggleIcon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        icon.className = 'fa-solid fa-sun text-orange-500';
+        localStorage.setItem('horizon_theme', 'light');
       } else {
-        localStorage.setItem('horizon_technicians_data', JSON.stringify(TECHNICIANS_MASTER));
-      }
-
-      const savedLeaves = localStorage.getItem('horizon_leave_applications');
-      if (savedLeaves) LEAVE_APPLICATIONS = JSON.parse(savedLeaves);
-
-      const savedApprovals = localStorage.getItem('horizon_pending_approvals');
-      if (savedApprovals) PENDING_APPROVALS = JSON.parse(savedApprovals);
-
-      updateApprovalBadge();
-    }
-
-    function saveDataToStorage() {
-      localStorage.setItem('horizon_technicians_data', JSON.stringify(TECHNICIANS_MASTER));
-      localStorage.setItem('horizon_leave_applications', JSON.stringify(LEAVE_APPLICATIONS));
-      localStorage.setItem('horizon_pending_approvals', JSON.stringify(PENDING_APPROVALS));
-      updateApprovalBadge();
-    }
-
-    function updateApprovalBadge() {
-      const badge = document.getElementById('approvalBadgeCount');
-      if (badge) {
-        if (PENDING_APPROVALS.length > 0) {
-          badge.textContent = PENDING_APPROVALS.length;
-          badge.classList.remove('hidden');
-        } else {
-          badge.classList.add('hidden');
-        }
+        html.classList.add('dark');
+        icon.className = 'fa-solid fa-moon text-amber-400';
+        localStorage.setItem('horizon_theme', 'dark');
       }
     }
 
-    async function getAuditTrail() {
-      if (FIREBASE_DB_URL.includes("YOUR-FIREBASE-PROJECT")) {
-        return JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
+    // PRESENCE HEARTBEAT
+    setInterval(() => {
+      if (currentUser) {
+        const presence = JSON.parse(localStorage.getItem('horizon_live_presence') || '{}');
+        presence[currentUser.id] = { name: currentUser.name, role: currentUser.role, lastActive: new Date().toISOString() };
+        localStorage.setItem('horizon_live_presence', JSON.stringify(presence));
+        updateOnlineCount();
       }
-      try {
-        const response = await fetch(`${FIREBASE_DB_URL}/audit_trail.json`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data) return Object.values(data).reverse();
-        }
-      } catch (e) {
-        console.warn("Could not reach Firebase database:", e);
-      }
-      return JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
-    }
+    }, 5000);
 
-    async function logAuditEvent(actorName, role, action, details) {
-      const logEntry = {
-        timestamp: new Date().toLocaleString('en-GB'),
-        actorName,
-        role,
-        action,
-        details
-      };
-
-      const localLogs = JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
-      localLogs.unshift(logEntry);
-      localStorage.setItem('horizon_audit_trail', JSON.stringify(localLogs));
-
-      if (!FIREBASE_DB_URL.includes("YOUR-FIREBASE-PROJECT")) {
-        try {
-          await fetch(`${FIREBASE_DB_URL}/audit_trail.json`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(logEntry)
-          });
-        } catch (e) {
-          console.warn("Failed to push event to cloud database:", e);
-        }
-      }
+    function updateOnlineCount() {
+      const presence = JSON.parse(localStorage.getItem('horizon_live_presence') || '{}');
+      const now = new Date().getTime();
+      let activeCount = 0;
+      Object.values(presence).forEach(p => {
+        if (now - new Date(p.lastActive).getTime() < 20000) activeCount++;
+      });
+      const badge = document.getElementById('onlineCountBadge');
+      if (badge) badge.textContent = activeCount;
     }
 
     window.onload = function() {
+      if (localStorage.getItem('horizon_theme') === 'light') document.documentElement.classList.remove('dark');
       loadDataFromStorage();
       const savedSession = sessionStorage.getItem('horizon_active_session');
       if (savedSession) {
@@ -838,95 +540,49 @@
       }
     };
 
+    function loadDataFromStorage() {
+      const savedTechs = localStorage.getItem('horizon_technicians_data');
+      if (savedTechs) TECHNICIANS_MASTER = JSON.parse(savedTechs);
+      const savedLeaves = localStorage.getItem('horizon_leave_applications');
+      if (savedLeaves) LEAVE_APPLICATIONS = JSON.parse(savedLeaves);
+    }
+
+    function saveDataToStorage() {
+      localStorage.setItem('horizon_technicians_data', JSON.stringify(TECHNICIANS_MASTER));
+      localStorage.setItem('horizon_leave_applications', JSON.stringify(LEAVE_APPLICATIONS));
+    }
+
+    // AUTOMATED ONEDRIVE FILE DISPATCHER
+    function dispatchToOneDriveSyncQueue(payload) {
+      const jsonContent = JSON.stringify(payload, null, 2);
+      const blob = new Blob([jsonContent], { type: 'application/json' });
+      const filename = `${payload.appId}_${Date.now()}.json`;
+
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    async function logAuditEvent(actorName, role, action, details) {
+      const logEntry = { timestamp: getFormattedTimestamp(), actorName, role, action, details };
+      const localLogs = JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
+      localLogs.unshift(logEntry);
+      localStorage.setItem('horizon_audit_trail', JSON.stringify(localLogs));
+    }
+
     function showLoginScreen() {
       document.getElementById('appSidebar').classList.add('hidden');
       document.getElementById('userBadge').classList.add('hidden');
-      document.getElementById('adminNavGroup').classList.add('hidden');
       hideAllViews();
       document.getElementById('view-login').classList.remove('hidden');
-      resetLoginStep();
     }
 
     function hideAllViews() {
-      const views = ['view-login', 'view-calendar', 'view-availability', 'view-roster', 'view-remaining', 'view-total', 'view-pdf', 'view-approvals', 'view-audit'];
-      views.forEach(v => document.getElementById(v).classList.add('hidden'));
-    }
-
-    function resetLoginStep() {
-      document.getElementById('step-request-otp').classList.remove('hidden');
-      document.getElementById('step-verify-otp').classList.add('hidden');
-      document.getElementById('emailOtpInput').value = '';
-      const btn = document.getElementById('btnSendOtp');
-      btn.disabled = false;
-      btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
-      generatedOtp = null;
-      activeUser = null;
-    }
-
-    function requestEmailOtp() {
-      const val = document.getElementById('loginUserSelect').value;
-      if (!val || !SYSTEM_USERS[val]) {
-        alert('Please select a user profile to receive an OTP code.');
-        return;
-      }
-
-      activeUser = SYSTEM_USERS[val];
-      generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-
-      document.getElementById('displayTargetEmail').textContent = activeUser.email;
-      const btn = document.getElementById('btnSendOtp');
-      btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Sending Email OTP...</span>`;
-
-      const templateParams = {
-        to_name: activeUser.name,
-        to_email: activeUser.email,
-        email: activeUser.email,
-        user_email: activeUser.email,
-        recipient: activeUser.email,
-        reply_to: activeUser.email,
-        otp_code: generatedOtp,
-        code: generatedOtp
-      };
-
-      emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, templateParams)
-        .then(function(response) {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
-          
-          document.getElementById('step-request-otp').classList.add('hidden');
-          document.getElementById('step-verify-otp').classList.remove('hidden');
-          
-          logAuditEvent(activeUser.name, activeUser.role, 'OTP Dispatched', `Verification code sent to ${activeUser.email}`);
-        }, function(error) {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Send OTP Code to Email</span>`;
-          alert('Failed to send email OTP: ' + JSON.stringify(error));
-        });
-    }
-
-    async function verifyEmailOtp() {
-      const inputCode = document.getElementById('emailOtpInput').value.trim();
-
-      if (inputCode === generatedOtp) {
-        currentUser = { role: activeUser.role, name: activeUser.name, id: activeUser.id };
-        sessionStorage.setItem('horizon_active_session', JSON.stringify(currentUser));
-
-        await logAuditEvent(activeUser.name, activeUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Login Success', `Authenticated via Email OTP sent to ${activeUser.email}`);
-        applyAuthenticatedUI();
-      } else {
-        alert('Invalid OTP verification code! Please check your email inbox.');
-        await logAuditEvent(activeUser.name, activeUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Failed Login', 'Incorrect Email OTP entered');
-      }
-    }
-
-    async function logout() {
-      if (currentUser) {
-        await logAuditEvent(currentUser.name, currentUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Logout', 'User signed out of session');
-      }
-      currentUser = null;
-      sessionStorage.removeItem('horizon_active_session');
-      showLoginScreen();
+      const views = ['view-login', 'view-calendar', 'view-manage-leaves', 'view-presence', 'view-availability', 'view-roster', 'view-remaining', 'view-total', 'view-pdf', 'view-audit'];
+      views.forEach(v => document.getElementById(v)?.classList.add('hidden'));
     }
 
     function applyAuthenticatedUI() {
@@ -937,87 +593,246 @@
       document.getElementById('badgeName').textContent = currentUser.name;
       document.getElementById('badgeRole').textContent = currentUser.role === 'admin' ? 'Administrator' : 'Supervisor';
 
-      if (currentUser.role === 'admin') {
-        document.getElementById('adminNavGroup').classList.remove('hidden');
-        document.getElementById('adminTeamFilterContainer').classList.remove('hidden');
-      } else {
-        document.getElementById('adminNavGroup').classList.add('hidden');
-        document.getElementById('adminTeamFilterContainer').classList.add('hidden');
-      }
+      if (currentUser.role === 'admin') document.getElementById('adminNavGroup').classList.remove('hidden');
+      else document.getElementById('adminNavGroup').classList.add('hidden');
+
       switchTab('calendar');
     }
 
     function switchTab(tabId) {
       hideAllViews();
-
-      if ((tabId === 'audit' || tabId === 'approvals' || tabId === 'roster') && currentUser.role !== 'admin') {
-        alert('Access Restricted: Only Administrators can view this module.');
-        switchTab('calendar');
-        return;
-      }
-
-      const viewEl = document.getElementById(`view-${tabId}`);
-      if (viewEl) viewEl.classList.remove('hidden');
+      document.getElementById(`view-${tabId}`)?.classList.remove('hidden');
 
       if (tabId === 'calendar') renderCalendar();
+      if (tabId === 'manage-leaves') renderManageLeavesTable();
+      if (tabId === 'presence') renderPresence();
       if (tabId === 'availability') renderAvailability();
       if (tabId === 'roster') renderRosterTable();
       if (tabId === 'remaining') renderRemainingDays();
       if (tabId === 'total') renderTotalDays();
       if (tabId === 'pdf') renderPdfTable();
-      if (tabId === 'approvals') renderApprovalsTable();
       if (tabId === 'audit') renderAuditTable();
     }
 
-    // ==================== CALENDAR MODULE ENGINE ====================
+    function requestEmailOtp() {
+      const val = document.getElementById('loginUserSelect').value;
+      if (!val) { alert('Select user profile.'); return; }
+      currentUser = SYSTEM_USERS[val];
+      sessionStorage.setItem('horizon_active_session', JSON.stringify(currentUser));
+      applyAuthenticatedUI();
+    }
+
+    function logout() {
+      currentUser = null;
+      sessionStorage.removeItem('horizon_active_session');
+      showLoginScreen();
+    }
+
+    // LEAVE FORM SUBMISSION
+    async function handleLeaveRequestSubmit(e) {
+      e.preventDefault();
+      const editAppId = document.getElementById('editAppId').value;
+      const techId = document.getElementById('leaveFormTechSelect').value;
+      const leaveType = document.getElementById('leaveFormType').value;
+      const fromDate = document.getElementById('leaveFormFrom').value;
+      const toDate = document.getElementById('leaveFormTo').value;
+
+      const tech = TECHNICIANS_MASTER.find(t => t.id === techId);
+      const daysCount = Math.ceil((new Date(toDate) - new Date(fromDate)) / (1000 * 60 * 60 * 24)) + 1;
+      const currentTimestamp = getFormattedTimestamp();
+
+      if (editAppId) {
+        const app = LEAVE_APPLICATIONS.find(a => a.appId === editAppId);
+        if (app) {
+          app.type = leaveType;
+          app.from = fromDate;
+          app.to = toDate;
+          app.days = daysCount;
+          app.action = 'Modified';
+          app.timestamp = currentTimestamp;
+
+          const syncPayload = {
+            appId: app.appId,
+            techId: tech.id,
+            techName: tech.name,
+            cpr: tech.cpr,
+            type: leaveType,
+            from: fromDate,
+            to: toDate,
+            days: daysCount,
+            action: 'Modified',
+            timestamp: currentTimestamp
+          };
+
+          dispatchToOneDriveSyncQueue(syncPayload);
+          saveDataToStorage();
+          await logAuditEvent(currentUser.name, currentUser.role, 'Modified Leave Application', `Amended App ${app.appId} for ${tech.name}.`);
+          alert(`Leave ${app.appId} amended successfully! Drop file into Sync_Queue.`);
+        }
+      } else {
+        const uniqueAppId = generateUniqueAppId();
+        const app = {
+          appId: uniqueAppId,
+          techId: tech.id,
+          techName: tech.name,
+          cpr: tech.cpr,
+          type: leaveType,
+          from: fromDate,
+          to: toDate,
+          days: daysCount,
+          action: 'Created',
+          timestamp: currentTimestamp
+        };
+
+        LEAVE_APPLICATIONS.push(app);
+
+        const syncPayload = {
+          appId: uniqueAppId,
+          techId: tech.id,
+          techName: tech.name,
+          cpr: tech.cpr,
+          type: leaveType,
+          from: fromDate,
+          to: toDate,
+          days: daysCount,
+          action: 'Created',
+          timestamp: currentTimestamp
+        };
+
+        dispatchToOneDriveSyncQueue(syncPayload);
+
+        const startMonth = new Date(fromDate).getMonth();
+        if (leaveType === 'Annual (Paid)') tech.monthlyPaid[startMonth] += daysCount;
+        else tech.monthlyUnpaid[startMonth] += daysCount;
+
+        saveDataToStorage();
+        await logAuditEvent(currentUser.name, currentUser.role, 'Created Leave Application', `Applied ${daysCount} days leave for ${tech.name}. App ID: ${uniqueAppId}`);
+        alert(`Leave Application Created! App ID: ${uniqueAppId}. Move generated JSON file into OneDrive Sync_Queue.`);
+      }
+
+      closeLeaveRequestModal();
+      renderCalendar();
+    }
+
+    // MANAGE / AMEND / CANCEL
+    function renderManageLeavesTable() {
+      const tbody = document.getElementById('manageLeavesTableBody');
+      tbody.innerHTML = '';
+
+      if (LEAVE_APPLICATIONS.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No active leave records found.</td></tr>`;
+        return;
+      }
+
+      LEAVE_APPLICATIONS.forEach(app => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30 transition border-b border-slate-200 dark:border-slate-800";
+        tr.innerHTML = `
+          <td class="p-3 font-mono font-bold text-orange-500">${app.appId}</td>
+          <td class="p-3 font-bold text-slate-800 dark:text-white">${app.techName} (${app.techId})</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${app.type === 'Annual (Paid)' ? 'bg-blue-500/20 text-blue-600' : 'bg-rose-500/20 text-rose-600'}">${app.type}</span></td>
+          <td class="p-3 font-mono text-slate-600 dark:text-slate-300">${app.from} to ${app.to}</td>
+          <td class="p-3 font-bold text-orange-500">${app.days} Days</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${app.action === 'Cancelled' ? 'bg-rose-500/20 text-rose-500' : app.action === 'Modified' ? 'bg-amber-500/20 text-amber-500' : 'bg-emerald-500/20 text-emerald-500'}">${app.action}</span></td>
+          <td class="p-3 text-center space-x-1">
+            ${app.action !== 'Cancelled' ? `
+              <button onclick="editLeave('${app.appId}')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold transition">Amend</button>
+              <button onclick="cancelLeave('${app.appId}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded text-xs font-bold transition">Cancel</button>
+            ` : '<span class="text-xs text-slate-400 font-bold">Cancelled & Refunded</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function editLeave(appId) {
+      const app = LEAVE_APPLICATIONS.find(a => a.appId === appId);
+      if (!app) return;
+
+      document.getElementById('modalTitle').textContent = `Amend Leave Request (${app.appId})`;
+      document.getElementById('editAppId').value = app.appId;
+
+      openLeaveRequestModal();
+      document.getElementById('leaveFormTechSelect').value = app.techId;
+      document.getElementById('leaveFormType').value = app.type;
+      document.getElementById('leaveFormFrom').value = app.from;
+      document.getElementById('leaveFormTo').value = app.to;
+    }
+
+    async function cancelLeave(appId) {
+      const app = LEAVE_APPLICATIONS.find(a => a.appId === appId);
+      if (!app) return;
+
+      if (!confirm(`Confirm cancellation of leave ${app.appId}? All ${app.days} days will be credited back.`)) return;
+
+      const tech = TECHNICIANS_MASTER.find(t => t.id === app.techId);
+      if (tech) {
+        const startMonth = new Date(app.from).getMonth();
+        if (app.type === 'Annual (Paid)') tech.monthlyPaid[startMonth] = Math.max(0, tech.monthlyPaid[startMonth] - app.days);
+        else tech.monthlyUnpaid[startMonth] = Math.max(0, tech.monthlyUnpaid[startMonth] - app.days);
+      }
+
+      const currentTimestamp = getFormattedTimestamp();
+      app.action = 'Cancelled';
+      app.timestamp = currentTimestamp;
+
+      const syncPayload = {
+        appId: app.appId,
+        techId: tech.id,
+        techName: tech.name,
+        cpr: tech.cpr,
+        type: app.type,
+        from: app.from,
+        to: app.to,
+        days: app.days,
+        action: 'Cancelled',
+        timestamp: currentTimestamp
+      };
+
+      dispatchToOneDriveSyncQueue(syncPayload);
+      saveDataToStorage();
+      await logAuditEvent(currentUser.name, currentUser.role, 'Cancelled Leave', `Cancelled ${app.appId}. Credited ${app.days} days back.`);
+      renderManageLeavesTable();
+      alert(`Leave Application ${app.appId} cancelled and refunded! Drop file into Sync_Queue.`);
+    }
+
+    function openLeaveRequestModal() {
+      const select = document.getElementById('leaveFormTechSelect');
+      select.innerHTML = '';
+      TECHNICIANS_MASTER.forEach(t => {
+        select.innerHTML += `<option value="${t.id}">${t.id} - ${t.name}</option>`;
+      });
+      document.getElementById('leaveRequestModal').classList.remove('hidden');
+    }
+
+    function closeLeaveRequestModal() {
+      document.getElementById('editAppId').value = '';
+      document.getElementById('modalTitle').textContent = 'Create Leave Application';
+      document.getElementById('leaveRequestModal').classList.add('hidden');
+    }
+
     function renderCalendar() {
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      
       const targetYear = currentCalendarIndex < 12 ? 2026 : 2027;
       const targetMonthIdx = currentCalendarIndex % 12;
-
       document.getElementById('calendarMonthTitle').textContent = `${monthNames[targetMonthIdx]} ${targetYear}`;
 
       const grid = document.getElementById('calendarGrid');
       grid.innerHTML = '';
 
-      let calendarTechs = getScopedTechnicians();
-      if (currentUser.role === 'admin') {
-        const calFilterVal = document.getElementById('adminTeamFilter')?.value || 'ALL';
-        if (calFilterVal !== 'ALL') {
-          calendarTechs = calendarTechs.filter(t => t.supId === calFilterVal);
-        }
-      }
-
       for (let day = 1; day <= 31; day++) {
         const dateStr = `${targetYear}-${String(targetMonthIdx+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-        
-        let dayLeaves = LEAVE_APPLICATIONS.filter(l => {
-          return dateStr >= l.from && dateStr <= l.to && calendarTechs.some(t => t.id === l.techId);
-        });
+        let activeLeaves = LEAVE_APPLICATIONS.filter(l => dateStr >= l.from && dateStr <= l.to && l.action !== 'Cancelled');
 
         const cell = document.createElement('div');
-        cell.className = `p-1.5 min-h-[70px] border border-slate-700/60 rounded-lg flex flex-col justify-between cursor-pointer transition hover:border-orange-500/80 bg-slate-900/50`;
-        cell.onclick = () => openDayInspector(dateStr, dayLeaves);
-
-        let tagsHtml = '';
-        dayLeaves.slice(0, 2).forEach(l => {
-          const t = TECHNICIANS_MASTER.find(x => x.id === l.techId);
-          const theme = SUPERVISOR_THEMES[t?.supId] || { bg: 'bg-slate-700', text: 'text-white' };
-          tagsHtml += `<div class="text-[8px] truncate px-1 py-0.5 rounded ${theme.bg} ${theme.text} font-semibold mt-0.5">${t?.name.split(' ')[0]} (${l.type})</div>`;
+        cell.className = `p-1.5 min-h-[65px] border border-slate-200 dark:border-slate-700/60 rounded-lg flex flex-col justify-between cursor-pointer transition bg-slate-50 dark:bg-slate-900/50`;
+        
+        let tags = '';
+        activeLeaves.forEach(l => {
+          tags += `<div class="text-[8px] truncate px-1 py-0.5 rounded bg-orange-500/20 text-orange-600 font-bold mt-0.5">${l.techName.split(' ')[0]}</div>`;
         });
 
-        if (dayLeaves.length > 2) {
-          tagsHtml += `<div class="text-[8px] text-orange-400 font-bold mt-0.5">+${dayLeaves.length - 2} more</div>`;
-        }
-
-        cell.innerHTML = `
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-xs ${dayLeaves.length > 0 ? 'text-orange-400' : 'text-slate-400'}">${day}</span>
-            ${dayLeaves.length > 0 ? `<span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>` : ''}
-          </div>
-          <div class="w-full">${tagsHtml}</div>
-        `;
+        cell.innerHTML = `<div class="font-bold text-xs ${activeLeaves.length > 0 ? 'text-orange-500' : 'text-slate-400'}">${day}</div><div>${tags}</div>`;
         grid.appendChild(cell);
       }
     }
@@ -1027,575 +842,172 @@
       renderCalendar();
     }
 
-    function openDayInspector(dateStr, dayLeaves) {
-      document.getElementById('dayInspectorTitle').textContent = `Leave Details for ${dateStr}`;
-      const list = document.getElementById('dayInspectorList');
-      list.innerHTML = '';
+    function renderPresence() {
+      const container = document.getElementById('presenceCardsContainer');
+      container.innerHTML = '';
+      const presence = JSON.parse(localStorage.getItem('horizon_live_presence') || '{}');
+      const now = new Date().getTime();
 
-      if (dayLeaves.length === 0) {
-        list.innerHTML = `<div class="p-4 text-center text-slate-500">No technicians on leave for this date.</div>`;
-      } else {
-        dayLeaves.forEach(l => {
-          const t = TECHNICIANS_MASTER.find(x => x.id === l.techId);
-          const supName = SYSTEM_USERS[t?.supId]?.name || '--';
-          const theme = SUPERVISOR_THEMES[t?.supId] || { bg: 'bg-slate-700', text: 'text-white' };
+      Object.keys(SYSTEM_USERS).forEach(uid => {
+        const user = SYSTEM_USERS[uid];
+        const pData = presence[uid];
+        const isOnline = pData && (now - new Date(pData.lastActive).getTime() < 25000);
 
-          const item = document.createElement('div');
-          item.className = `p-3 rounded-xl border border-slate-700 bg-slate-900/80 flex items-center justify-between`;
-          item.innerHTML = `
-            <div>
-              <div class="font-bold text-white text-sm">${t?.name} (${t?.id})</div>
-              <div class="text-[10px] text-slate-400">Supervisor: ${supName} • Period: ${l.from} to ${l.to}</div>
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl flex items-center justify-between shadow-sm";
+        card.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-600 font-bold flex items-center justify-center font-mono text-base">${user.name.charAt(0)}</div>
+              <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-800 ${isOnline ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
             </div>
-            <span class="px-2.5 py-1 rounded text-xs font-bold ${theme.bg} ${theme.text}">${l.type} Leave</span>
-          `;
-          list.appendChild(item);
-        });
-      }
-
-      document.getElementById('dayInspectorModal').classList.remove('hidden');
-    }
-
-    function closeDayInspectorModal() {
-      document.getElementById('dayInspectorModal').classList.add('hidden');
-    }
-
-    // ==================== CREATE LEAVE APPLICATION LOGIC ====================
-    function openLeaveRequestModal() {
-      const techList = currentUser.role === 'admin' ? TECHNICIANS_MASTER : TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
-      const select = document.getElementById('leaveFormTechSelect');
-      select.innerHTML = '';
-
-      techList.forEach(t => {
-        const supName = SYSTEM_USERS[t.supId]?.name || 'Unassigned';
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = `${t.id} - ${t.name} (${supName})`;
-        select.appendChild(opt);
+            <div>
+              <div class="font-bold text-slate-800 dark:text-white text-sm">${user.name}</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 uppercase">${user.role}</div>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${isOnline ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}">
+            ${isOnline ? 'ONLINE NOW' : 'OFFLINE'}
+          </span>
+        `;
+        container.appendChild(card);
       });
-
-      document.getElementById('leaveRequestModal').classList.remove('hidden');
     }
 
-    function closeLeaveRequestModal() {
-      document.getElementById('leaveRequestModal').classList.add('hidden');
+    function renderRemainingDays() {
+      const tbody = document.getElementById('remainingTableBody');
+      tbody.innerHTML = '';
+      TECHNICIANS_MASTER.forEach(t => {
+        const totalPaidTaken = t.monthlyPaid.reduce((a, b) => a + b, 0);
+        tbody.innerHTML += `
+          <tr class="border-b border-slate-200 dark:border-slate-800">
+            <td class="p-3 font-mono font-bold text-orange-500">${t.id}</td>
+            <td class="p-3 font-bold text-slate-800 dark:text-white">${t.name}</td>
+            <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
+            <td class="p-3 text-slate-400">${SYSTEM_USERS[t.supId]?.name || '--'}</td>
+            <td class="p-3 font-mono">${t.balance2027} Days</td>
+            <td class="p-3 font-mono text-rose-500">${totalPaidTaken} Days</td>
+            <td class="p-3 font-mono font-bold text-emerald-500">${t.balance2027 - totalPaidTaken} Days</td>
+          </tr>
+        `;
+      });
     }
 
-    async function handleLeaveRequestSubmit(e) {
-      e.preventDefault();
-
-      const techId = document.getElementById('leaveFormTechSelect').value;
-      const leaveType = document.getElementById('leaveFormType').value;
-      const fromDate = document.getElementById('leaveFormFrom').value;
-      const toDate = document.getElementById('leaveFormTo').value;
-
-      if (fromDate > toDate) {
-        alert("Leave Start Date cannot be after End Date!");
-        return;
-      }
-
-      const tech = TECHNICIANS_MASTER.find(t => t.id === techId);
-      const daysCount = Math.ceil((new Date(toDate) - new Date(fromDate)) / (1000 * 60 * 60 * 24)) + 1;
-      const todayStr = new Date().toISOString().split('T')[0];
-
-      const app = {
-        appId: 'APP_' + Date.now(),
-        techId: tech.id,
-        techName: tech.name,
-        cpr: tech.cpr,
-        position: 'Technician',
-        type: leaveType,
-        from: fromDate,
-        to: toDate,
-        days: daysCount,
-        createdDate: todayStr
-      };
-
-      LEAVE_APPLICATIONS.push(app);
-
-      const startMonth = new Date(fromDate).getMonth();
-      if (leaveType === 'Annual (Paid)') {
-        tech.monthlyPaid[startMonth] += daysCount;
-      } else {
-        tech.monthlyUnpaid[startMonth] += daysCount;
-      }
-
-      saveDataToStorage();
-      await logAuditEvent(currentUser.name, currentUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Created Leave Application', `Applied ${daysCount} days ${leaveType} leave for ${tech.name} (${tech.id}). Auto-generated PDF Report.`);
-      closeLeaveRequestModal();
-      renderCalendar();
-      alert("Leave Application successfully recorded on Calendar & PDF Form generated in PDF Reports!");
+    function renderTotalDays() {
+      const tbody = document.getElementById('totalDaysTableBody');
+      tbody.innerHTML = '';
+      TECHNICIANS_MASTER.forEach(t => {
+        const totalPaid = t.monthlyPaid.reduce((a, b) => a + b, 0);
+        const totalUnpaid = t.monthlyUnpaid.reduce((a, b) => a + b, 0);
+        tbody.innerHTML += `
+          <tr class="border-b border-slate-200 dark:border-slate-800">
+            <td class="p-3 font-mono font-bold text-orange-500">${t.id}</td>
+            <td class="p-3 font-bold text-slate-800 dark:text-white">${t.name}</td>
+            ${t.monthlyPaid.map(m => `<td class="p-3 font-mono">${m}</td>`).join('')}
+            <td class="p-3 font-mono font-bold text-blue-500">${totalPaid} d</td>
+            <td class="p-3 font-mono font-bold text-rose-500">${totalUnpaid} d</td>
+            <td class="p-3 font-mono font-bold text-orange-500">${totalPaid + totalUnpaid} Days</td>
+          </tr>
+        `;
+      });
     }
 
-    // ==================== PDF MODULE ENGINE ====================
+    function renderAvailability() {
+      const container = document.getElementById('availabilityTeamsContainer');
+      container.innerHTML = '';
+      Object.keys(SYSTEM_USERS).filter(k => k.startsWith('sup_')).forEach(supId => {
+        const techs = TECHNICIANS_MASTER.filter(t => t.supId === supId);
+        container.innerHTML += `
+          <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm">
+            <h3 class="font-bold text-sm text-slate-800 dark:text-white uppercase mb-3"><i class="fa-solid fa-user-shield text-orange-500 mr-2"></i>${SYSTEM_USERS[supId].name}'s Team (${techs.length} Technicians)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              ${techs.map(t => `<div class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex justify-between items-center text-xs"><div><div class="font-bold text-slate-800 dark:text-white">${t.name}</div><div class="text-[10px] text-slate-400">ID: ${t.id}</div></div><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-500">${t.status}</span></div>`).join('')}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderRosterTable() {
+      const tbody = document.getElementById('rosterTableBody');
+      tbody.innerHTML = '';
+      TECHNICIANS_MASTER.forEach(t => {
+        tbody.innerHTML += `
+          <tr class="border-b border-slate-200 dark:border-slate-800">
+            <td class="p-3 font-mono font-bold text-orange-500">${t.id}</td>
+            <td class="p-3 font-bold text-slate-800 dark:text-white">${t.name}</td>
+            <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
+            <td class="p-3 text-slate-400">${SYSTEM_USERS[t.supId]?.name || '--'}</td>
+          </tr>
+        `;
+      });
+    }
+
     function renderPdfTable() {
       const tbody = document.getElementById('pdfTableBody');
       tbody.innerHTML = '';
-
-      const techList = getScopedTechnicians();
-      const filteredApps = LEAVE_APPLICATIONS.filter(a => techList.some(t => t.id === a.techId));
-
-      if (filteredApps.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-500">No generated PDF leave applications found. Submit a leave request in Calendar module.</td></tr>`;
-        return;
-      }
-
-      filteredApps.forEach(app => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
-        tr.innerHTML = `
-          <td class="p-3 font-mono text-slate-400">${app.appId}</td>
-          <td class="p-3 font-mono font-bold text-orange-400">${app.techId}</td>
-          <td class="p-3 font-semibold text-white">${app.techName}</td>
-          <td class="p-3 font-mono text-slate-400">${app.cpr}</td>
-          <td class="p-3 text-slate-300">Technician</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${app.type === 'Annual (Paid)' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">${app.type}</span></td>
-          <td class="p-3 font-mono text-slate-300">${app.from} to ${app.to}</td>
-          <td class="p-3 font-mono font-bold text-emerald-400">${app.days} Days</td>
-          <td class="p-3 font-mono text-slate-400">${app.createdDate}</td>
-          <td class="p-3 text-center">
-            <button onclick="downloadPdfForm('${app.appId}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1.5 rounded text-xs font-bold transition flex items-center justify-center space-x-1 mx-auto"><i class="fa-solid fa-file-arrow-down"></i> <span>Download PDF</span></button>
-          </td>
+      LEAVE_APPLICATIONS.forEach(app => {
+        tbody.innerHTML += `
+          <tr class="border-b border-slate-200 dark:border-slate-800">
+            <td class="p-3 font-mono text-orange-500 font-bold">${app.appId}</td>
+            <td class="p-3 font-bold text-slate-800 dark:text-white">${app.techName} (${app.techId})</td>
+            <td class="p-3">${app.type}</td>
+            <td class="p-3 font-mono">${app.from} to ${app.to}</td>
+            <td class="p-3 font-bold text-emerald-500">${app.days} Days</td>
+            <td class="p-3 text-center"><button onclick="downloadPdfForm('${app.appId}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded font-bold text-xs">Download PDF</button></td>
+          </tr>
         `;
-        tbody.appendChild(tr);
       });
     }
 
     function downloadPdfForm(appId) {
       const app = LEAVE_APPLICATIONS.find(a => a.appId === appId);
       if (!app) return;
-
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // Header
       doc.setFontSize(18);
-      doc.setTextColor(234, 88, 12); // Orange
+      doc.setTextColor(249, 115, 22);
       doc.text("HORIZON TELECOM SERVICES", 20, 20);
 
-      doc.setFontSize(14);
+      doc.setFontSize(12);
       doc.setTextColor(30, 41, 59);
       doc.text("OFFICIAL LEAVE APPLICATION FORM", 20, 30);
       doc.line(20, 33, 190, 33);
 
-      // Form Table Data
-      doc.setFontSize(11);
-      doc.text(`Employee No (ID): ${app.techId}`, 20, 45);
-      doc.text(`CPR No: ${app.cpr}`, 120, 45);
-
-      doc.text(`Employee Name: ${app.techName}`, 20, 55);
-      doc.text(`Position: Technician`, 120, 55);
-
-      doc.text(`Application Date: ${app.createdDate}`, 20, 65);
-
-      doc.line(20, 70, 190, 70);
-
-      // Leave Details
-      doc.setFontSize(12);
-      doc.text(`Leave Type: ${app.type}`, 20, 80);
-      doc.text(`Leave Date From: ${app.from}`, 20, 90);
-      doc.text(`Leave Date To: ${app.to}`, 120, 90);
-      doc.text(`Total Days: ${app.days} Days`, 20, 100);
-
-      doc.line(20, 108, 190, 108);
-
-      // Signatures
       doc.setFontSize(10);
-      doc.text("Employee Signature: ______________________", 20, 130);
-      doc.text("Line Manager Signature: ______________________", 20, 145);
-      doc.text("HR Signature: ______________________", 20, 160);
+      doc.text(`Unique App ID: ${app.appId}`, 20, 45);
+      doc.text(`Employee ID: ${app.techId}`, 120, 45);
+      doc.text(`Employee Name: ${app.techName}`, 20, 55);
+      doc.text(`CPR No: ${app.cpr}`, 120, 55);
+      doc.text(`Leave Type: ${app.type}`, 20, 65);
+      doc.text(`Action Status: ${app.action}`, 120, 65);
+      doc.text(`Period: ${app.from} to ${app.to}`, 20, 75);
+      doc.text(`Total Duration: ${app.days} Days`, 120, 75);
+      doc.text(`Timestamp: ${app.timestamp}`, 20, 85);
 
-      doc.setFontSize(8);
-      doc.setTextColor(100);
-      doc.text("As per Bahraini Labour Law, unnotified absence exceeding limits subject to termination without indemnity.", 20, 180);
+      doc.line(20, 95, 190, 95);
+      doc.text("Line Manager Signature: ______________________", 20, 115);
+      doc.text("HR Manager Signature: ______________________", 20, 135);
 
-      doc.save(`Horizon_Leave_Form_${app.techId}_${app.from}.pdf`);
+      doc.save(`Horizon_Leave_Form_${app.techId}.pdf`);
     }
 
-    // ==================== AVAILABILITY MODULE ENGINE ====================
-    function renderAvailability() {
-      const container = document.getElementById('availabilityTeamsContainer');
-      container.innerHTML = '';
-
-      let countDuty = 0, countPaid = 0, countUnpaid = 0;
-
-      const grouped = {};
-
-      if (currentUser.role === 'admin') {
-        Object.keys(SUPERVISOR_THEMES).forEach(supKey => {
-          grouped[supKey] = TECHNICIANS_MASTER.filter(t => t.supId === supKey);
-        });
-      } else {
-        grouped[currentUser.id] = TECHNICIANS_MASTER.filter(t => t.supId === currentUser.id);
-      }
-
-      const activeList = getScopedTechnicians();
-      activeList.forEach(t => {
-        if (t.status === 'On Duty') countDuty++;
-        if (t.status === 'On Paid Leave') countPaid++;
-        if (t.status === 'On Unpaid Leave') countUnpaid++;
-      });
-
-      document.getElementById('countOnDuty').textContent = countDuty;
-      document.getElementById('countPaidLeave').textContent = countPaid;
-      document.getElementById('countUnpaidLeave').textContent = countUnpaid;
-
-      Object.keys(grouped).forEach(supId => {
-        const theme = SUPERVISOR_THEMES[supId] || { name: 'Assigned Team', bg: 'bg-slate-800', text: 'text-white' };
-        const techs = grouped[supId];
-
-        const card = document.createElement('div');
-        card.className = "bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden";
-
-        let rowsHtml = '';
-        if (techs.length === 0) {
-          rowsHtml = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No technicians registered for this supervisor team.</td></tr>`;
-        } else {
-          techs.forEach(t => {
-            rowsHtml += `
-              <tr class="hover:bg-slate-700/30 transition border-b border-slate-800/60">
-                <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
-                <td class="p-3 font-semibold text-white">${t.name}</td>
-                <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
-                <td class="p-3">
-                  <span class="px-2.5 py-1 rounded text-xs font-bold ${t.status === 'On Duty' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
-                    ${t.status}
-                  </span>
-                </td>
-              </tr>
-            `;
-          });
-        }
-
-        card.innerHTML = `
-          <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-700 flex justify-between items-center">
-            <span class="font-bold text-xs uppercase tracking-wider ${theme.text}"><i class="fa-solid fa-user-shield mr-1.5"></i>${theme.name}'s Team (${techs.length} Technicians)</span>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900/40 text-slate-400 uppercase font-semibold">
-                <tr>
-                  <th class="p-3">Tech ID</th>
-                  <th class="p-3">Name</th>
-                  <th class="p-3">CPR Number</th>
-                  <th class="p-3">Roster Status</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-700/50 text-slate-300">${rowsHtml}</tbody>
-            </table>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // ==================== TECH ROSTER HUB MODULE (ADMIN EXCLUSIVE) ====================
-    function renderRosterTable() {
-      const tbody = document.getElementById('rosterTableBody');
-      tbody.innerHTML = '';
-
-      TECHNICIANS_MASTER.forEach(t => {
-        const supName = SYSTEM_USERS[t.supId]?.name || '--';
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
-        tr.innerHTML = `
-          <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
-          <td class="p-3 font-semibold text-white">${t.name}</td>
-          <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
-          <td class="p-3 text-slate-400 font-semibold">${supName}</td>
-          <td class="p-3 text-center space-x-1">
-            <button onclick='openTechModal(${JSON.stringify(t)})' class="bg-blue-600/80 hover:bg-blue-500 text-white p-1.5 rounded transition" title="Edit Roster Profile"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button onclick="deleteTech('${t.id}')" class="bg-rose-600/80 hover:bg-rose-500 text-white p-1.5 rounded transition" title="Delete Profile"><i class="fa-solid fa-trash-can"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function openTechModal(tech = null) {
-      const modal = document.getElementById('techModal');
-      const title = document.getElementById('techModalTitle');
-
-      if (tech) {
-        title.textContent = "Edit Technician Profile";
-        document.getElementById('formOriginalId').value = tech.id;
-        document.getElementById('formTechId').value = tech.id;
-        document.getElementById('formTechName').value = tech.name;
-        document.getElementById('formTechCPR').value = tech.cpr;
-        document.getElementById('formTechSupId').value = tech.supId;
-        document.getElementById('formTechBalance').value = tech.balance2027;
-        document.getElementById('formTechStatus').value = tech.status;
-      } else {
-        title.textContent = "Add New Technician";
-        document.getElementById('techForm').reset();
-        document.getElementById('formOriginalId').value = "";
-      }
-
-      modal.classList.remove('hidden');
-    }
-
-    function closeTechModal() {
-      document.getElementById('techModal').classList.add('hidden');
-    }
-
-    async function handleTechFormSubmit(e) {
-      e.preventDefault();
-
-      const origId = document.getElementById('formOriginalId').value;
-      const techId = document.getElementById('formTechId').value.trim();
-      const techName = document.getElementById('formTechName').value.trim();
-      const techCPR = document.getElementById('formTechCPR').value.trim();
-      const techSupId = document.getElementById('formTechSupId').value;
-      const techBalance = parseInt(document.getElementById('formTechBalance').value) || 30;
-      const techStatus = document.getElementById('formTechStatus').value;
-
-      const payload = {
-        id: techId,
-        name: techName,
-        cpr: techCPR,
-        balance2027: techBalance,
-        status: techStatus,
-        supId: techSupId,
-        monthlyPaid: origId ? TECHNICIANS_MASTER.find(t=>t.id===origId)?.monthlyPaid || [0,0,0,0,0,0,0,0,0,0,0,0] : [0,0,0,0,0,0,0,0,0,0,0,0],
-        monthlyUnpaid: origId ? TECHNICIANS_MASTER.find(t=>t.id===origId)?.monthlyUnpaid || [0,0,0,0,0,0,0,0,0,0,0,0] : [0,0,0,0,0,0,0,0,0,0,0,0]
-      };
-
-      if (origId) {
-        const idx = TECHNICIANS_MASTER.findIndex(t => t.id === origId);
-        if (idx !== -1) TECHNICIANS_MASTER[idx] = payload;
-        await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Edit', `Updated technician ${techName} (${techId})`);
-      } else {
-        TECHNICIANS_MASTER.push(payload);
-        await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Add', `Added technician ${techName} (${techId})`);
-      }
-
-      saveDataToStorage();
-      closeTechModal();
-      renderRosterTable();
-      alert("Technician roster record saved successfully!");
-    }
-
-    async function deleteTech(techId) {
-      const tech = TECHNICIANS_MASTER.find(t => t.id === techId);
-      if (!tech) return;
-
-      if (!confirm(`Are you sure you want to delete technician ${tech.name} (${tech.id})?`)) return;
-
-      TECHNICIANS_MASTER = TECHNICIANS_MASTER.filter(t => t.id !== techId);
-      saveDataToStorage();
-      await logAuditEvent(currentUser.name, 'Admin', 'Direct Tech Delete', `Deleted technician ${tech.name} (${techId})`);
-      renderRosterTable();
-      alert("Technician deleted directly!");
-    }
-
-    // ==================== EDIT REMAINING BALANCE ONLY ENGINE ====================
-    function openEditBalanceModal(techId) {
-      const tech = TECHNICIANS_MASTER.find(t => t.id === techId);
-      if (!tech) return;
-
-      document.getElementById('balanceTargetTechId').value = tech.id;
-      document.getElementById('balanceTechNameDisplay').textContent = `${tech.name} (${tech.id})`;
-      document.getElementById('balanceInputNumber').value = tech.balance2027;
-
-      document.getElementById('editBalanceModal').classList.remove('hidden');
-    }
-
-    function closeEditBalanceModal() {
-      document.getElementById('editBalanceModal').classList.add('hidden');
-    }
-
-    async function handleEditBalanceSubmit(e) {
-      e.preventDefault();
-
-      const techId = document.getElementById('balanceTargetTechId').value;
-      const newBalance = parseInt(document.getElementById('balanceInputNumber').value) || 0;
-
-      const tech = TECHNICIANS_MASTER.find(t => t.id === techId);
-      if (!tech) return;
-
-      tech.balance2027 = newBalance;
-      saveDataToStorage();
-
-      await logAuditEvent(currentUser.name, currentUser.role === 'admin' ? 'Admin' : 'Supervisor', 'Updated Leave Balance', `Updated leave balance for ${tech.name} (${tech.id}) to ${newBalance} days`);
-      closeEditBalanceModal();
-      renderRemainingDays();
-      alert("Leave Remaining Balance updated successfully!");
-    }
-
-    // ==================== REMAINING DAYS ENGINE ====================
-    function renderRemainingDays() {
-      const techList = getScopedTechnicians();
-      const tbody = document.getElementById('remainingTableBody');
-      tbody.innerHTML = '';
-
-      if (techList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No technician records found.</td></tr>`;
-        return;
-      }
-
-      techList.forEach(t => {
-        const supName = SYSTEM_USERS[t.supId]?.name || '--';
-        const totalPaidTaken = t.monthlyPaid.reduce((a, b) => a + b, 0);
-        const remaining = t.balance2027 - totalPaidTaken;
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
-        tr.innerHTML = `
-          <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
-          <td class="p-3 font-semibold text-white">${t.name}</td>
-          <td class="p-3 font-mono text-slate-400">${t.cpr}</td>
-          <td class="p-3 text-slate-400 font-semibold">${supName}</td>
-          <td class="p-3 font-mono text-slate-300">${t.balance2027} Days</td>
-          <td class="p-3 font-mono text-rose-400">${totalPaidTaken} Days</td>
-          <td class="p-3 font-mono font-bold text-emerald-400">${remaining} Days</td>
-          <td class="p-3 text-center">
-            <button onclick="openEditBalanceModal('${t.id}')" class="bg-amber-600/80 hover:bg-amber-500 text-white px-2.5 py-1 rounded text-xs font-bold transition flex items-center justify-center space-x-1 mx-auto"><i class="fa-solid fa-pen-to-square"></i> <span>Edit Balance</span></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ==================== TOTAL DAYS ENGINE ====================
-    function renderTotalDays() {
-      const techList = getScopedTechnicians();
-      const tbody = document.getElementById('totalDaysTableBody');
-      tbody.innerHTML = '';
-
-      if (techList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="18" class="p-4 text-center text-slate-500">No technician records found.</td></tr>`;
-        return;
-      }
-
-      techList.forEach(t => {
-        const supName = SYSTEM_USERS[t.supId]?.name || '--';
-        const totalPaid = t.monthlyPaid.reduce((a, b) => a + b, 0);
-        const totalUnpaid = t.monthlyUnpaid.reduce((a, b) => a + b, 0);
-        const combinedTotal = totalPaid + totalUnpaid;
-
-        let mCells = '';
-        for (let m = 0; m < 12; m++) {
-          const sumM = t.monthlyPaid[m] + t.monthlyUnpaid[m];
-          mCells += `<td class="p-3 font-mono ${sumM > 0 ? 'text-orange-400 font-bold' : 'text-slate-500'}">${sumM}</td>`;
-        }
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
-        tr.innerHTML = `
-          <td class="p-3 font-mono font-bold text-orange-400">${t.id}</td>
-          <td class="p-3 font-semibold text-white">${t.name}</td>
-          <td class="p-3 text-slate-400 text-[11px] font-semibold">${supName}</td>
-          ${mCells}
-          <td class="p-3 font-mono font-bold text-blue-400">${totalPaid} d</td>
-          <td class="p-3 font-mono font-bold text-rose-400">${totalUnpaid} d</td>
-          <td class="p-3 font-mono font-bold text-orange-400">${combinedTotal} Days</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ==================== ADMIN APPROVALS ENGINE ====================
-    function renderApprovalsTable() {
-      const tbody = document.getElementById('approvalsTableBody');
-      tbody.innerHTML = '';
-
-      if (PENDING_APPROVALS.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No pending supervisor requests found.</td></tr>`;
-        return;
-      }
-
-      PENDING_APPROVALS.forEach(req => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
-        tr.innerHTML = `
-          <td class="p-3 font-mono text-slate-400">${req.timestamp}</td>
-          <td class="p-3 font-semibold text-white">${req.supName}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${req.type === 'ADD' ? 'bg-emerald-500/20 text-emerald-300' : (req.type === 'EDIT' ? 'bg-blue-500/20 text-blue-300' : 'bg-rose-500/20 text-rose-300')}">${req.type}</span></td>
-          <td class="p-3 font-mono font-bold text-orange-400">${req.payload.id} - ${req.payload.name}</td>
-          <td class="p-3 text-slate-300">CPR: ${req.payload.cpr} | Balance: ${req.payload.balance2027} | Status: ${req.payload.status}</td>
-          <td class="p-3 text-center space-x-1">
-            <button onclick="approveRequest('${req.reqId}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-bold transition">Approve</button>
-            <button onclick="rejectRequest('${req.reqId}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded text-xs font-bold transition">Reject</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    async function approveRequest(reqId) {
-      const reqIdx = PENDING_APPROVALS.findIndex(r => r.reqId === reqId);
-      if (reqIdx === -1) return;
-
-      const req = PENDING_APPROVALS[reqIdx];
-
-      if (req.type === 'ADD') {
-        TECHNICIANS_MASTER.push(req.payload);
-      } else if (req.type === 'EDIT') {
-        const idx = TECHNICIANS_MASTER.findIndex(t => t.id === req.origId);
-        if (idx !== -1) TECHNICIANS_MASTER[idx] = req.payload;
-      } else if (req.type === 'DELETE') {
-        TECHNICIANS_MASTER = TECHNICIANS_MASTER.filter(t => t.id !== req.origId);
-      }
-
-      PENDING_APPROVALS.splice(reqIdx, 1);
-      saveDataToStorage();
-
-      await logAuditEvent(currentUser.name, 'Admin', 'Approved Request', `Approved ${req.type} request from ${req.supName} for Tech ${req.payload.name} (${req.payload.id})`);
-      renderApprovalsTable();
-      alert("Request approved and applied directly!");
-    }
-
-    async function rejectRequest(reqId) {
-      const reqIdx = PENDING_APPROVALS.findIndex(r => r.reqId === reqId);
-      if (reqIdx === -1) return;
-
-      const req = PENDING_APPROVALS[reqIdx];
-      PENDING_APPROVALS.splice(reqIdx, 1);
-      saveDataToStorage();
-
-      await logAuditEvent(currentUser.name, 'Admin', 'Rejected Request', `Rejected ${req.type} request from ${req.supName} for Tech ${req.payload.name}`);
-      renderApprovalsTable();
-      alert("Supervisor request rejected.");
-    }
-
-    // ==================== AUDIT ENGINE ====================
-    async function renderAuditTable() {
-      const logs = await getAuditTrail();
+    function renderAuditTable() {
+      const logs = JSON.parse(localStorage.getItem('horizon_audit_trail') || '[]');
       const tbody = document.getElementById('auditTableBody');
       tbody.innerHTML = '';
-
-      if (logs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No action logs recorded yet.</td></tr>`;
-        return;
-      }
-
-      logs.forEach(log => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-700/30 transition border-b border-slate-800";
-        tr.innerHTML = `
-          <td class="p-3 font-mono text-slate-400">${log.timestamp}</td>
-          <td class="p-3 font-semibold text-white">${log.actorName}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${log.role === 'Admin' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'}">${log.role}</span></td>
-          <td class="p-3 text-emerald-400 font-medium">${log.action}</td>
-          <td class="p-3 text-slate-400">${log.details}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    async function exportAuditTrail() {
-      const logs = await getAuditTrail();
-      let csv = 'Timestamp,Actor,Role,Action,Details\n';
       logs.forEach(l => {
-        csv += `"${l.timestamp}","${l.actorName}","${l.role}","${l.action}","${l.details}"\n`;
+        tbody.innerHTML += `
+          <tr class="border-b border-slate-200 dark:border-slate-800">
+            <td class="p-3 font-mono text-slate-400">${l.timestamp}</td>
+            <td class="p-3 font-bold text-slate-800 dark:text-white">${l.actorName}</td>
+            <td class="p-3">${l.role}</td>
+            <td class="p-3 font-bold text-emerald-500">${l.action}</td>
+            <td class="p-3 text-slate-400">${l.details}</td>
+          </tr>
+        `;
       });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `horizon-audit-logs-${Date.now()}.csv`;
-      a.click();
     }
   </script>
 </body>
