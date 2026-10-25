@@ -214,7 +214,7 @@
             <i class="fa-solid fa-calendar-xmark text-rose-500"></i>
             <span>Manage, Amend or Cancel Leave Applications</span>
           </h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Canceling automatically credits days back and triggers an action entry in OneDrive.</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Canceling automatically credits days back and records Action By user in OneDrive.</p>
         </div>
 
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
@@ -228,6 +228,7 @@
                   <th class="p-3">Period</th>
                   <th class="p-3">Total Days</th>
                   <th class="p-3">Action State</th>
+                  <th class="p-3">Action By</th>
                   <th class="p-3 text-center">Manage Actions</th>
                 </tr>
               </thead>
@@ -341,6 +342,7 @@
                   <th class="p-3">Type</th>
                   <th class="p-3">Period</th>
                   <th class="p-3">Days</th>
+                  <th class="p-3">Action By</th>
                   <th class="p-3 text-center">Download Official Form</th>
                 </tr>
               </thead>
@@ -470,7 +472,6 @@
     let currentUser = null;
     let currentCalendarIndex = 9;
 
-    // UNIQUE APP ID GENERATOR FUNCTION
     function generateUniqueAppId() {
       const now = new Date();
       const year = now.getFullYear();
@@ -484,7 +485,6 @@
       return `app_${year}-${month}-${day}_${hours}${mins}${secs}${millis}`;
     }
 
-    // TIMESTAMP GENERATOR FUNCTION
     function getFormattedTimestamp() {
       const now = new Date();
       const datePart = now.toISOString().split('T')[0];
@@ -492,7 +492,6 @@
       return `${datePart} ${timePart}`;
     }
 
-    // THEME SWITCHER
     function toggleTheme() {
       const html = document.documentElement;
       const icon = document.getElementById('themeToggleIcon');
@@ -507,7 +506,6 @@
       }
     }
 
-    // PRESENCE HEARTBEAT
     setInterval(() => {
       if (currentUser) {
         const presence = JSON.parse(localStorage.getItem('horizon_live_presence') || '{}');
@@ -552,7 +550,6 @@
       localStorage.setItem('horizon_leave_applications', JSON.stringify(LEAVE_APPLICATIONS));
     }
 
-    // AUTOMATED ONEDRIVE FILE DISPATCHER
     function dispatchToOneDriveSyncQueue(payload) {
       const jsonContent = JSON.stringify(payload, null, 2);
       const blob = new Blob([jsonContent], { type: 'application/json' });
@@ -628,7 +625,6 @@
       showLoginScreen();
     }
 
-    // LEAVE FORM SUBMISSION
     async function handleLeaveRequestSubmit(e) {
       e.preventDefault();
       const editAppId = document.getElementById('editAppId').value;
@@ -640,6 +636,7 @@
       const tech = TECHNICIANS_MASTER.find(t => t.id === techId);
       const daysCount = Math.ceil((new Date(toDate) - new Date(fromDate)) / (1000 * 60 * 60 * 24)) + 1;
       const currentTimestamp = getFormattedTimestamp();
+      const actionBy = currentUser ? currentUser.name : 'System';
 
       if (editAppId) {
         const app = LEAVE_APPLICATIONS.find(a => a.appId === editAppId);
@@ -649,6 +646,7 @@
           app.to = toDate;
           app.days = daysCount;
           app.action = 'Modified';
+          app.actionBy = actionBy;
           app.timestamp = currentTimestamp;
 
           const syncPayload = {
@@ -661,6 +659,7 @@
             to: toDate,
             days: daysCount,
             action: 'Modified',
+            actionBy: actionBy,
             timestamp: currentTimestamp
           };
 
@@ -681,6 +680,7 @@
           to: toDate,
           days: daysCount,
           action: 'Created',
+          actionBy: actionBy,
           timestamp: currentTimestamp
         };
 
@@ -696,6 +696,7 @@
           to: toDate,
           days: daysCount,
           action: 'Created',
+          actionBy: actionBy,
           timestamp: currentTimestamp
         };
 
@@ -714,13 +715,12 @@
       renderCalendar();
     }
 
-    // MANAGE / AMEND / CANCEL
     function renderManageLeavesTable() {
       const tbody = document.getElementById('manageLeavesTableBody');
       tbody.innerHTML = '';
 
       if (LEAVE_APPLICATIONS.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No active leave records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">No active leave records found.</td></tr>`;
         return;
       }
 
@@ -734,6 +734,7 @@
           <td class="p-3 font-mono text-slate-600 dark:text-slate-300">${app.from} to ${app.to}</td>
           <td class="p-3 font-bold text-orange-500">${app.days} Days</td>
           <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${app.action === 'Cancelled' ? 'bg-rose-500/20 text-rose-500' : app.action === 'Modified' ? 'bg-amber-500/20 text-amber-500' : 'bg-emerald-500/20 text-emerald-500'}">${app.action}</span></td>
+          <td class="p-3 font-bold text-slate-700 dark:text-slate-300">${app.actionBy || '--'}</td>
           <td class="p-3 text-center space-x-1">
             ${app.action !== 'Cancelled' ? `
               <button onclick="editLeave('${app.appId}')" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold transition">Amend</button>
@@ -773,7 +774,10 @@
       }
 
       const currentTimestamp = getFormattedTimestamp();
+      const actionBy = currentUser ? currentUser.name : 'System';
+
       app.action = 'Cancelled';
+      app.actionBy = actionBy;
       app.timestamp = currentTimestamp;
 
       const syncPayload = {
@@ -786,6 +790,7 @@
         to: app.to,
         days: app.days,
         action: 'Cancelled',
+        actionBy: actionBy,
         timestamp: currentTimestamp
       };
 
@@ -954,6 +959,7 @@
             <td class="p-3">${app.type}</td>
             <td class="p-3 font-mono">${app.from} to ${app.to}</td>
             <td class="p-3 font-bold text-emerald-500">${app.days} Days</td>
+            <td class="p-3 font-bold text-slate-700 dark:text-slate-300">${app.actionBy || '--'}</td>
             <td class="p-3 text-center"><button onclick="downloadPdfForm('${app.appId}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded font-bold text-xs">Download PDF</button></td>
           </tr>
         `;
@@ -984,7 +990,8 @@
       doc.text(`Action Status: ${app.action}`, 120, 65);
       doc.text(`Period: ${app.from} to ${app.to}`, 20, 75);
       doc.text(`Total Duration: ${app.days} Days`, 120, 75);
-      doc.text(`Timestamp: ${app.timestamp}`, 20, 85);
+      doc.text(`Action By: ${app.actionBy || '--'}`, 20, 85);
+      doc.text(`Timestamp: ${app.timestamp}`, 120, 85);
 
       doc.line(20, 95, 190, 95);
       doc.text("Line Manager Signature: ______________________", 20, 115);
