@@ -111,8 +111,8 @@
       </div>
 
       <div class="hidden md:flex p-4 border-t border-slate-700/80 text-xs text-slate-500 justify-between items-center">
-        <span>Horizon Universal Sync</span>
-        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v15.0</span>
+        <span>Horizon M365 Sync</span>
+        <span class="bg-slate-900 px-2 py-1 rounded text-slate-400 font-mono">v16.0</span>
       </div>
     </aside>
 
@@ -142,12 +142,10 @@
                 <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Select User Account</label>
                 <select id="loginUserSelect" class="w-full bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-orange-500 shadow-inner">
                   <option value="">-- Choose User Profile --</option>
-                  <optgroup label="Administrators (Full System Access)">
-                    <option value="admin_1">Habib Khamis (Admin)</option>
-                    <option value="admin_2">Husain Kadhem (Admin)</option>
-                    <option value="admin_3">Hasan Sahwan (Admin)</option>
+                  <optgroup label="System Administrator">
+                    <option value="admin_1">Habib Khamis (System Administrator)</option>
                   </optgroup>
-                  <optgroup label="Supervisors (Leave Request Access)">
+                  <optgroup label="Team Supervisors">
                     <option value="sup_1">Zuhair Alsaffar (Supervisor)</option>
                     <option value="sup_2">Jaafar Kadhem (Supervisor)</option>
                     <option value="sup_3">Husain Yusuf (Supervisor)</option>
@@ -627,10 +625,9 @@
       'sup_4': { name: 'Sayed Mohammed Saeed', bg: 'bg-amber-500/20', border: 'border-amber-500/40', text: 'text-amber-300' }
     };
 
+    // SYSTEM USERS - HABIB KHAMIS SET AS SOLE SYSTEM ADMINISTRATOR
     const SYSTEM_USERS = {
       'admin_1': { id: 'admin_1', name: 'Habib Khamis', role: 'admin', email: 'habib.khamis@horizon.bh' },
-      'admin_2': { id: 'admin_2', name: 'Husain Kadhem', role: 'admin', email: 'husain.kadhem@horizon.bh' },
-      'admin_3': { id: 'admin_3', name: 'Hasan Sahwan', role: 'admin', email: 'sahwan@horizon.bh' },
       'sup_1': { id: 'sup_1', name: 'Zuhair Alsaffar', role: 'supervisor', email: 'zuhaer@horizon.bh' },
       'sup_2': { id: 'sup_2', name: 'Jaafar Kadhem', role: 'supervisor', email: 'kadhem@horizon.bh' },
       'sup_3': { id: 'sup_3', name: 'Husain Yusuf', role: 'supervisor', email: 'yusuf@horizon.bh' },
@@ -751,7 +748,6 @@
       const savedTechs = localStorage.getItem('horizon_technicians_data');
       if (savedTechs) {
         const parsed = JSON.parse(savedTechs);
-        // Ensure browser localstorage hasn't stripped out supervisor teams from an old session
         if (parsed.length >= 50) {
           TECHNICIANS_MASTER = parsed;
         } else {
